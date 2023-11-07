@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>dhu</groupId>
+    <artifactId>recette.lib</artifactId>
+    <version>0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    
+    <developers>
+        <developer>
+            <id>dhu</id>
+            <name>dominique huguenin</name>
+            <email>dominique.huguenin@rpn.ch</email>
+            <roles>
+                <role>Project Manager</role>
+                <role>Architect</role>
+            </roles>
+            <organization>cifom-et</organization>
+            <timezone>+2</timezone>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>mylos.cifom.ch</system>
+        <url>https://mylos.cifom.ch/gitlab/dhu.projets/recettes/recette.lib/-/issues</url>
+    </issueManagement>    
+
+    <scm>
+        <connection>scm:git:git@mylos.cifom.ch:dhu.projets/recettes/recette.lib</connection>
+        <developerConnection>scm:git:git@mylos.cifom.ch:dhu.projets/recettes/recette.lib</developerConnection>
+        <url>https://mylos.cifom.ch/gitlab/dhu.projets/recettes/recette.lib</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>dhu_project_maven_repo_token</id>
+            <url>https://mylos.cifom.ch/gitlab/api/v4/projects/1127/packages/maven</url>
+        </repository>
+    </repositories>
+    
+    <distributionManagement>
+        <repository>
+            <id>dhu_project_maven_repo_token</id>
+            <url>https://mylos.cifom.ch/gitlab/api/v4/projects/1127/packages/maven</url>
+        </repository>
+        <snapshotRepository>
+            <id>dhu_project_maven_repo_token</id>
+            <url>https://mylos.cifom.ch/gitlab/api/v4/projects/1127/packages/maven</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.10</version>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>                
+                </executions>
+            </plugin>            
+        </plugins>
+        
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <configuration>
+                        <configLocation>${basedir}/sun_checks.xml</configLocation>
+                    </configuration>            
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+    </build>
+    
+</project>

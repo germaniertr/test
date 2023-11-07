@@ -1,0 +1,120 @@
+image: maven:3.9.3-amazoncorretto-17-debian
+
+stages:
+- validate
+- test
+- deploy
+- release
+
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  POSTGRES_DB: $POSTGRES_DB
+  POSTGRES_USER: $POSTGRES_USER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_HOST_AUTH_METHOD: trust
+
+default:
+  services:
+    - name: postgres:12.2-alpine
+      alias: $POSTGRES_HOST
+
+cache:
+  paths:
+  - .m2/repository
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAGS || $CI_COMMIT_MESSAGE =~ /^\[maven-release-plugin\]/
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+'mvn validate':
+  tags:
+  - docker
+  stage: validate
+  script:
+  - mvn $MAVEN_CLI_OPTS validate
+
+'mvn checkstyle':
+  tags:
+  - docker
+  stage: validate
+  allow_failure: true
+  script:
+  - mvn $MAVEN_CLI_OPTS checkstyle:check
+
+'mvn verify':
+  tags:
+  - docker
+  stage: test
+  artifacts:
+    when: always
+    reports:
+      junit:
+      - './target/surefire-reports/TEST-*.xml'
+  script:
+  - 'mvn $MAVEN_CLI_OPTS verify --settings ci_settings.xml'
+
+'mvn deploy':
+  tags:
+  - docker
+  stage: deploy
+  only:
+    variables:
+    - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  artifacts:
+    reports:
+      dotenv: deploy.env    
+  script:
+  - if [ ! -f ci_settings.xml ];
+        then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/packages/maven_repository/index.html#create-maven-packages-with-gitlab-cicd for instructions.";
+    fi
+  - 'mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -B -DskipTests=true'
+    
+  - 'echo "PROJECT_GROUP_ID=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" > deploy.env'
+  - 'echo "PROJECT_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> deploy.env'
+  - 'echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> deploy.env'
+
+.configuration_ssh:
+  script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >  ~/.ssh/id_rsa
+    - chmod -R 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+'mvn release':
+  tags:
+  - docker
+  stage: release
+  only:
+    variables:
+    - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  when: manual
+  artifacts:
+    reports:
+      dotenv: ansible.env    
+  script:
+  - if [ ! -f ci_settings.xml ];
+        then echo "CI settings missing\! If deploying to GitLab Maven Repository, please see https://docs.gitlab.com/ee/user/packages/maven_repository/index.html#create-maven-packages-with-gitlab-cicd for instructions.";
+    fi
+
+  - !reference [.configuration_ssh, script]
+
+  - apt-get install git -y
+  - git config --global user.email "gitlab-runner@example.com"
+  - git config --global user.name "gitlab-runner"
+  
+  - git checkout -B "$CI_COMMIT_REF_NAME"  
+
+  - 'echo "PROJECT_GROUP_ID=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" > ansible.env'
+  - 'echo "PROJECT_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> ansible.env'
+  # extrait la version sans la partie après le tiret
+  - echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{ sub(/-SNAPSHOT.*/, ""); print }'  )" >> ansible.env
+
+  - mvn release:prepare --settings ci_settings.xml -B -DskipTests=true
+  - mvn release:perform --settings ci_settings.xml -B -DskipTests=true
+
