@@ -7,6 +7,7 @@ import core.serialisation.json.IdentifiantJson;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
+import java.util.ArrayList;
 import java.util.List;
 import recette.domain.Composant;
 import recette.domain.Recette;
@@ -134,6 +135,19 @@ public class RecetteJson implements Recette {
     @Override
     public String toString() {
         return "RecetteJson{" + "entite=" + entite + '}';
+    }
+
+    public static List<RecetteJson> getInstance(final List<Recette> list) {
+        if (list == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<RecetteJson> entiteJsonList = new ArrayList<>();
+        for (Recette e : list) {
+            entiteJsonList.add(new RecetteJson(e));
+        }
+
+        return entiteJsonList;
     }
 
 }
