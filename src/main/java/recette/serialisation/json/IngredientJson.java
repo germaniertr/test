@@ -8,6 +8,8 @@ import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
+import java.util.ArrayList;
+import java.util.List;
 import recette.domain.Ingredient;
 import recette.domain.IngredientBase;
 import recette.domain.Recette;
@@ -133,6 +135,19 @@ public class IngredientJson implements Ingredient {
             return json;
         }
 
+    }
+
+    public static List<IngredientJson> getInstance(final List<Ingredient> list) {
+        if (list == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<IngredientJson> entiteJsonList = new ArrayList<>();
+        for (Ingredient p : list) {
+            entiteJsonList.add(new IngredientJson(p));
+        }
+
+        return entiteJsonList;
     }
 
 }
