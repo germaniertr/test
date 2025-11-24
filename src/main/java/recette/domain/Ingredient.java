@@ -18,4 +18,7 @@ public interface Ingredient {
 
     void setDetail(String detail);
 
+    Recette getRecette();
+
+    void setRecette(Recette recette);
 }
