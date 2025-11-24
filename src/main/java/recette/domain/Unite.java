@@ -6,7 +6,7 @@ package recette.domain;
  */
 public interface Unite {
 
-    String getUUID();
+    Identifiant getIdentifiant();
 
     void update(Unite unite);
 

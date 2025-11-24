@@ -6,7 +6,7 @@ package recette.domain;
  */
 public interface Composant {
 
-    String getUUID();
+    Identifiant getIdentifiant();
 
     void update(Composant recette);
 

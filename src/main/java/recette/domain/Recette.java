@@ -8,7 +8,7 @@ import java.util.List;
  */
 public interface Recette {
 
-    String getUUID();
+    Identifiant getIdentifiant();
 
     void update(Recette recette);
 
