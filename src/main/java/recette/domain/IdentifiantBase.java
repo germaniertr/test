@@ -14,7 +14,7 @@ public class IdentifiantBase implements Identifiant {
 
     @Override
     public String getUUID() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.uuid;
     }
 
 }
