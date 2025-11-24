@@ -1,5 +1,7 @@
 package recette.domain;
 
+import java.util.List;
+
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
@@ -26,4 +28,5 @@ public interface Recette {
 
     void setNombrePersonnes(Integer nombrePersonnes);
 
+    List<Composant> getComposants();
 }
