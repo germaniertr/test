@@ -6,8 +6,10 @@ package recette.domain;
  */
 public class IdentifiantBase implements Identifiant {
 
+    private final String uuid;
+
     IdentifiantBase(final String uuid) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.uuid = uuid;
     }
 
     @Override
