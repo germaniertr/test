@@ -6,6 +6,8 @@ package recette.domain;
  */
 public class UniteBase implements Unite {
 
+    private String code;
+
     public UniteBase(final Identifiant identifiant) {
     }
 
@@ -26,7 +28,7 @@ public class UniteBase implements Unite {
 
     @Override
     public void setCode(final String code) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.code = code;
     }
 
 }
