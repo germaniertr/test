@@ -56,5 +56,12 @@ public class UniteBaseTest {
         Assertions.assertEquals(this.entiteRef.hashCode(), entiteRef.hashCode());
     }
 
-    
+    @Test
+    public void testEqualsUniteNull() {
+        Unite entite = null;
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+    }
+
 }
