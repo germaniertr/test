@@ -26,7 +26,13 @@ public class RecetteBase implements Recette {
 
     @Override
     public void update(final Recette recette) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (recette == null) {
+            return;
+        }
+        this.nom = recette.getNom();
+        this.detail = recette.getDetail();
+        this.preparation = recette.getPreparation();
+        this.nombrePersonnes = recette.getNombrePersonnes();
     }
 
     @Override
