@@ -25,7 +25,7 @@ public class UniteBase implements Unite {
 
     @Override
     public String getCode() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.code;
     }
 
     @Override
