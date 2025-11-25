@@ -11,6 +11,7 @@ public class IngredientBase implements Ingredient {
     private final Identifiant identifiant;
     private String nom;
     private String detail;
+    private Recette recette;
 
     IngredientBase(final Identifiant identifiant) {
         this.identifiant = identifiant;
@@ -28,6 +29,7 @@ public class IngredientBase implements Ingredient {
         }
         this.nom = ingredient.getNom();
         this.detail = ingredient.getDetail();
+        this.recette = ingredient.getRecette();
     }
 
     @Override
@@ -52,12 +54,12 @@ public class IngredientBase implements Ingredient {
 
     @Override
     public Recette getRecette() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.recette;
     }
 
     @Override
     public void setRecette(final Recette recette) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.recette = recette;
     }
 
     @Override
