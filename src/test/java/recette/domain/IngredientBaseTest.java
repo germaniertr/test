@@ -84,4 +84,31 @@ public class IngredientBaseTest {
         Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
     }
 
+    @Test
+    public void testUpdate() {
+        String nom = "nom";
+        String detail = "detail";
+
+        Ingredient entite = new IngredientBase(null);
+        entite.setNom(nom);
+        entite.setDetail(detail);
+        this.entiteRef.update(entite);
+
+        Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(nom, entiteRef.getNom());
+        Assertions.assertEquals(detail, entiteRef.getDetail());
+    }
+
+    @Test
+    public void testUpdateNull() {
+        this.entiteRef.setNom(nomRef);
+        this.entiteRef.setDetail(detailRef);
+
+        this.entiteRef.update(null);
+
+        Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(nomRef, entiteRef.getNom());
+        Assertions.assertEquals(detailRef, entiteRef.getDetail());
+    }
+
 }
