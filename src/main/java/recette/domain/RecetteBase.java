@@ -40,9 +40,7 @@ public class RecetteBase implements Recette {
 
         this.composants.clear();
         for (Composant c : recette.getComposants()) {
-            Composant copie = new ComposantBase(c.getIdentifiant(), c.getIngredient());
-            copie.update(c);
-            this.composants.add(copie);
+            this.composants.add(new ComposantBase(c));
         }
     }
 
