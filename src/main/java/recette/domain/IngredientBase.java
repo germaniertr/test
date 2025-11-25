@@ -23,7 +23,11 @@ public class IngredientBase implements Ingredient {
 
     @Override
     public void update(final Ingredient ingredient) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (ingredient == null) {
+            return;
+        }
+        this.nom = ingredient.getNom();
+        this.detail = ingredient.getDetail();
     }
 
     @Override
