@@ -1,5 +1,6 @@
 package recette.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,9 +15,11 @@ public class RecetteBase implements Recette {
     private String detail;
     private String preparation;
     private Integer nombrePersonnes;
+    private final List<Composant> composants;
 
     RecetteBase(final Identifiant identifiant) {
         this.identifiant = identifiant;
+        this.composants = new ArrayList<>();
     }
 
     @Override
@@ -77,7 +80,7 @@ public class RecetteBase implements Recette {
 
     @Override
     public List<Composant> getComposants() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.composants;
     }
 
     @Override

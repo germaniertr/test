@@ -1,5 +1,7 @@
 package recette.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -20,7 +22,11 @@ public class RecetteBaseTest {
     private String detailRef;
     private String preparationRef;
     private Integer nombrePersonneRef;
-    private RecetteBase entiteRef;
+    private Recette entiteRef;
+    private Composant composantRef1;
+    private Composant composantRef2;
+    private Composant composantRef3;
+    private List<Object> composantsRef;
 
     public RecetteBaseTest() {
     }
@@ -33,11 +39,39 @@ public class RecetteBaseTest {
         preparationRef = "preparation recette";
         nombrePersonneRef = 4;
 
+        composantRef1 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
+                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef1.setCommentaire("commentaire 1");
+        composantRef1.setQuantite(123.0);
+        composantRef1.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+
+        composantRef2 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
+                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef2.setCommentaire("commentaire 2");
+        composantRef2.setQuantite(34.6);
+        composantRef2.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+
+        composantRef3 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
+                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef3.setCommentaire("commentaire 3");
+        composantRef3.setQuantite(45.7);
+        composantRef3.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+
+        composantsRef = new ArrayList<>();
+        composantsRef.add(composantRef1);
+        composantsRef.add(composantRef2);
+        composantsRef.add(composantRef3);
+
         entiteRef = new RecetteBase(identifiantRef);
         entiteRef.setNom(nomRef);
         entiteRef.setDetail(detailRef);
         entiteRef.setPreparation(preparationRef);
         entiteRef.setNombrePersonnes(nombrePersonneRef);
+
+        entiteRef.getComposants().add(composantRef1);
+        entiteRef.getComposants().add(composantRef2);
+        entiteRef.getComposants().add(composantRef3);
+
     }
 
     @AfterEach
