@@ -8,13 +8,19 @@ import java.util.List;
  */
 public class RecetteBase implements Recette {
 
-    RecetteBase(IdentifiantBase identifiantRef) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private final Identifiant identifiant;
+    private String nom;
+    private String detail;
+    private String preparation;
+    private Integer nombrePersonnes;
+
+    RecetteBase(final Identifiant identifiant) {
+        this.identifiant = identifiant;
     }
 
     @Override
     public Identifiant getIdentifiant() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.identifiant;
     }
 
     @Override
@@ -24,42 +30,42 @@ public class RecetteBase implements Recette {
 
     @Override
     public String getNom() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.nom;
     }
 
     @Override
     public void setNom(final String nom) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.nom = nom;
     }
 
     @Override
     public String getDetail() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.detail;
     }
 
     @Override
     public void setDetail(final String detail) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.detail = detail;
     }
 
     @Override
     public String getPreparation() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.preparation;
     }
 
     @Override
     public void setPreparation(final String preparation) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.preparation = preparation;
     }
 
     @Override
     public Integer getNombrePersonnes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.nombrePersonnes;
     }
 
     @Override
     public void setNombrePersonnes(final Integer nombrePersonnes) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.nombrePersonnes = nombrePersonnes;
     }
 
     @Override
