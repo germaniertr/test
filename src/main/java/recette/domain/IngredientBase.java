@@ -6,12 +6,17 @@ package recette.domain;
  */
 public class IngredientBase implements Ingredient {
 
+    private final Identifiant identifiant;
+    private String nom;
+    private String detail;
+
     IngredientBase(final Identifiant identifiant) {
+        this.identifiant = identifiant;
     }
 
     @Override
     public Identifiant getIdentifiant() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.identifiant;
     }
 
     @Override
@@ -21,22 +26,22 @@ public class IngredientBase implements Ingredient {
 
     @Override
     public String getNom() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.nom;
     }
 
     @Override
     public void setNom(final String nom) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.nom = nom;
     }
 
     @Override
     public String getDetail() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.detail;
     }
 
     @Override
     public void setDetail(final String detail) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.detail = detail;
     }
 
     @Override
