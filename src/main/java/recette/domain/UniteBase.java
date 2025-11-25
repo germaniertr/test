@@ -7,13 +7,14 @@ package recette.domain;
 public class UniteBase implements Unite {
 
     private String code;
+    private Identifiant identifiant;
 
     public UniteBase(final Identifiant identifiant) {
     }
 
     @Override
     public Identifiant getIdentifiant() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.identifiant;
     }
 
     @Override
