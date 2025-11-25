@@ -1,5 +1,7 @@
 package recette.domain;
 
+import java.util.Objects;
+
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
@@ -62,6 +64,30 @@ public class ComposantBase implements Composant {
     @Override
     public void setUnite(final Unite unite) {
         this.unite = unite;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = HASH;
+        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
+        return hash;
+    }
+    private static final int HASH2 = 41;
+    private static final int HASH = 7;
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Composant)) {
+            return false;
+        }
+        final Composant other = (Composant) obj;
+        return Objects.equals(this.identifiant, other.getIdentifiant());
     }
 
 }
