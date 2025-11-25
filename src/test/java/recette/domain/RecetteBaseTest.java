@@ -242,7 +242,7 @@ public class RecetteBaseTest {
         for (int i = 0; i < composants.size(); i += 1) {
             Assertions.assertNotSame(composants.get(i),
                     this.entiteRef.getComposants().get(i));
-            
+
             Assertions.assertEquals(composants.get(i).getIngredient(),
                     this.entiteRef.getComposants().get(i).getIngredient());
             Assertions.assertEquals(composants.get(i).getCommentaire(),
@@ -277,6 +277,48 @@ public class RecetteBaseTest {
                     this.entiteRef.getComposants().get(i).getUnite());
         }
 
+    }
+
+    @Test
+    public void testClone() {
+        Recette entite = new RecetteBase(entiteRef);
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+
+        Assertions.assertEquals(this.entiteRef.getIdentifiant(),
+                entite.getIdentifiant());
+
+        Assertions.assertEquals(this.entiteRef.getNom(),
+                entite.getNom());
+        Assertions.assertEquals(this.entiteRef.getDetail(),
+                entite.getDetail());
+        Assertions.assertEquals(this.entiteRef.getPreparation(),
+                entite.getPreparation());
+        Assertions.assertEquals(this.entiteRef.getNombrePersonnes(),
+                entite.getNombrePersonnes());
+
+        for (int i = 0; i < composantsRef.size(); i += 1) {
+            Assertions.assertNotSame(composantsRef.get(i),
+                    entite.getComposants().get(i));
+
+            Assertions.assertEquals(composantsRef.get(i).getIngredient(),
+                    entite.getComposants().get(i).getIngredient());
+            Assertions.assertEquals(composantsRef.get(i).getCommentaire(),
+                    entite.getComposants().get(i).getCommentaire());
+            Assertions.assertEquals(composantsRef.get(i).getQuantite(),
+                    entite.getComposants().get(i).getQuantite());
+            Assertions.assertEquals(composantsRef.get(i).getUnite(),
+                    entite.getComposants().get(i).getUnite());
+        }
+    }
+
+    @Test
+    public void testCloneIllegalArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new RecetteBase((Recette) null);
+                });
     }
 
 }

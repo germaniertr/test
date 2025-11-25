@@ -23,6 +23,22 @@ public class RecetteBase implements Recette {
         this.composants = new ArrayList<>();
     }
 
+    RecetteBase(final Recette entite) {
+        if (entite == null) {
+            throw new IllegalArgumentException("Erreur: l'argument recette ne peut pas être null");
+        }
+        this.identifiant = entite.getIdentifiant();
+        this.nom = entite.getNom();
+        this.detail = entite.getDetail();
+        this.preparation = entite.getPreparation();
+        this.nombrePersonnes = entite.getNombrePersonnes();
+
+        this.composants = new ArrayList<>();
+        for (Composant c : entite.getComposants()) {
+            this.composants.add(new ComposantBase(c));
+        }
+    }
+
     @Override
     public Identifiant getIdentifiant() {
         return this.identifiant;
