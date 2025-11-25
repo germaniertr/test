@@ -30,6 +30,8 @@ public class IngredientBaseTest {
         detailRef = "détail de référence";
 
         entiteRef = new IngredientBase(identifiantRef);
+        this.entiteRef.setNom(nomRef);
+        this.entiteRef.setDetail(detailRef);
     }
 
     @AfterEach
@@ -44,12 +46,14 @@ public class IngredientBaseTest {
     
     @Test
     public void testGetSet() {
-        this.entiteRef.setNom(nomRef);
-        this.entiteRef.setDetail(detailRef);
+        String nom = "nom modifié";
+        String detail = "détail modifié";
+        this.entiteRef.setNom(nom);
+        this.entiteRef.setDetail(detail);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
-        Assertions.assertEquals(nomRef, entiteRef.getNom());
-        Assertions.assertEquals(detailRef, entiteRef.getDetail());
+        Assertions.assertEquals(nom, entiteRef.getNom());
+        Assertions.assertEquals(detail, entiteRef.getDetail());
     }
 
     @Test
@@ -101,9 +105,6 @@ public class IngredientBaseTest {
 
     @Test
     public void testUpdateNull() {
-        this.entiteRef.setNom(nomRef);
-        this.entiteRef.setDetail(detailRef);
-
         this.entiteRef.update(null);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
