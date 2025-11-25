@@ -75,4 +75,36 @@ public class ComposantBaseTest {
         Assertions.assertEquals(unite, this.entiteRef.getUnite());
     }
 
+    @Test
+    public void testEquals() {
+        Composant entite = new ComposantBase(identifiantRef, ingredientRef);
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+    }
+
+    @Test
+    public void testEqualsSame() {
+        Assertions.assertSame(this.entiteRef, this.entiteRef);
+        Assertions.assertEquals(this.entiteRef, this.entiteRef);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entiteRef.hashCode());
+    }
+
+    @Test
+    public void testEqualsNull() {
+        Composant entite = null;
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+    }
+
+    @Test
+    public void testEqualsObject() {
+        Object entite = new Object();
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
+    }
+    
 }
