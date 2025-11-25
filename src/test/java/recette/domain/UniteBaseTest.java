@@ -42,7 +42,11 @@ public class UniteBaseTest {
     }
 
     @Test
-    public void testSomeMethod() {
+    public void testEquals() {
+        Unite entite = new UniteBase(identifiantRef);
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
     }
 
 }
