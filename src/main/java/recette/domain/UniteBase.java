@@ -22,7 +22,10 @@ public class UniteBase implements Unite {
 
     @Override
     public void update(final Unite unite) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (unite == null) {
+            return;
+        }
+        this.code = unite.getCode();
     }
 
     @Override
