@@ -27,8 +27,13 @@ public class ComposantBase implements Composant {
     }
 
     @Override
-    public void update(final Composant recette) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void update(final Composant composant) {
+        if (composant == null) {
+            return;
+        }
+        this.quantite = composant.getQuantite();
+        this.commentaire = composant.getCommentaire();
+        this.unite = composant.getUnite();
     }
 
     @Override
