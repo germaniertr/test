@@ -1,5 +1,6 @@
 package recette.domain;
 
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,11 +11,21 @@ import org.junit.jupiter.api.Test;
  */
 public class IngredientBaseTest {
 
+    private IdentifiantBase identifiantRef;
+    private String nomRef;
+    private String detailRef;
+    private IngredientBase entiteRef;
+
     public IngredientBaseTest() {
     }
 
     @BeforeEach
     public void setUp() {
+        identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
+        nomRef = "nom de référence";
+        detailRef = "détail de référence";
+
+        entiteRef = new IngredientBase(identifiantRef);
     }
 
     @AfterEach
