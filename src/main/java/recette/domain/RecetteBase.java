@@ -36,6 +36,13 @@ public class RecetteBase implements Recette {
         this.detail = recette.getDetail();
         this.preparation = recette.getPreparation();
         this.nombrePersonnes = recette.getNombrePersonnes();
+
+        this.composants.clear();
+        for (Composant c : recette.getComposants()) {
+            Composant copie = new ComposantBase(c.getIdentifiant(), c.getIngredient());
+            copie.update(c);
+            this.composants.add(copie);
+        }
     }
 
     @Override
