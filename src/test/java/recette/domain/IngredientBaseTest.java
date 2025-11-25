@@ -2,6 +2,7 @@ package recette.domain;
 
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,35 +34,12 @@ public class IngredientBaseTest {
     }
 
     @Test
-    public void testGetIdentifiant() {
-    }
+    public void testGetSet() {
+        this.entiteRef.setNom(nomRef);
+        this.entiteRef.setDetail(detailRef);
 
-    @Test
-    public void testUpdate() {
+        Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(nomRef, entiteRef.getNom());
+        Assertions.assertEquals(detailRef, entiteRef.getDetail());
     }
-
-    @Test
-    public void testGetNom() {
-    }
-
-    @Test
-    public void testSetNom() {
-    }
-
-    @Test
-    public void testGetDetail() {
-    }
-
-    @Test
-    public void testSetDetail() {
-    }
-
-    @Test
-    public void testGetRecette() {
-    }
-
-    @Test
-    public void testSetRecette() {
-    }
-
 }
