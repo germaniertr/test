@@ -51,5 +51,37 @@ public class IngredientBaseTest {
         Assertions.assertEquals(nomRef, entiteRef.getNom());
         Assertions.assertEquals(detailRef, entiteRef.getDetail());
     }
-    
+
+    @Test
+    public void testEquals() {
+        Ingredient entite = new IngredientBase(identifiantRef);
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+    }
+
+    @Test
+    public void testEqualsSame() {
+        Assertions.assertSame(this.entiteRef, this.entiteRef);
+        Assertions.assertEquals(this.entiteRef, this.entiteRef);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entiteRef.hashCode());
+    }
+
+    @Test
+    public void testEqualsNull() {
+        Ingredient entite = null;
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+    }
+
+    @Test
+    public void testEqualsObject() {
+        Object entite = new Object();
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
+    }
+
 }
