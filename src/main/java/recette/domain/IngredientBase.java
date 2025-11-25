@@ -18,6 +18,17 @@ public class IngredientBase implements Ingredient {
         this.identifiant = identifiant;
     }
 
+    IngredientBase(final Ingredient entite) {
+        if (entite == null) {
+            throw new IllegalArgumentException("Erreur: l'argument ingrédient ne peut pas être null");
+        }
+
+        this.identifiant = entite.getIdentifiant();
+        this.nom = entite.getNom();
+        this.detail = entite.getDetail();
+        this.recette = entite.getRecette();
+    }
+
     @Override
     public Identifiant getIdentifiant() {
         return this.identifiant;

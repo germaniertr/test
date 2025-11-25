@@ -1,7 +1,7 @@
 package recette.domain;
 
+import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
-import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 public class IngredientBaseTest {
 
     private static final Logger LOG = Logger.getLogger(IngredientBaseTest.class.getName());
-    
+
     private IdentifiantBase identifiantRef;
     private String nomRef;
     private String detailRef;
@@ -47,7 +47,7 @@ public class IngredientBaseTest {
         //Ceci n'est pas un test!
         LOG.info(this.entiteRef.toString());
     }
-    
+
     @Test
     public void testGetSet() {
         String nom = "nom modifié";
@@ -103,7 +103,7 @@ public class IngredientBaseTest {
         String detail = "detail";
         Recette recette = new RecetteBase(new IdentifiantBase());
 
-        Ingredient entite = new IngredientBase(null);
+        Ingredient entite = new IngredientBase((Identifiant) null);
         entite.setNom(nom);
         entite.setDetail(detail);
         entite.setRecette(recette);
@@ -124,4 +124,26 @@ public class IngredientBaseTest {
         Assertions.assertEquals(detailRef, entiteRef.getDetail());
     }
 
+    @Test
+    public void testClone() {
+        Ingredient entite = new IngredientBase(entiteRef);
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+
+        Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
+
+        Assertions.assertEquals(this.entiteRef.getNom(), entite.getNom());
+        Assertions.assertEquals(this.entiteRef.getDetail(), entite.getDetail());
+        Assertions.assertEquals(this.entiteRef.getRecette(), entite.getRecette());
+
+    }
+
+    @Test
+    public void testCloneIllegalArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new IngredientBase((Ingredient) null);
+                });
+    }
 }
