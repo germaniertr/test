@@ -6,13 +6,22 @@ package recette.domain;
  */
 public class ComposantBase implements Composant {
 
+    private final Identifiant identifiant;
+    private final Ingredient ingredient;
+    private Double quantite;
+    private String commentaire;
+    private Unite unite;
+
     public ComposantBase(final Identifiant identifiant,
             final Ingredient ingredient) {
+        this.identifiant = identifiant;
+        this.ingredient = ingredient;
+
     }
 
     @Override
     public Identifiant getIdentifiant() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.identifiant;
     }
 
     @Override
@@ -22,37 +31,37 @@ public class ComposantBase implements Composant {
 
     @Override
     public Double getQuantite() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.quantite;
     }
 
     @Override
     public void setQuantite(final Double quantite) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.quantite = quantite;
     }
 
     @Override
     public String getCommentaire() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.commentaire;
     }
 
     @Override
     public void setCommentaire(final String commentaire) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.commentaire = commentaire;
     }
 
     @Override
     public Ingredient getIngredient() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.ingredient;
     }
 
     @Override
     public Unite getUnite() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.unite;
     }
 
     @Override
     public void setUnite(final Unite unite) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.unite = unite;
     }
 
 }
