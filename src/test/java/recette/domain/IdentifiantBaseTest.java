@@ -34,11 +34,53 @@ public class IdentifiantBaseTest {
     public void testGetUUID() {
         Assertions.assertEquals(uuidRef, idRef.getUUID());
     }
-    
+
     @Test
     public void testToString() {
         //Ceci n'est pas un test!
         LOG.info(this.idRef.toString());
     }
 
+    @Test
+    public void testEquals() {
+        Identifiant id2 = new IdentifiantBase(uuidRef);
+
+        //Vérifier si idRef et id2 sont des instances différentes
+        Assertions.assertTrue(idRef != id2);
+        Assertions.assertNotSame(idRef, id2);
+
+        //Vérifier si idRef.equals(id2) et id2.equals(idRef) sont vrai
+        Assertions.assertEquals(idRef, id2);
+        Assertions.assertTrue(idRef.equals(id2));
+        Assertions.assertTrue(id2.equals(idRef));
+
+        //Si idRef.equals(id2) alors les hashcodes doivent éguales
+        Assertions.assertEquals(idRef.hashCode(), id2.hashCode());
+
+    }
+    
+    @Test
+    public void testEqualsSame() {
+        Assertions.assertSame(this.idRef, this.idRef);
+        Assertions.assertEquals(this.idRef, this.idRef);
+        Assertions.assertEquals(this.idRef.hashCode(), idRef.hashCode());
+    }
+
+    @Test
+    public void testEqualsNull() {
+        Identifiant id = null;
+
+        Assertions.assertNotSame(this.idRef, id);
+        Assertions.assertNotEquals(this.idRef, id);
+    }
+
+    @Test
+    public void testEqualsObject() {
+        Object id = new Object();
+
+        Assertions.assertNotSame(this.idRef, id);
+        Assertions.assertNotEquals(this.idRef, id);
+        Assertions.assertNotEquals(this.idRef.hashCode(), id.hashCode());
+    }
+    
 }
