@@ -34,29 +34,29 @@ public class RecetteBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
+        identifiantRef = new IdentifiantBase();
         nomRef = "nom recette";
         detailRef = "description recette";
         preparationRef = "preparation recette";
         nombrePersonneRef = 4;
 
-        composantRef1 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
-                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef1 = new ComposantBase(new IdentifiantBase(),
+                new IngredientBase(new IdentifiantBase()));
         composantRef1.setCommentaire("commentaire 1");
         composantRef1.setQuantite(123.0);
-        composantRef1.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef1.setUnite(new UniteBase(new IdentifiantBase()));
 
-        composantRef2 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
-                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef2 = new ComposantBase(new IdentifiantBase(),
+                new IngredientBase(new IdentifiantBase()));
         composantRef2.setCommentaire("commentaire 2");
         composantRef2.setQuantite(34.6);
-        composantRef2.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef2.setUnite(new UniteBase(new IdentifiantBase()));
 
-        composantRef3 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
-                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef3 = new ComposantBase(new IdentifiantBase(),
+                new IngredientBase(new IdentifiantBase()));
         composantRef3.setCommentaire("commentaire 3");
         composantRef3.setQuantite(45.7);
-        composantRef3.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composantRef3.setUnite(new UniteBase(new IdentifiantBase()));
 
         composantsRef = new ArrayList<>();
         composantsRef.add(composantRef1);
@@ -122,13 +122,13 @@ public class RecetteBaseTest {
 
         composant2.setCommentaire("Composant modifié");
         composant2.setQuantite(34.6);
-        composant2.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composant2.setUnite(new UniteBase(new IdentifiantBase()));
 
-        Composant composant4 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
-                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        Composant composant4 = new ComposantBase(new IdentifiantBase(),
+                new IngredientBase(new IdentifiantBase()));
         composant4.setCommentaire("commentaire 4");
         composant4.setQuantite(45.7);
-        composant4.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));;
+        composant4.setUnite(new UniteBase(new IdentifiantBase()));;
 
         List<Composant> composants = new ArrayList<>();
         composants.add(composant2);
@@ -209,13 +209,13 @@ public class RecetteBaseTest {
 
         composant2.setCommentaire("Composant modifié");
         composant2.setQuantite(34.6);
-        composant2.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        composant2.setUnite(new UniteBase(new IdentifiantBase()));
 
-        Composant composant4 = new ComposantBase(new IdentifiantBase(UUID.randomUUID().toString()),
-                new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString())));
+        Composant composant4 = new ComposantBase(new IdentifiantBase(),
+                new IngredientBase(new IdentifiantBase()));
         composant4.setCommentaire("commentaire 4");
         composant4.setQuantite(45.7);
-        composant4.setUnite(new UniteBase(new IdentifiantBase(UUID.randomUUID().toString())));;
+        composant4.setUnite(new UniteBase(new IdentifiantBase()));;
 
         List<Composant> composants = new ArrayList<>();
         composants.add(composant2);

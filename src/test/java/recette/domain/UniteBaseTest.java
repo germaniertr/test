@@ -24,7 +24,7 @@ public class UniteBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
+        identifiantRef = new IdentifiantBase();
         codeRef = "code référence";
         entiteRef = new UniteBase(identifiantRef);
         entiteRef.setCode(codeRef);

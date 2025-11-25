@@ -25,17 +25,17 @@ public class ComposantBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
+        identifiantRef = new IdentifiantBase();
         quantiteRef = 2.5;
         commentaireRef = "commentaire";
 
         ingredientRef
-                = new IngredientBase(new IdentifiantBase(UUID.randomUUID().toString()));
+                = new IngredientBase(new IdentifiantBase());
 
         ingredientRef.setNom("nom ingrédient");
         ingredientRef.setDetail("description ingrédient");
 
-        uniteRef = new UniteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        uniteRef = new UniteBase(new IdentifiantBase());
         uniteRef.setCode("c.c");
 
         entiteRef = new ComposantBase(identifiantRef, ingredientRef);
@@ -63,7 +63,7 @@ public class ComposantBaseTest {
         Double quantite = 2500.0;
         String commentaire = "nouveau commentaire";
 
-        Unite unite = new UniteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        Unite unite = new UniteBase(new IdentifiantBase());
         unite.setCode("g");
 
         this.entiteRef.setCommentaire(commentaire);
@@ -113,7 +113,7 @@ public class ComposantBaseTest {
         Double quantite = 2500.0;
         String commentaire = "nouveau commentaire";
 
-        Unite unite = new UniteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        Unite unite = new UniteBase(new IdentifiantBase());
         unite.setCode("g");
 
         Composant entite = new ComposantBase(null, null);

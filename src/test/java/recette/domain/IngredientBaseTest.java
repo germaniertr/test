@@ -27,10 +27,10 @@ public class IngredientBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
+        identifiantRef = new IdentifiantBase();
         nomRef = "nom de référence";
         detailRef = "détail de référence";
-        recetteRef = new RecetteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        recetteRef = new RecetteBase(new IdentifiantBase());
 
         entiteRef = new IngredientBase(identifiantRef);
         this.entiteRef.setNom(nomRef);
@@ -52,7 +52,7 @@ public class IngredientBaseTest {
     public void testGetSet() {
         String nom = "nom modifié";
         String detail = "détail modifié";
-        Recette recette = new RecetteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        Recette recette = new RecetteBase(new IdentifiantBase());
 
         this.entiteRef.setNom(nom);
         this.entiteRef.setDetail(detail);
@@ -101,7 +101,7 @@ public class IngredientBaseTest {
     public void testUpdate() {
         String nom = "nom";
         String detail = "detail";
-        Recette recette = new RecetteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        Recette recette = new RecetteBase(new IdentifiantBase());
 
         Ingredient entite = new IngredientBase(null);
         entite.setNom(nom);
