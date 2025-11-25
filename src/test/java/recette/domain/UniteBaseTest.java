@@ -1,7 +1,7 @@
 package recette.domain;
 
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +25,11 @@ public class UniteBaseTest {
         entiteRef = new UniteBase(identifiantRef);
     }
 
-    @AfterEach
-    public void tearDown() {
+    @Test
+    public void testGetSet() {
+        entiteRef.setCode(codeRef);
+        Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(codeRef, entiteRef.getCode());
     }
 
     @Test
