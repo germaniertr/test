@@ -14,6 +14,14 @@ public class IdentifiantBase implements Identifiant {
         this.uuid = uuid;
     }
 
+    public IdentifiantBase(final Identifiant identifiant) {
+        if (identifiant == null) {
+            throw new IllegalArgumentException("Erreur: l'argument identifiant ne peut pas être null");
+        }
+
+        this.uuid = identifiant.getUUID();
+    }
+
     @Override
     public String getUUID() {
         return this.uuid;

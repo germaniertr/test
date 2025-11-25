@@ -1,7 +1,5 @@
 package core.domain;
 
-import core.domain.IdentifiantBase;
-import core.domain.Identifiant;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -60,7 +58,7 @@ public class IdentifiantBaseTest {
         Assertions.assertEquals(idRef.hashCode(), id2.hashCode());
 
     }
-    
+
     @Test
     public void testEqualsSame() {
         Assertions.assertSame(this.idRef, this.idRef);
@@ -84,5 +82,26 @@ public class IdentifiantBaseTest {
         Assertions.assertNotEquals(this.idRef, id);
         Assertions.assertNotEquals(this.idRef.hashCode(), id.hashCode());
     }
-    
+
+    @Test
+    public void testClone() {
+        Identifiant id2 = new IdentifiantBase(idRef);
+
+        Assertions.assertEquals(idRef, id2);
+        Assertions.assertEquals(idRef.hashCode(), id2.hashCode());
+
+        Assertions.assertNotSame(idRef, id2);
+        Assertions.assertTrue(idRef != id2);
+
+        Assertions.assertEquals(idRef.getUUID(), id2.getUUID());
+    }
+
+    @Test
+    public void testCloneIllegalArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new IdentifiantBase((Identifiant) null);
+                });
+    }
+
 }
