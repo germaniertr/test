@@ -104,4 +104,10 @@ public class IdentifiantBaseTest {
                 });
     }
 
+    @Test
+    public void testContructeurSansParametre() {
+        Identifiant id = new IdentifiantBase();
+        Assertions.assertNotNull(id.getUUID());
+    }
+
 }

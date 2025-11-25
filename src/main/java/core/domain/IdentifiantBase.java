@@ -1,6 +1,7 @@
 package core.domain;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  *
@@ -20,6 +21,10 @@ public class IdentifiantBase implements Identifiant {
         }
 
         this.uuid = identifiant.getUUID();
+    }
+
+    public IdentifiantBase() {
+        this.uuid = UUID.randomUUID().toString();
     }
 
     @Override
