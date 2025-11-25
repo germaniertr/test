@@ -6,6 +6,10 @@ package recette.domain;
  */
 public class ComposantBase implements Composant {
 
+    public ComposantBase(final Identifiant identifiant,
+            final Ingredient ingredient) {
+    }
+
     @Override
     public Identifiant getIdentifiant() {
         throw new UnsupportedOperationException("Not supported yet.");
