@@ -7,9 +7,10 @@ package recette.domain;
 public class UniteBase implements Unite {
 
     private String code;
-    private Identifiant identifiant;
+    private final Identifiant identifiant;
 
     public UniteBase(final Identifiant identifiant) {
+        this.identifiant = identifiant;
     }
 
     @Override
