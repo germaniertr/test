@@ -16,6 +16,16 @@ public class UniteBase implements Unite {
         this.identifiant = identifiant;
     }
 
+    public UniteBase(final Unite entite) {
+        if (entite == null) {
+            throw new IllegalArgumentException("Erreur: l'argument unité ne peut pas être null");
+        }
+
+        this.identifiant = entite.getIdentifiant();
+        this.code = entite.getCode();
+
+    }
+
     @Override
     public Identifiant getIdentifiant() {
         return this.identifiant;

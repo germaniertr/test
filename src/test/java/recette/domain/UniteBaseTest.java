@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -79,7 +80,7 @@ public class UniteBaseTest {
     @Test
     public void testUpdate() {
         String code = "c.s";
-        Unite entite = new UniteBase(null);
+        Unite entite = new UniteBase((Identifiant)null);
         entite.setCode(code);
         this.entiteRef.update(entite);
 
@@ -93,6 +94,28 @@ public class UniteBaseTest {
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
         Assertions.assertEquals(this.codeRef, this.entiteRef.getCode());
+    }
+
+    @Test
+    public void testClone() {
+        Unite entite = new UniteBase(entiteRef);
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+
+        Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
+
+        Assertions.assertEquals(this.entiteRef.getCode(), entite.getCode());
+
+    }
+
+    @Test
+    public void testCloneIllegalArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new UniteBase((Unite) null);
+                });
     }
 
 }
