@@ -18,7 +18,8 @@ public class IngredientBaseTest {
     private IdentifiantBase identifiantRef;
     private String nomRef;
     private String detailRef;
-    private IngredientBase entiteRef;
+    private Ingredient entiteRef;
+    private Recette recetteRef;
 
     public IngredientBaseTest() {
     }
@@ -28,10 +29,12 @@ public class IngredientBaseTest {
         identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
         nomRef = "nom de référence";
         detailRef = "détail de référence";
+        recetteRef = new RecetteBase(new IdentifiantBase(UUID.randomUUID().toString()));
 
         entiteRef = new IngredientBase(identifiantRef);
         this.entiteRef.setNom(nomRef);
         this.entiteRef.setDetail(detailRef);
+        this.entiteRef.setRecette(recetteRef);
     }
 
     @AfterEach
@@ -48,12 +51,17 @@ public class IngredientBaseTest {
     public void testGetSet() {
         String nom = "nom modifié";
         String detail = "détail modifié";
+        Recette recette = new RecetteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+
         this.entiteRef.setNom(nom);
         this.entiteRef.setDetail(detail);
+        this.entiteRef.setRecette(recette);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
         Assertions.assertEquals(nom, entiteRef.getNom());
         Assertions.assertEquals(detail, entiteRef.getDetail());
+        Assertions.assertEquals(recette, entiteRef.getRecette());
+
     }
 
     @Test
@@ -92,15 +100,18 @@ public class IngredientBaseTest {
     public void testUpdate() {
         String nom = "nom";
         String detail = "detail";
+        Recette recette = new RecetteBase(new IdentifiantBase(UUID.randomUUID().toString()));
 
         Ingredient entite = new IngredientBase(null);
         entite.setNom(nom);
         entite.setDetail(detail);
+        entite.setRecette(recette);
         this.entiteRef.update(entite);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
         Assertions.assertEquals(nom, entiteRef.getNom());
         Assertions.assertEquals(detail, entiteRef.getDetail());
+        Assertions.assertEquals(recette, entiteRef.getRecette());
     }
 
     @Test
