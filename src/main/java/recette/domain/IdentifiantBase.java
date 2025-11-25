@@ -17,4 +17,8 @@ public class IdentifiantBase implements Identifiant {
         return this.uuid;
     }
 
+    @Override
+    public String toString() {
+        return "IdentifiantBase{" + "uuid=" + uuid + '}';
+    }
 }
