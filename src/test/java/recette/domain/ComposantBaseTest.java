@@ -106,5 +106,37 @@ public class ComposantBaseTest {
         Assertions.assertNotEquals(this.entiteRef, entite);
         Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
     }
-    
+
+    @Test
+    public void testUpdate() {
+        Double quantite = 2500.0;
+        String commentaire = "nouveau commentaire";
+
+        Unite unite = new UniteBase(new IdentifiantBase(UUID.randomUUID().toString()));
+        unite.setCode("g");
+
+        Composant entite = new ComposantBase(null, null);
+        entite.setCommentaire(commentaire);
+        entite.setQuantite(quantite);
+        entite.setUnite(unite);
+
+        this.entiteRef.update(entite);
+
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(quantite, this.entiteRef.getQuantite());
+        Assertions.assertEquals(commentaire, this.entiteRef.getCommentaire());
+        Assertions.assertEquals(this.ingredientRef, this.entiteRef.getIngredient());
+        Assertions.assertEquals(unite, this.entiteRef.getUnite());
+    }
+
+    @Test
+    public void testUpdateNull() {
+        this.entiteRef.update(null);
+
+        Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(this.quantiteRef, this.entiteRef.getQuantite());
+        Assertions.assertEquals(this.commentaireRef, this.entiteRef.getCommentaire());
+        Assertions.assertEquals(this.ingredientRef, this.entiteRef.getIngredient());
+        Assertions.assertEquals(this.uniteRef, this.entiteRef.getUnite());
+    }
 }
