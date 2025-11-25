@@ -26,13 +26,15 @@ public class UniteBaseTest {
         identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
         codeRef = "code référence";
         entiteRef = new UniteBase(identifiantRef);
+        entiteRef.setCode(codeRef);
     }
 
     @Test
     public void testGetSet() {
-        entiteRef.setCode(codeRef);
+        String code = "code modifié";
+        entiteRef.setCode(code);
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
-        Assertions.assertEquals(codeRef, entiteRef.getCode());
+        Assertions.assertEquals(code, entiteRef.getCode());
     }
 
     @Test
@@ -86,8 +88,6 @@ public class UniteBaseTest {
 
     @Test
     public void testUpdateNull() {
-        entiteRef.setCode(codeRef);
-        
         this.entiteRef.update(null);
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
