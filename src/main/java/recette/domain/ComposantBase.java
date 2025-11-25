@@ -22,6 +22,18 @@ public class ComposantBase implements Composant {
 
     }
 
+    ComposantBase(final Composant entite) {
+        if (entite == null) {
+            throw new IllegalArgumentException("Erreur: l'argument composant ne peut pas être null");
+        }
+        this.identifiant = entite.getIdentifiant();
+        this.ingredient = entite.getIngredient();
+        this.commentaire = entite.getCommentaire();
+        this.quantite = entite.getQuantite();
+        this.unite = entite.getUnite();
+
+    }
+
     @Override
     public Identifiant getIdentifiant() {
         return this.identifiant;

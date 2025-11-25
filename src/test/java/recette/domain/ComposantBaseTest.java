@@ -140,4 +140,29 @@ public class ComposantBaseTest {
         Assertions.assertEquals(this.ingredientRef, this.entiteRef.getIngredient());
         Assertions.assertEquals(this.uniteRef, this.entiteRef.getUnite());
     }
+
+    @Test
+    public void testClone() {
+        Composant entite = new ComposantBase(this.entiteRef);
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+
+        Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
+
+        Assertions.assertEquals(this.entiteRef.getQuantite(), entite.getQuantite());
+        Assertions.assertEquals(this.entiteRef.getCommentaire(), entite.getCommentaire());
+        Assertions.assertEquals(this.entiteRef.getIngredient(), entite.getIngredient());
+        Assertions.assertEquals(this.entiteRef.getUnite(), entite.getUnite());
+
+    }
+
+    @Test
+    public void testCloneIllegalArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> {
+                    new ComposantBase((Composant) null);
+                });
+    }
 }
