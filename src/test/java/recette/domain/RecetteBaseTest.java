@@ -111,4 +111,36 @@ public class RecetteBaseTest {
         Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
     }
 
+    @Test
+    public void testUpdate() {
+        String nom = "nouveau nom";
+        String detail = "nouveau détail";
+        String preparation = "nouvelle preparation";
+        Integer nombrePersonne = 40;
+
+        Recette entite = new RecetteBase(identifiantRef);
+        entite.setNom(nom);
+        entite.setDetail(detail);
+        entite.setPreparation(preparation);
+        entite.setNombrePersonnes(nombrePersonne);
+        this.entiteRef.update(entite);
+
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(nom, this.entiteRef.getNom());
+        Assertions.assertEquals(detail, this.entiteRef.getDetail());
+        Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
+        Assertions.assertEquals(nombrePersonne, this.entiteRef.getNombrePersonnes());
+    }
+
+    @Test
+    public void testUpdateNull() {
+        this.entiteRef.update(null);
+
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(nomRef, this.entiteRef.getNom());
+        Assertions.assertEquals(detailRef, this.entiteRef.getDetail());
+        Assertions.assertEquals(preparationRef, this.entiteRef.getPreparation());
+        Assertions.assertEquals(nombrePersonneRef, this.entiteRef.getNombrePersonnes());
+    }
+
 }
