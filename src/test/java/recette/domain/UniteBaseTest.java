@@ -72,4 +72,26 @@ public class UniteBaseTest {
         Assertions.assertNotEquals(this.entiteRef, entite);
         Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
     }
+
+    @Test
+    public void testUpdate() {
+        String code = "c.s";
+        Unite entite = new UniteBase(null);
+        entite.setCode(code);
+        this.entiteRef.update(entite);
+
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(code, this.entiteRef.getCode());
+    }
+
+    @Test
+    public void testUpdateNull() {
+        entiteRef.setCode(codeRef);
+        
+        this.entiteRef.update(null);
+
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(this.codeRef, this.entiteRef.getCode());
+    }
+
 }
