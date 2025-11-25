@@ -8,6 +8,10 @@ import java.util.List;
  */
 public class RecetteBase implements Recette {
 
+    RecetteBase(IdentifiantBase identifiantRef) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     @Override
     public Identifiant getIdentifiant() {
         throw new UnsupportedOperationException("Not supported yet.");

@@ -1,6 +1,8 @@
 package recette.domain;
 
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,60 +11,63 @@ import org.junit.jupiter.api.Test;
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
 public class RecetteBaseTest {
-    
+
+    private IdentifiantBase identifiantRef;
+    private String nomRef;
+    private String detailRef;
+    private String preparationRef;
+    private Integer nombrePersonneRef;
+    private RecetteBase entiteRef;
+
     public RecetteBaseTest() {
     }
-    
+
     @BeforeEach
     public void setUp() {
+        identifiantRef = new IdentifiantBase(UUID.randomUUID().toString());
+        nomRef = "nom recette";
+        detailRef = "description recette";
+        preparationRef = "preparation recette";
+        nombrePersonneRef = 4;
+
+        entiteRef = new RecetteBase(identifiantRef);
+        entiteRef.setNom(nomRef);
+        entiteRef.setDetail(detailRef);
+        entiteRef.setPreparation(preparationRef);
+        entiteRef.setNombrePersonnes(nombrePersonneRef);
     }
-    
+
     @AfterEach
     public void tearDown() {
     }
 
     @Test
-    public void testGetIdentifiant() {
+    public void testGet() {
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(nomRef, this.entiteRef.getNom());
+        Assertions.assertEquals(detailRef, this.entiteRef.getDetail());
+        Assertions.assertEquals(preparationRef, this.entiteRef.getPreparation());
+        Assertions.assertEquals(nombrePersonneRef, this.entiteRef.getNombrePersonnes());
     }
 
     @Test
-    public void testUpdate() {
+    public void testSet() {
+        String nom = "nouveau nom";
+        String detail = "nouveau détail";
+        String preparation = "nouvelle preparation";
+        Integer nombrePersonne = 40;
+
+        this.entiteRef.setNom(nom);
+        this.entiteRef.setDetail(detail);
+        this.entiteRef.setPreparation(preparation);
+        this.entiteRef.setNombrePersonnes(nombrePersonne);
+
+        Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(nom, this.entiteRef.getNom());
+        Assertions.assertEquals(detail, this.entiteRef.getDetail());
+        Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
+        Assertions.assertEquals(nombrePersonne, this.entiteRef.getNombrePersonnes());
+
     }
 
-    @Test
-    public void testGetNom() {
-    }
-
-    @Test
-    public void testSetNom() {
-    }
-
-    @Test
-    public void testGetDetail() {
-    }
-
-    @Test
-    public void testSetDetail() {
-    }
-
-    @Test
-    public void testGetPreparation() {
-    }
-
-    @Test
-    public void testSetPreparation() {
-    }
-
-    @Test
-    public void testGetNombrePersonnes() {
-    }
-
-    @Test
-    public void testSetNombrePersonnes() {
-    }
-
-    @Test
-    public void testGetComposants() {
-    }
-    
 }
