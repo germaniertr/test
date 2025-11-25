@@ -1,4 +1,4 @@
-package recette.domain;
+package core.domain;
 
 /**
  *

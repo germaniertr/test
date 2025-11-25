@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.Identifiant;
 import java.util.List;
 
 /**

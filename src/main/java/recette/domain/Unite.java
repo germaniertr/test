@@ -1,5 +1,7 @@
 package recette.domain;
 
+import core.domain.Identifiant;
+
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)

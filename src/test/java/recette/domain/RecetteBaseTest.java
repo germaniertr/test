@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.IdentifiantBase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

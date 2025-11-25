@@ -1,5 +1,7 @@
-package recette.domain;
+package core.domain;
 
+import core.domain.IdentifiantBase;
+import core.domain.Identifiant;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.IdentifiantBase;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

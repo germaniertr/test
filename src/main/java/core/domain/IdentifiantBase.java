@@ -1,4 +1,4 @@
-package recette.domain;
+package core.domain;
 
 import java.util.Objects;
 
@@ -10,7 +10,7 @@ public class IdentifiantBase implements Identifiant {
 
     private final String uuid;
 
-    IdentifiantBase(final String uuid) {
+    public IdentifiantBase(final String uuid) {
         this.uuid = uuid;
     }
 
