@@ -79,4 +79,36 @@ public class RecetteBaseTest {
 
     }
 
+    @Test
+    public void testEquals() {
+        Recette entite = new RecetteBase(identifiantRef);
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef, entite);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
+    }
+
+    @Test
+    public void testEqualsSame() {
+        Assertions.assertSame(this.entiteRef, this.entiteRef);
+        Assertions.assertEquals(this.entiteRef, this.entiteRef);
+        Assertions.assertEquals(this.entiteRef.hashCode(), entiteRef.hashCode());
+    }
+
+    @Test
+    public void testEqualsNull() {
+        Recette entite = null;
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+    }
+
+    @Test
+    public void testEqualsObject() {
+        Object entite = new Object();
+
+        Assertions.assertNotSame(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef, entite);
+        Assertions.assertNotEquals(this.entiteRef.hashCode(), entite.hashCode());
+    }
+
 }
