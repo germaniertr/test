@@ -1,6 +1,7 @@
 package recette.domain;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -80,6 +81,30 @@ public class RecetteBase implements Recette {
                 + ", detail=" + detail
                 + ", preparation=" + preparation
                 + ", nombrePersonnes=" + nombrePersonnes + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = HASH;
+        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
+        return hash;
+    }
+    private static final int HASH2 = 37;
+    private static final int HASH = 3;
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Recette)) {
+            return false;
+        }
+        final Recette other = (Recette) obj;
+        return Objects.equals(this.identifiant, other.getIdentifiant());
     }
 
 }
