@@ -1,5 +1,7 @@
 package recette.domain;
 
+import java.util.Objects;
+
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
@@ -57,6 +59,30 @@ public class IngredientBase implements Ingredient {
     @Override
     public String toString() {
         return "IngredientBase{" + "identifiant=" + identifiant + ", nom=" + nom + ", detail=" + detail + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = HASH;
+        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
+        return hash;
+    }
+    private static final int HASH2 = 71;
+    private static final int HASH = 7;
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Ingredient)) {
+            return false;
+        }
+        final Ingredient other = (Ingredient) obj;
+        return Objects.equals(this.identifiant, other.getIdentifiant());
     }
 
 }
