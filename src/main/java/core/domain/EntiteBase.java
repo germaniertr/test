@@ -15,13 +15,6 @@ public abstract class EntiteBase<E extends Entite>
         this.identifiant = identifiant;
     }
 
-    protected EntiteBase(final E entite) {
-        if (entite == null) {
-            throw new IllegalArgumentException("Erreur: l'argument unité ne peut pas être null");
-        }
-        this.identifiant = entite.getIdentifiant();
-    }
-
     @Override
     public Identifiant getIdentifiant() {
         return this.identifiant;
