@@ -40,35 +40,41 @@ public class RecetteBaseTest {
         preparationRef = "preparation recette";
         nombrePersonneRef = 4;
 
-        composantRef1 = new ComposantBase(IdentifiantBase.builder().build(),
-                IngredientBase.builder()
-                        .identifiant(IdentifiantBase.builder().build())
-                        .build());
-        composantRef1.setCommentaire("commentaire 1");
-        composantRef1.setQuantite(123.0);
-        composantRef1.setUnite(UniteBase.builder()
+        composantRef1 = ComposantBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build());
+                .ingredient(IngredientBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .commentaire("commentaire 1")
+                .quantite(123.0)
+                .unite(UniteBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .build();
 
-        composantRef2 = new ComposantBase(IdentifiantBase.builder().build(),
-                IngredientBase.builder()
-                        .identifiant(IdentifiantBase.builder().build())
-                        .build());
-        composantRef2.setCommentaire("commentaire 2");
-        composantRef2.setQuantite(34.6);
-        composantRef2.setUnite(UniteBase.builder()
+        composantRef2 = ComposantBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build());
+                .ingredient(IngredientBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .commentaire("commentaire 2")
+                .quantite(34.6)
+                .unite(UniteBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .build();
 
-        composantRef3 = new ComposantBase(IdentifiantBase.builder().build(),
-                IngredientBase.builder()
-                        .identifiant(IdentifiantBase.builder().build())
-                        .build());
-        composantRef3.setCommentaire("commentaire 3");
-        composantRef3.setQuantite(45.7);
-        composantRef3.setUnite(UniteBase.builder()
+        composantRef3 = ComposantBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build());
+                .ingredient(IngredientBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .commentaire("commentaire 3")
+                .quantite(45.7)
+                .unite(UniteBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .build();
 
         composantsRef = new ArrayList<>();
         composantsRef.add(composantRef1);
@@ -126,27 +132,26 @@ public class RecetteBaseTest {
         String preparation = "nouvelle preparation";
         Integer nombrePersonne = 40;
 
-        Composant composant2 = new ComposantBase(composantRef2.getIdentifiant(),
-                composantRef2.getIngredient());
-        composant2.setCommentaire(composantRef2.getCommentaire());
-        composant2.setQuantite(composantRef2.getQuantite());
-        composant2.setUnite(composantRef2.getUnite());
-
-        composant2.setCommentaire("Composant modifié");
-        composant2.setQuantite(34.6);
-        composant2.setUnite(UniteBase.builder()
-                .identifiant(IdentifiantBase.builder().build())
-                .build());
-
-        Composant composant4 = new ComposantBase(IdentifiantBase.builder().build(),
-                IngredientBase.builder()
+        Composant composant2 = ComposantBase.builder()
+                .composant(this.entiteRef.getComposants().get(1))
+                .commentaire("Composant modifié")
+                .quantite(34.6)
+                .unite(UniteBase.builder()
                         .identifiant(IdentifiantBase.builder().build())
-                        .build());
-        composant4.setCommentaire("commentaire 4");
-        composant4.setQuantite(45.7);
-        composant4.setUnite(UniteBase.builder()
+                        .build())
+                .build();
+
+        Composant composant4 = ComposantBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build());
+                .ingredient(IngredientBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .commentaire("commentaire 4")
+                .quantite(45.7)
+                .unite(UniteBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .build();
 
         List<Composant> composants = new ArrayList<>();
         composants.add(composant2);
@@ -168,6 +173,7 @@ public class RecetteBaseTest {
         Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
         Assertions.assertEquals(nombrePersonne, this.entiteRef.getNombrePersonnes());
 
+        Assertions.assertEquals(composants.size(), this.entiteRef.getComposants().size());
         for (int i = 0; i < composants.size(); i += 1) {
             Assertions.assertEquals(composants.get(i).getIngredient(),
                     this.entiteRef.getComposants().get(i).getIngredient());
@@ -219,27 +225,29 @@ public class RecetteBaseTest {
         String preparation = "nouvelle preparation";
         Integer nombrePersonne = 40;
 
-        Composant composant2 = new ComposantBase(composantRef2.getIdentifiant(),
-                composantRef2.getIngredient());
-        composant2.setCommentaire(composantRef2.getCommentaire());
-        composant2.setQuantite(composantRef2.getQuantite());
-        composant2.setUnite(composantRef2.getUnite());
-
-        composant2.setCommentaire("Composant modifié");
-        composant2.setQuantite(34.6);
-        composant2.setUnite(UniteBase.builder()
+        Composant composant2 = ComposantBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build());
-
-        Composant composant4 = new ComposantBase(IdentifiantBase.builder().build(),
-                IngredientBase.builder()
+                .ingredient(IngredientBase.builder()
                         .identifiant(IdentifiantBase.builder().build())
-                        .build());
-        composant4.setCommentaire("commentaire 4");
-        composant4.setQuantite(45.7);
-        composant4.setUnite(UniteBase.builder()
+                        .build())
+                .commentaire("Composant modifié")
+                .quantite(34.6)
+                .unite(UniteBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .build();
+
+        Composant composant4 = ComposantBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build());
+                .ingredient(IngredientBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .commentaire("commentaire 4")
+                .quantite(45.7)
+                .unite(UniteBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build())
+                .build();
 
         List<Composant> composants = new ArrayList<>();
         composants.add(composant2);

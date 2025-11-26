@@ -7,27 +7,19 @@ import core.domain.Identifiant;
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class ComposantBase extends EntiteBase<Composant> implements Composant {
+public final class ComposantBase extends EntiteBase<Composant> implements Composant {
 
     private final Ingredient ingredient;
     private Double quantite;
     private String commentaire;
     private Unite unite;
 
-    public ComposantBase(final Identifiant identifiant,
-            final Ingredient ingredient) {
-        super(identifiant);
-        this.ingredient = ingredient;
-
-    }
-
-    ComposantBase(final Composant entite) {
-        super(entite);
-        this.ingredient = entite.getIngredient();
-        this.commentaire = entite.getCommentaire();
-        this.quantite = entite.getQuantite();
-        this.unite = entite.getUnite();
-
+    private ComposantBase(final Builder b) {
+        super(b.identifiant);
+        this.ingredient = b.ingredient;
+        this.commentaire = b.commentaire;
+        this.quantite = b.quantite;
+        this.unite = b.unite;
     }
 
     @Override
@@ -95,4 +87,62 @@ public class ComposantBase extends EntiteBase<Composant> implements Composant {
         return super.equals(obj);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private Identifiant identifiant = null;
+        private Ingredient ingredient;
+        private String commentaire;
+        private Double quantite;
+        private Unite unite;
+
+        protected Builder() {
+        }
+
+        public Builder composant(final Composant pComposant) {
+            if (pComposant == null) {
+                throw new IllegalArgumentException("Erreur: l'argument composant ne peut pas être null");
+            }
+            this.identifiant = pComposant.getIdentifiant();
+            this.ingredient = pComposant.getIngredient();
+            this.commentaire = pComposant.getCommentaire();
+            this.quantite = pComposant.getQuantite();
+            this.unite = pComposant.getUnite();
+
+            return this;
+        }
+
+        public Builder identifiant(final Identifiant pIdentifiant) {
+            this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Builder ingredient(final Ingredient pIngredient) {
+            this.ingredient = pIngredient;
+            return this;
+        }
+
+        public Builder commentaire(final String pCommentaire) {
+            this.commentaire = pCommentaire;
+            return this;
+        }
+
+        public Builder quantite(final Double pQuantite) {
+            this.quantite = pQuantite;
+            return this;
+        }
+
+        public Builder unite(final Unite pUnite) {
+            this.unite = pUnite;
+            return this;
+        }
+
+        public Composant build() {
+            return new ComposantBase(this);
+        }
+
+    }
 }

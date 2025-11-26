@@ -31,7 +31,9 @@ public class RecetteBase extends EntiteBase<Recette> implements Recette {
 
         this.composants = new ArrayList<>();
         for (Composant c : entite.getComposants()) {
-            this.composants.add(new ComposantBase(c));
+            this.composants.add(ComposantBase.builder()
+                    .composant(c)
+                    .build());
         }
     }
 
@@ -47,7 +49,9 @@ public class RecetteBase extends EntiteBase<Recette> implements Recette {
 
         this.composants.clear();
         for (Composant c : recette.getComposants()) {
-            this.composants.add(new ComposantBase(c));
+            this.composants.add(ComposantBase.builder()
+                    .composant(c)
+                    .build());
         }
     }
 
