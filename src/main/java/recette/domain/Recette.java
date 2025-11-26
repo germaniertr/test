@@ -1,17 +1,13 @@
 package recette.domain;
 
-import core.domain.Identifiant;
+import core.domain.Entite;
 import java.util.List;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public interface Recette {
-
-    Identifiant getIdentifiant();
-
-    void update(Recette recette);
+public interface Recette extends Entite<Recette> {
 
     String getNom();
 

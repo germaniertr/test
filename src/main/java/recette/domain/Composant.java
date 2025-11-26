@@ -1,16 +1,12 @@
 package recette.domain;
 
-import core.domain.Identifiant;
+import core.domain.Entite;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public interface Composant {
-
-    Identifiant getIdentifiant();
-
-    void update(Composant recette);
+public interface Composant extends Entite<Composant> {
 
     Double getQuantite();
 
