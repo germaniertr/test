@@ -1,6 +1,7 @@
 package recette.domain;
 
 import java.util.UUID;
+import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
 public class RecetteBaseTest {
+
+    private static final Logger LOG = Logger.getLogger(UniteBaseTest.class.getName());
 
     private IdentifiantBase identifiantRef;
     private String nomRef;
@@ -39,6 +42,12 @@ public class RecetteBaseTest {
 
     @AfterEach
     public void tearDown() {
+    }
+
+    @Test
+    public void testToString() {
+        //Ceci n'est pas un test!
+        LOG.info(this.entiteRef.toString());
     }
 
     @Test

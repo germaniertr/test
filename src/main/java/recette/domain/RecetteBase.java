@@ -73,4 +73,13 @@ public class RecetteBase implements Recette {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String toString() {
+        return "RecetteBase{" + "identifiant=" + identifiant
+                + ", nom=" + nom
+                + ", detail=" + detail
+                + ", preparation=" + preparation
+                + ", nombrePersonnes=" + nombrePersonnes + '}';
+    }
+
 }
