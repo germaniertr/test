@@ -81,16 +81,16 @@ public class RecetteBaseTest {
         composantsRef.add(composantRef2);
         composantsRef.add(composantRef3);
 
-        entiteRef = new RecetteBase(identifiantRef);
-        entiteRef.setNom(nomRef);
-        entiteRef.setDetail(detailRef);
-        entiteRef.setPreparation(preparationRef);
-        entiteRef.setNombrePersonnes(nombrePersonneRef);
-
-        entiteRef.getComposants().add(composantRef1);
-        entiteRef.getComposants().add(composantRef2);
-        entiteRef.getComposants().add(composantRef3);
-
+        entiteRef = RecetteBase.builder()
+                .identifiant(identifiantRef)
+                .nom(nomRef)
+                .detail(detailRef)
+                .preparation(preparationRef)
+                .nombrePersonnes(nombrePersonneRef)
+                .composant(composantRef1)
+                .composant(composantRef2)
+                .composant(composantRef3)
+                .build();
     }
 
     @AfterEach
@@ -188,7 +188,10 @@ public class RecetteBaseTest {
 
     @Test
     public void testEquals() {
-        Recette entite = new RecetteBase(identifiantRef);
+        Recette entite = RecetteBase.builder()
+                .identifiant(identifiantRef)
+                .build();
+
         Assertions.assertNotSame(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
@@ -253,14 +256,15 @@ public class RecetteBaseTest {
         composants.add(composant2);
         composants.add(composant4);
 
-        Recette entite = new RecetteBase(identifiantRef);
-        entite.setNom(nom);
-        entite.setDetail(detail);
-        entite.setPreparation(preparation);
-        entite.setNombrePersonnes(nombrePersonne);
-
-        entite.getComposants().add(composant2);
-        entite.getComposants().add(composant4);
+        Recette entite = RecetteBase.builder()
+                .identifiant(identifiantRef)
+                .nom(nom)
+                .detail(detail)
+                .preparation(preparation)
+                .nombrePersonnes(nombrePersonne)
+                .composant(composant2)
+                .composant(composant4)
+                .build();
 
         this.entiteRef.update(entite);
 
@@ -313,7 +317,10 @@ public class RecetteBaseTest {
 
     @Test
     public void testClone() {
-        Recette entite = new RecetteBase(entiteRef);
+        Recette entite = RecetteBase.builder()
+                .recette(entiteRef)
+                .build();
+
         Assertions.assertNotSame(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
@@ -349,7 +356,7 @@ public class RecetteBaseTest {
     public void testCloneIllegalArgument() {
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
-                    new RecetteBase((Recette) null);
+                    RecetteBase.builder().recette((Recette) null).build();
                 });
     }
 

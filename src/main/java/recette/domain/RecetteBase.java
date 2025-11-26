@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class RecetteBase extends EntiteBase<Recette> implements Recette {
+public final class RecetteBase extends EntiteBase<Recette> implements Recette {
 
     private String nom;
     private String detail;
@@ -17,20 +17,15 @@ public class RecetteBase extends EntiteBase<Recette> implements Recette {
     private Integer nombrePersonnes;
     private final List<Composant> composants;
 
-    RecetteBase(final Identifiant identifiant) {
-        super(identifiant);
-        this.composants = new ArrayList<>();
-    }
-
-    RecetteBase(final Recette entite) {
-        super(entite);
-        this.nom = entite.getNom();
-        this.detail = entite.getDetail();
-        this.preparation = entite.getPreparation();
-        this.nombrePersonnes = entite.getNombrePersonnes();
+    private RecetteBase(final Builder b) {
+        super(b.identifiant);
+        this.nom = b.nom;
+        this.detail = b.detail;
+        this.preparation = b.preparation;
+        this.nombrePersonnes = b.nombrePersonnes;
 
         this.composants = new ArrayList<>();
-        for (Composant c : entite.getComposants()) {
+        for (Composant c : b.composants) {
             this.composants.add(ComposantBase.builder()
                     .composant(c)
                     .build());
@@ -129,4 +124,76 @@ public class RecetteBase extends EntiteBase<Recette> implements Recette {
         return super.equals(obj);
     }
 
+    public static Builder builder() {
+        return new Builder();
+
+    }
+
+    public static class Builder {
+
+        private Identifiant identifiant = null;
+        private String nom;
+        private String detail;
+        private String preparation;
+        private Integer nombrePersonnes;
+        private List<Composant> composants;
+
+        protected Builder() {
+            composants = new ArrayList<>();
+        }
+
+        public Builder recette(final Recette pRecette) {
+            if (pRecette == null) {
+                throw new IllegalArgumentException("Erreur: l'argument recette ne peut pas être null");
+            }
+            this.identifiant = pRecette.getIdentifiant();
+            this.nom = pRecette.getNom();
+            this.detail = pRecette.getDetail();
+            this.preparation = pRecette.getPreparation();
+            this.nombrePersonnes = pRecette.getNombrePersonnes();
+
+            for (Composant c : pRecette.getComposants()) {
+                this.composants.add(ComposantBase.builder()
+                        .composant(c)
+                        .build());
+            }
+
+            return this;
+        }
+
+        public Builder identifiant(final Identifiant pIdentifiant) {
+            this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Builder nom(final String pNom) {
+            this.nom = pNom;
+            return this;
+        }
+
+        public Builder detail(final String pDetail) {
+            this.detail = pDetail;
+            return this;
+        }
+
+        public Builder preparation(final String pPreparation) {
+            this.preparation = pPreparation;
+            return this;
+        }
+
+        public Builder nombrePersonnes(final Integer pNombrePersonnes) {
+            this.nombrePersonnes = pNombrePersonnes;
+            return this;
+        }
+
+        public Builder composant(final Composant pComposant) {
+            this.composants.add(pComposant);
+            return this;
+        }
+
+        public Recette build() {
+            return new RecetteBase(this);
+        }
+
+    }
 }
