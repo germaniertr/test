@@ -2,7 +2,6 @@ package recette.domain;
 
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
-import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,7 @@ public class UniteBaseTest {
 
     private Identifiant identifiantRef;
     private String codeRef;
-    private UniteBase entiteRef;
+    private Unite entiteRef;
 
     public UniteBaseTest() {
     }
@@ -27,8 +26,10 @@ public class UniteBaseTest {
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
         codeRef = "code référence";
-        entiteRef = new UniteBase(identifiantRef);
-        entiteRef.setCode(codeRef);
+        entiteRef = UniteBase.builder()
+                .identifiant(identifiantRef)
+                .code(codeRef)
+                .build();
     }
 
     @Test
@@ -47,7 +48,9 @@ public class UniteBaseTest {
 
     @Test
     public void testEquals() {
-        Unite entite = new UniteBase(identifiantRef);
+        Unite entite = UniteBase.builder()
+                .identifiant(identifiantRef)
+                .build();
         Assertions.assertNotSame(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
@@ -80,8 +83,11 @@ public class UniteBaseTest {
     @Test
     public void testUpdate() {
         String code = "c.s";
-        Unite entite = new UniteBase((Identifiant) null);
-        entite.setCode(code);
+        Unite entite = UniteBase.builder()
+                .identifiant((Identifiant) null)
+                .code(code)
+                .build();
+
         this.entiteRef.update(entite);
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
@@ -98,7 +104,9 @@ public class UniteBaseTest {
 
     @Test
     public void testClone() {
-        Unite entite = new UniteBase(entiteRef);
+        Unite entite = UniteBase.builder()
+                .unite(entiteRef)
+                .build();
 
         Assertions.assertNotSame(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef, entite);
@@ -114,7 +122,9 @@ public class UniteBaseTest {
     public void testCloneIllegalArgument() {
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
-                    new UniteBase((Unite) null);
+                    UniteBase.builder()
+                            .unite((Unite) null)
+                            .build();
                 });
     }
 

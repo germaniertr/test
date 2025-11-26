@@ -7,17 +7,13 @@ import core.domain.Identifiant;
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class UniteBase extends EntiteBase<Unite> implements Unite {
+public final class UniteBase extends EntiteBase<Unite> implements Unite {
 
     private String code;
 
-    public UniteBase(final Identifiant identifiant) {
-        super(identifiant);
-    }
-
-    public UniteBase(final Unite entite) {
-        super(entite);
-        this.code = entite.getCode();
+    private UniteBase(final Builder b) {
+        super(b.identifiant);
+        this.code = b.code;
     }
 
     @Override
@@ -62,4 +58,42 @@ public class UniteBase extends EntiteBase<Unite> implements Unite {
         return super.equals(obj);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private Identifiant identifiant = null;
+        private String code = null;
+
+        protected Builder() {
+        }
+
+        public Builder unite(final Unite pUnite) {
+            if (pUnite == null) {
+                throw new IllegalArgumentException("Erreur: l'argument unité ne peut pas être null");
+            }
+
+            this.identifiant = pUnite.getIdentifiant();
+            this.code = pUnite.getCode();
+
+            return this;
+        }
+
+        public Builder identifiant(final Identifiant pIdentifiant) {
+            this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Builder code(final String pCode) {
+            this.code = pCode;
+            return this;
+        }
+
+        public Unite build() {
+            return new UniteBase(this);
+
+        }
+    }
 }

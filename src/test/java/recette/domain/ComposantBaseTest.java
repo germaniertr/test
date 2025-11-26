@@ -35,8 +35,10 @@ public class ComposantBaseTest {
         ingredientRef.setNom("nom ingrédient");
         ingredientRef.setDetail("description ingrédient");
 
-        uniteRef = new UniteBase(IdentifiantBase.builder().build());
-        uniteRef.setCode("c.c");
+        uniteRef = UniteBase.builder()
+                .identifiant(IdentifiantBase.builder().build())
+                .code("c.c")
+                .build();
 
         entiteRef = new ComposantBase(identifiantRef, ingredientRef);
         entiteRef.setCommentaire(commentaireRef);
@@ -63,8 +65,10 @@ public class ComposantBaseTest {
         Double quantite = 2500.0;
         String commentaire = "nouveau commentaire";
 
-        Unite unite = new UniteBase(IdentifiantBase.builder().build());
-        unite.setCode("g");
+        Unite unite = UniteBase.builder()
+                .identifiant(IdentifiantBase.builder().build())
+                .code("g")
+                .build();
 
         this.entiteRef.setCommentaire(commentaire);
         this.entiteRef.setQuantite(quantite);
@@ -113,8 +117,10 @@ public class ComposantBaseTest {
         Double quantite = 2500.0;
         String commentaire = "nouveau commentaire";
 
-        Unite unite = new UniteBase(IdentifiantBase.builder().build());
-        unite.setCode("g");
+        Unite unite = UniteBase.builder()
+                .identifiant(IdentifiantBase.builder().build())
+                .code("g")
+                .build();
 
         Composant entite = new ComposantBase(null, null);
         entite.setCommentaire(commentaire);
