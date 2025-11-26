@@ -33,4 +33,9 @@ public class UniteBase implements Unite {
         this.code = code;
     }
 
+    @Override
+    public String toString() {
+        return "UniteBase{" + "code=" + code + ", identifiant=" + identifiant + '}';
+    }
+
 }
