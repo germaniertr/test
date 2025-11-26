@@ -54,4 +54,9 @@ public class IngredientBase implements Ingredient {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String toString() {
+        return "IngredientBase{" + "identifiant=" + identifiant + ", nom=" + nom + ", detail=" + detail + '}';
+    }
+
 }
