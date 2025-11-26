@@ -1,15 +1,14 @@
 package recette.domain;
 
+import core.domain.EntiteBase;
 import core.domain.Identifiant;
-import java.util.Objects;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class ComposantBase implements Composant {
+public class ComposantBase extends EntiteBase<Composant> implements Composant {
 
-    private final Identifiant identifiant;
     private final Ingredient ingredient;
     private Double quantite;
     private String commentaire;
@@ -17,26 +16,18 @@ public class ComposantBase implements Composant {
 
     public ComposantBase(final Identifiant identifiant,
             final Ingredient ingredient) {
-        this.identifiant = identifiant;
+        super(identifiant);
         this.ingredient = ingredient;
 
     }
 
     ComposantBase(final Composant entite) {
-        if (entite == null) {
-            throw new IllegalArgumentException("Erreur: l'argument composant ne peut pas être null");
-        }
-        this.identifiant = entite.getIdentifiant();
+        super(entite);
         this.ingredient = entite.getIngredient();
         this.commentaire = entite.getCommentaire();
         this.quantite = entite.getQuantite();
         this.unite = entite.getUnite();
 
-    }
-
-    @Override
-    public Identifiant getIdentifiant() {
-        return this.identifiant;
     }
 
     @Override
@@ -86,12 +77,8 @@ public class ComposantBase implements Composant {
 
     @Override
     public int hashCode() {
-        int hash = HASH;
-        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
-        return hash;
+        return super.hashCode();
     }
-    private static final int HASH2 = 41;
-    private static final int HASH = 7;
 
     @Override
     public boolean equals(final Object obj) {
@@ -105,7 +92,7 @@ public class ComposantBase implements Composant {
             return false;
         }
         final Composant other = (Composant) obj;
-        return Objects.equals(this.identifiant, other.getIdentifiant());
+        return super.equals(obj);
     }
 
 }

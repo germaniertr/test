@@ -1,17 +1,16 @@
 package recette.domain;
 
+import core.domain.EntiteBase;
 import core.domain.Identifiant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class RecetteBase implements Recette {
+public class RecetteBase extends EntiteBase<Recette> implements Recette {
 
-    private final Identifiant identifiant;
     private String nom;
     private String detail;
     private String preparation;
@@ -19,15 +18,12 @@ public class RecetteBase implements Recette {
     private final List<Composant> composants;
 
     RecetteBase(final Identifiant identifiant) {
-        this.identifiant = identifiant;
+        super(identifiant);
         this.composants = new ArrayList<>();
     }
 
     RecetteBase(final Recette entite) {
-        if (entite == null) {
-            throw new IllegalArgumentException("Erreur: l'argument recette ne peut pas être null");
-        }
-        this.identifiant = entite.getIdentifiant();
+        super(entite);
         this.nom = entite.getNom();
         this.detail = entite.getDetail();
         this.preparation = entite.getPreparation();
@@ -37,11 +33,6 @@ public class RecetteBase implements Recette {
         for (Composant c : entite.getComposants()) {
             this.composants.add(new ComposantBase(c));
         }
-    }
-
-    @Override
-    public Identifiant getIdentifiant() {
-        return this.identifiant;
     }
 
     @Override
@@ -107,7 +98,7 @@ public class RecetteBase implements Recette {
 
     @Override
     public String toString() {
-        return "RecetteBase{" + "identifiant=" + identifiant
+        return "RecetteBase{" + super.toString()
                 + ", nom=" + nom
                 + ", detail=" + detail
                 + ", preparation=" + preparation
@@ -116,12 +107,8 @@ public class RecetteBase implements Recette {
 
     @Override
     public int hashCode() {
-        int hash = HASH;
-        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
-        return hash;
+        return super.hashCode();
     }
-    private static final int HASH2 = 37;
-    private static final int HASH = 3;
 
     @Override
     public boolean equals(final Object obj) {
@@ -135,7 +122,7 @@ public class RecetteBase implements Recette {
             return false;
         }
         final Recette other = (Recette) obj;
-        return Objects.equals(this.identifiant, other.getIdentifiant());
+        return super.equals(obj);
     }
 
 }

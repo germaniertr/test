@@ -1,37 +1,28 @@
 package recette.domain;
 
+import core.domain.EntiteBase;
 import core.domain.Identifiant;
-import java.util.Objects;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class IngredientBase implements Ingredient {
+public class IngredientBase extends EntiteBase<Ingredient> implements Ingredient {
 
-    private final Identifiant identifiant;
     private String nom;
     private String detail;
     private Recette recette;
 
     IngredientBase(final Identifiant identifiant) {
-        this.identifiant = identifiant;
+        super(identifiant);
     }
 
     IngredientBase(final Ingredient entite) {
-        if (entite == null) {
-            throw new IllegalArgumentException("Erreur: l'argument ingrédient ne peut pas être null");
-        }
+        super(entite);
 
-        this.identifiant = entite.getIdentifiant();
         this.nom = entite.getNom();
         this.detail = entite.getDetail();
         this.recette = entite.getRecette();
-    }
-
-    @Override
-    public Identifiant getIdentifiant() {
-        return this.identifiant;
     }
 
     @Override
@@ -76,17 +67,13 @@ public class IngredientBase implements Ingredient {
 
     @Override
     public String toString() {
-        return "IngredientBase{" + "identifiant=" + identifiant + ", nom=" + nom + ", detail=" + detail + '}';
+        return "IngredientBase{" + super.toString() + ", nom=" + nom + ", detail=" + detail + '}';
     }
 
     @Override
     public int hashCode() {
-        int hash = HASH;
-        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
-        return hash;
+        return super.hashCode();
     }
-    private static final int HASH2 = 71;
-    private static final int HASH = 7;
 
     @Override
     public boolean equals(final Object obj) {
@@ -99,8 +86,7 @@ public class IngredientBase implements Ingredient {
         if (!(obj instanceof Ingredient)) {
             return false;
         }
-        final Ingredient other = (Ingredient) obj;
-        return Objects.equals(this.identifiant, other.getIdentifiant());
+        return super.equals(obj);
     }
 
 }

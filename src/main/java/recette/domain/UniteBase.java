@@ -1,34 +1,23 @@
 package recette.domain;
 
+import core.domain.EntiteBase;
 import core.domain.Identifiant;
-import java.util.Objects;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class UniteBase implements Unite {
+public class UniteBase extends EntiteBase<Unite> implements Unite {
 
     private String code;
-    private final Identifiant identifiant;
 
     public UniteBase(final Identifiant identifiant) {
-        this.identifiant = identifiant;
+        super(identifiant);
     }
 
     public UniteBase(final Unite entite) {
-        if (entite == null) {
-            throw new IllegalArgumentException("Erreur: l'argument unité ne peut pas être null");
-        }
-
-        this.identifiant = entite.getIdentifiant();
+        super(entite);
         this.code = entite.getCode();
-
-    }
-
-    @Override
-    public Identifiant getIdentifiant() {
-        return this.identifiant;
     }
 
     @Override
@@ -51,17 +40,13 @@ public class UniteBase implements Unite {
 
     @Override
     public String toString() {
-        return "UniteBase{" + "code=" + code + ", identifiant=" + identifiant + '}';
+        return "UniteBase{" + super.toString() + ", code=" + code + '}';
     }
 
     @Override
     public int hashCode() {
-        int hash = HASH;
-        hash = HASH2 * hash + Objects.hashCode(this.identifiant);
-        return hash;
+        return super.hashCode();
     }
-    private static final int HASH2 = 37;
-    private static final int HASH = 7;
 
     @Override
     public boolean equals(final Object obj) {
@@ -74,8 +59,7 @@ public class UniteBase implements Unite {
         if (!(obj instanceof Unite)) {
             return false;
         }
-        final Unite other = (Unite) obj;
-        return Objects.equals(this.identifiant, other.getIdentifiant());
+        return super.equals(obj);
     }
 
 }
