@@ -16,7 +16,7 @@ public class IngredientBaseTest {
 
     private static final Logger LOG = Logger.getLogger(IngredientBaseTest.class.getName());
 
-    private IdentifiantBase identifiantRef;
+    private Identifiant identifiantRef;
     private String nomRef;
     private String detailRef;
     private Ingredient entiteRef;
@@ -27,10 +27,10 @@ public class IngredientBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase();
+        identifiantRef = IdentifiantBase.builder().build();
         nomRef = "nom de référence";
         detailRef = "détail de référence";
-        recetteRef = new RecetteBase(new IdentifiantBase());
+        recetteRef = new RecetteBase(IdentifiantBase.builder().build());
 
         entiteRef = new IngredientBase(identifiantRef);
         this.entiteRef.setNom(nomRef);
@@ -52,7 +52,7 @@ public class IngredientBaseTest {
     public void testGetSet() {
         String nom = "nom modifié";
         String detail = "détail modifié";
-        Recette recette = new RecetteBase(new IdentifiantBase());
+        Recette recette = new RecetteBase(IdentifiantBase.builder().build());
 
         this.entiteRef.setNom(nom);
         this.entiteRef.setDetail(detail);
@@ -101,7 +101,7 @@ public class IngredientBaseTest {
     public void testUpdate() {
         String nom = "nom";
         String detail = "detail";
-        Recette recette = new RecetteBase(new IdentifiantBase());
+        Recette recette = new RecetteBase(IdentifiantBase.builder().build());
 
         Ingredient entite = new IngredientBase((Identifiant) null);
         entite.setNom(nom);

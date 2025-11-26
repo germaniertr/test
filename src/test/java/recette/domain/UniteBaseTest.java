@@ -16,7 +16,7 @@ public class UniteBaseTest {
 
     private static final Logger LOG = Logger.getLogger(UniteBaseTest.class.getName());
 
-    private IdentifiantBase identifiantRef;
+    private Identifiant identifiantRef;
     private String codeRef;
     private UniteBase entiteRef;
 
@@ -25,7 +25,7 @@ public class UniteBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase();
+        identifiantRef = IdentifiantBase.builder().build();
         codeRef = "code référence";
         entiteRef = new UniteBase(identifiantRef);
         entiteRef.setCode(codeRef);
@@ -80,7 +80,7 @@ public class UniteBaseTest {
     @Test
     public void testUpdate() {
         String code = "c.s";
-        Unite entite = new UniteBase((Identifiant)null);
+        Unite entite = new UniteBase((Identifiant) null);
         entite.setCode(code);
         this.entiteRef.update(entite);
 

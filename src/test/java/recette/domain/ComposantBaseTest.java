@@ -1,7 +1,7 @@
 package recette.domain;
 
+import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ComposantBaseTest {
 
-    private IdentifiantBase identifiantRef;
+    private Identifiant identifiantRef;
     private Double quantiteRef;
     private String commentaireRef;
     private Ingredient ingredientRef;
@@ -25,17 +25,17 @@ public class ComposantBaseTest {
 
     @BeforeEach
     public void setUp() {
-        identifiantRef = new IdentifiantBase();
+        identifiantRef = IdentifiantBase.builder().build();
         quantiteRef = 2.5;
         commentaireRef = "commentaire";
 
         ingredientRef
-                = new IngredientBase(new IdentifiantBase());
+                = new IngredientBase(IdentifiantBase.builder().build());
 
         ingredientRef.setNom("nom ingrédient");
         ingredientRef.setDetail("description ingrédient");
 
-        uniteRef = new UniteBase(new IdentifiantBase());
+        uniteRef = new UniteBase(IdentifiantBase.builder().build());
         uniteRef.setCode("c.c");
 
         entiteRef = new ComposantBase(identifiantRef, ingredientRef);
@@ -63,7 +63,7 @@ public class ComposantBaseTest {
         Double quantite = 2500.0;
         String commentaire = "nouveau commentaire";
 
-        Unite unite = new UniteBase(new IdentifiantBase());
+        Unite unite = new UniteBase(IdentifiantBase.builder().build());
         unite.setCode("g");
 
         this.entiteRef.setCommentaire(commentaire);
@@ -113,7 +113,7 @@ public class ComposantBaseTest {
         Double quantite = 2500.0;
         String commentaire = "nouveau commentaire";
 
-        Unite unite = new UniteBase(new IdentifiantBase());
+        Unite unite = new UniteBase(IdentifiantBase.builder().build());
         unite.setCode("g");
 
         Composant entite = new ComposantBase(null, null);

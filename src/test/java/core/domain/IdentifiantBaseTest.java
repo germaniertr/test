@@ -15,7 +15,7 @@ public class IdentifiantBaseTest {
     private static final Logger LOG = Logger.getLogger(IdentifiantBaseTest.class.getName());
 
     private String uuidRef;
-    private IdentifiantBase idRef;
+    private Identifiant idRef;
 
     public IdentifiantBaseTest() {
     }
@@ -23,7 +23,9 @@ public class IdentifiantBaseTest {
     @BeforeEach
     public void setUp() {
         uuidRef = "12345678-1234-1234-123456789012";
-        idRef = new IdentifiantBase(uuidRef);
+        idRef = IdentifiantBase.builder()
+                .uuid(uuidRef)
+                .build();
     }
 
     @AfterEach
@@ -43,7 +45,9 @@ public class IdentifiantBaseTest {
 
     @Test
     public void testEquals() {
-        Identifiant id2 = new IdentifiantBase(uuidRef);
+        Identifiant id2 = IdentifiantBase.builder()
+                .uuid(uuidRef)
+                .build();
 
         //Vérifier si idRef et id2 sont des instances différentes
         Assertions.assertTrue(idRef != id2);
@@ -85,7 +89,9 @@ public class IdentifiantBaseTest {
 
     @Test
     public void testClone() {
-        Identifiant id2 = new IdentifiantBase(idRef);
+        Identifiant id2 = IdentifiantBase.builder()
+                .identifiant(idRef)
+                .build();
 
         Assertions.assertEquals(idRef, id2);
         Assertions.assertEquals(idRef.hashCode(), id2.hashCode());
@@ -100,13 +106,15 @@ public class IdentifiantBaseTest {
     public void testCloneIllegalArgument() {
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
-                    new IdentifiantBase((Identifiant) null);
+                    IdentifiantBase.builder()
+                            .identifiant((Identifiant) null)
+                            .build();
                 });
     }
 
     @Test
     public void testContructeurSansParametre() {
-        Identifiant id = new IdentifiantBase();
+        Identifiant id = IdentifiantBase.builder().build();
         Assertions.assertNotNull(id.getUUID());
     }
 

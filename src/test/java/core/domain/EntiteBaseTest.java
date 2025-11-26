@@ -20,7 +20,9 @@ public class EntiteBaseTest {
     @BeforeEach
     public void setUp() {
         uuidRef = "12345678-1234-1234-123456789012";
-        idRef = new IdentifiantBase(uuidRef);
+        idRef = IdentifiantBase.builder()
+                .uuid(uuidRef)
+                .build();
 
         entiteRef = new EntiteBase(idRef) {
             @Override
