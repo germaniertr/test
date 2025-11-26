@@ -30,7 +30,9 @@ public class ComposantBaseTest {
         commentaireRef = "commentaire";
 
         ingredientRef
-                = new IngredientBase(IdentifiantBase.builder().build());
+                = IngredientBase.builder()
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build();
 
         ingredientRef.setNom("nom ingrédient");
         ingredientRef.setDetail("description ingrédient");

@@ -32,10 +32,12 @@ public class IngredientBaseTest {
         detailRef = "détail de référence";
         recetteRef = new RecetteBase(IdentifiantBase.builder().build());
 
-        entiteRef = new IngredientBase(identifiantRef);
-        this.entiteRef.setNom(nomRef);
-        this.entiteRef.setDetail(detailRef);
-        this.entiteRef.setRecette(recetteRef);
+        entiteRef = IngredientBase.builder()
+                .identifiant(identifiantRef)
+                .nom(nomRef)
+                .detail(detailRef)
+                .recette(recetteRef)
+                .build();
     }
 
     @AfterEach
@@ -67,7 +69,9 @@ public class IngredientBaseTest {
 
     @Test
     public void testEquals() {
-        Ingredient entite = new IngredientBase(identifiantRef);
+        Ingredient entite = IngredientBase.builder()
+                .identifiant(identifiantRef)
+                .build();
         Assertions.assertNotSame(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
@@ -103,10 +107,11 @@ public class IngredientBaseTest {
         String detail = "detail";
         Recette recette = new RecetteBase(IdentifiantBase.builder().build());
 
-        Ingredient entite = new IngredientBase((Identifiant) null);
-        entite.setNom(nom);
-        entite.setDetail(detail);
-        entite.setRecette(recette);
+        Ingredient entite = IngredientBase.builder()
+                .nom(nom)
+                .detail(detail)
+                .recette(recette)
+                .build();
         this.entiteRef.update(entite);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
@@ -126,7 +131,9 @@ public class IngredientBaseTest {
 
     @Test
     public void testClone() {
-        Ingredient entite = new IngredientBase(entiteRef);
+        Ingredient entite = IngredientBase.builder()
+                .ingredient(entiteRef)
+                .build();
         Assertions.assertNotSame(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef, entite);
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
@@ -143,7 +150,9 @@ public class IngredientBaseTest {
     public void testCloneIllegalArgument() {
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> {
-                    new IngredientBase((Ingredient) null);
+                    IngredientBase.builder()
+                            .ingredient((Ingredient) null)
+                            .build();
                 });
     }
 }

@@ -7,22 +7,18 @@ import core.domain.Identifiant;
  *
  * @author dominique huguenin (dominique.huguenin AT rpn.ch)
  */
-public class IngredientBase extends EntiteBase<Ingredient> implements Ingredient {
+public final class IngredientBase extends EntiteBase<Ingredient> implements Ingredient {
 
     private String nom;
     private String detail;
     private Recette recette;
 
-    IngredientBase(final Identifiant identifiant) {
-        super(identifiant);
-    }
+    private IngredientBase(final Builder b) {
+        super(b.identifiant);
 
-    IngredientBase(final Ingredient entite) {
-        super(entite);
-
-        this.nom = entite.getNom();
-        this.detail = entite.getDetail();
-        this.recette = entite.getRecette();
+        this.nom = b.nom;
+        this.detail = b.detail;
+        this.recette = b.recette;
     }
 
     @Override
@@ -89,4 +85,55 @@ public class IngredientBase extends EntiteBase<Ingredient> implements Ingredient
         return super.equals(obj);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private Identifiant identifiant = null;
+        private String nom;
+        private String detail;
+        private Recette recette;
+
+        protected Builder() {
+        }
+
+        public Builder ingredient(final Ingredient pIngredient) {
+            if (pIngredient == null) {
+                throw new IllegalArgumentException("Erreur: l'argument ingrédient ne peut pas être null");
+            }
+
+            this.identifiant = pIngredient.getIdentifiant();
+            this.nom = pIngredient.getNom();
+            this.detail = pIngredient.getDetail();
+            this.recette = pIngredient.getRecette();
+
+            return this;
+        }
+
+        public Builder identifiant(final Identifiant pIdentifiant) {
+            this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Ingredient build() {
+            return new IngredientBase(this);
+        }
+
+        public Builder nom(final String pNom) {
+            this.nom = pNom;
+            return this;
+        }
+
+        public Builder detail(final String pDetail) {
+            this.detail = pDetail;
+            return this;
+        }
+
+        public Builder recette(final Recette pRecette) {
+            this.recette = pRecette;
+            return this;
+        }
+    }
 }
