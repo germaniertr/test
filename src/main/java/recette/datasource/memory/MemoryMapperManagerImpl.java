@@ -11,14 +11,22 @@ import recette.domain.DemoData;
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
-public class MemoryMapperManagerImpl implements MapperManager{
+public final class MemoryMapperManagerImpl implements MapperManager {
 
-    private MemoryMapperManagerImpl(DemoData demoData) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private static MemoryMapperManagerImpl mapperManager;
+
+    private final DemoData data;
+    private DatabaseSetup databaseSetup;
+
+    private MemoryMapperManagerImpl() {
+        this.data = new DemoData();
     }
-    
-    public static MapperManager getInstance(DemoData demoData){
-        throw new UnsupportedOperationException("Not supported yet.");
+
+    public static MapperManager getInstance() {
+        if (mapperManager == null) {
+            mapperManager = new MemoryMapperManagerImpl();
+        }
+        return mapperManager;
     }
 
     @Override
@@ -33,12 +41,19 @@ public class MemoryMapperManagerImpl implements MapperManager{
 
     @Override
     public DatabaseSetup getDatabaseSetup() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (this.databaseSetup == null) {
+            this.databaseSetup = new DatabaseSetupImpl(this);
+        }
+        return this.databaseSetup;
     }
 
     @Override
     public RecetteMapper getRecetteMapper() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    DemoData getData() {
+        return this.data;
     }
 
 }
