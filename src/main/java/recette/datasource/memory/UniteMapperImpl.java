@@ -96,7 +96,17 @@ public class UniteMapperImpl implements UniteMapper {
 
     @Override
     public void update(final Unite entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null || entite.getIdentifiant() == null) {
+            return;
+        }
+
+        Unite e = this.mapperManager.getData()
+                .getUnites().get(entite.getIdentifiant());
+
+        checkEntiteInconnue(e, entite);
+        checkContainteCodeNotNull(entite);
+
+        e.update(entite);
     }
 
     @Override

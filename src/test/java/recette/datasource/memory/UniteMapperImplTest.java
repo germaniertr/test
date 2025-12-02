@@ -198,4 +198,55 @@ public class UniteMapperImplTest {
         });
     }
 
+    @Test
+    public void testUpdate() throws Exception {
+        Unite nouvelleEntite = mapperManager.getUniteMapper()
+                .create(nouvelleUniteRef);
+        Unite entite = mapperManager.getUniteMapper()
+                .retrieve(nouvelleEntite.getIdentifiant());
+
+        Assertions.assertNotNull(entite.getIdentifiant());
+        Assertions.assertEquals(nouvelleUniteRef.getCode(), entite.getCode());
+
+        Unite entiteMod = UniteBase.builder().unite(entite).build();
+        entiteMod.setCode(entite.getCode() + " update");
+
+        mapperManager.getUniteMapper().update(entiteMod);
+        Unite entiteModifie = mapperManager.getUniteMapper().retrieve(entiteMod.getIdentifiant());
+
+        Assertions.assertEquals(entiteMod, entiteModifie);
+        Assertions.assertEquals(entiteMod.getCode(), entiteModifie.getCode());
+    }
+
+    @Test
+    public void testUpdateEntiteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Unite entiteMod = UniteBase.builder()
+                        .unite(nouvelleUniteRef)
+                        .identifiant(IdentifiantBase.builder()
+                                .build())
+                        .build();
+                mapperManager.getUniteMapper()
+                        .update(entiteMod);
+            }
+        });
+    }
+
+    @Test
+    public void testUpdateCodeNull() throws Exception {
+        Assertions.assertThrows(
+                ContrainteNotNullPersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Unite entite = mapperManager.getUniteMapper().retrieve(identifiantCS);
+                entite.setCode(null);
+                mapperManager.getUniteMapper()
+                        .update(entite);
+            }
+        });
+    }
+
 }
