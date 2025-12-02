@@ -12,6 +12,12 @@ import recette.domain.Unite;
  */
 public class UniteMapperImpl implements UniteMapper {
 
+    private final MemoryMapperManagerImpl mapperManager;
+
+    UniteMapperImpl(final MemoryMapperManagerImpl mm) {
+        this.mapperManager = mm;
+    }
+
     @Override
     public Unite create(final Unite entite) throws PersistenceException {
         throw new UnsupportedOperationException("Not supported yet.");

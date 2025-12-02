@@ -17,6 +17,7 @@ public final class MemoryMapperManagerImpl implements MapperManager {
 
     private final DemoData data;
     private DatabaseSetup databaseSetup;
+    private UniteMapper uniteMapper;
 
     private MemoryMapperManagerImpl() {
         this.data = new DemoData();
@@ -31,7 +32,10 @@ public final class MemoryMapperManagerImpl implements MapperManager {
 
     @Override
     public UniteMapper getUniteMapper() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (this.uniteMapper == null) {
+            this.uniteMapper = new UniteMapperImpl(this);
+        }
+        return this.uniteMapper;
     }
 
     @Override
