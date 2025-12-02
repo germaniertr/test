@@ -117,7 +117,53 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public void update(final Recette entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null || entite.getIdentifiant() == null) {
+            return;
+        }
+
+        Recette e = this.mapperManager.getData()
+                .getRecettes().get(entite.getIdentifiant());
+
+        checkEntiteInconnue(e, entite);
+
+        RecetteBase.Builder builder = RecetteBase.builder()
+                .identifiant(entite.getIdentifiant())
+                .nom(entite.getNom())
+                .detail(entite.getDetail())
+                .preparation(entite.getPreparation())
+                .nombrePersonnes(entite.getNombrePersonnes());
+
+        for (Composant c : entite.getComposants()) {
+            Ingredient ingredient = this.mapperManager.getIngredientMapper()
+                    .retrieve(c.getIngredient().getIdentifiant());
+            checkIngredientInconnu(ingredient, c);
+
+            Unite unite = null;
+            if (c.getUnite() != null) {
+                unite = this.mapperManager.getUniteMapper()
+                        .retrieve(c.getUnite().getIdentifiant());
+
+                checkUniteInconnue(unite, c);
+            }
+
+            Composant composant = ComposantBase.builder()
+                    .composant(c)
+                    .ingredient(ingredient)
+                    .unite(unite)
+                    .build();
+
+            builder.composant(composant);
+
+        }
+
+        Recette entiteModifie = builder
+                .build();
+
+        this.checkContainteNomNotNull(entiteModifie);
+        this.checkContrainteNomUnique(entiteModifie);
+
+        e.update(entiteModifie);
+
     }
 
     @Override

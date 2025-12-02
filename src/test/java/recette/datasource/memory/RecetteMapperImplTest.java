@@ -380,4 +380,159 @@ public class RecetteMapperImplTest {
 
     }
 
+    @Test
+    public void testUpdate() throws Exception {
+
+        Recette nouvelleEntite
+                = mapperManager.getRecetteMapper()
+                        .create(nouvelleEntiteRef);
+        Recette entite
+                = mapperManager.getRecetteMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+        Recette entiteModifie = RecetteBase.builder()
+                .identifiant(entite.getIdentifiant())
+                .nom(entite.getNom() + " update")
+                .detail(entite.getDetail() + " update")
+                .preparation(entite.getPreparation() + " update")
+                .nombrePersonnes(entite.getNombrePersonnes() * 10)
+                .composant(entite.getComposants().get(2))
+                .composant(ComposantBase.builder()
+                        .ingredient(IngredientBase.builder()
+                                .identifiant(IdentifiantBase.builder()
+                                        .uuid(DemoData.INGREDIENTS.THYM.UUID) //thym
+                                        .build())
+                                .build())
+                        .quantite(1.0)
+                        .unite(UniteBase.builder()
+                                .identifiant(IdentifiantBase.builder()
+                                        .uuid(DemoData.UNITES.BRINS.UUID) //brin
+                                        .build())
+                                .build())
+                        .commentaire("commentaire update")
+                        .build())
+                .build();
+
+        mapperManager.getRecetteMapper()
+                .update(entiteModifie);
+
+        Recette entiteMod
+                = mapperManager.getRecetteMapper()
+                        .retrieve(entiteModifie.getIdentifiant());
+
+        Assertions.assertEquals(entiteModifie, entiteMod);
+        Assertions.assertEquals(entiteModifie.getDetail(),
+                entiteMod.getDetail());
+        Assertions.assertEquals(entiteModifie.getPreparation(),
+                entiteMod.getPreparation());
+        Assertions.assertEquals(entiteModifie.getNombrePersonnes(),
+                entiteMod.getNombrePersonnes());
+
+        Assertions.assertEquals(entiteModifie.getComposants().size(),
+                entiteMod.getComposants().size());
+
+        for (int i = 0; i < entiteModifie.getComposants().size(); i += 1) {
+            Assertions.assertEquals(entiteModifie.getComposants().get(i).getIngredient(),
+                    entiteMod.getComposants().get(i).getIngredient());
+
+            Assertions.assertNotNull(entiteMod.getComposants().get(i).getIngredient().getNom());
+
+            Assertions.assertEquals(entiteModifie.getComposants().get(i).getQuantite(),
+                    entiteMod.getComposants().get(i).getQuantite());
+            Assertions.assertEquals(entiteModifie.getComposants().get(i).getUnite(),
+                    entiteMod.getComposants().get(i).getUnite());
+            if (entiteMod.getComposants().get(i).getUnite() != null) {
+                Assertions.assertNotNull(entiteMod.getComposants().get(i).getUnite().getCode());
+            }
+            Assertions.assertEquals(entiteModifie.getComposants().get(i).getCommentaire(),
+                    entiteMod.getComposants().get(i).getCommentaire());
+        }
+
+    }
+
+    @Test
+    public void testUpdateEntiteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette entiteMod = RecetteBase.builder()
+                        .recette(nouvelleEntiteRef)
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build();
+
+                mapperManager.getRecetteMapper()
+                        .update(entiteMod);
+            }
+        });
+
+    }
+
+    @Test
+    public void testUpdateIngredientInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette entite
+                        = mapperManager.getRecetteMapper()
+                                .retrieve(identifiantAubergineRef);
+                entite.getComposants().add(ComposantBase.builder()
+                        .ingredient(IngredientBase.builder()
+                                .identifiant(IdentifiantBase.builder().build())
+                                .build())
+                        .build());
+
+                mapperManager.getRecetteMapper()
+                        .update(entite);
+            }
+        });
+
+    }
+
+    @Test
+    public void testUpdateUniteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette entite
+                        = mapperManager.getRecetteMapper()
+                                .retrieve(identifiantAubergineRef);
+                entite.getComposants().add(ComposantBase.builder()
+                        .ingredient(IngredientBase.builder()
+                                .identifiant(IdentifiantBase.builder()
+                                        .uuid(DemoData.INGREDIENTS.SEL.UUID)
+                                        .build())
+                                .build())
+                        .unite(UniteBase.builder()
+                                .identifiant(IdentifiantBase.builder().build())
+                                .build())
+                        .build());
+
+                mapperManager.getRecetteMapper()
+                        .update(entite);
+            }
+        });
+
+    }
+
+    @Test
+    public void testUpdateNomNull() throws Exception {
+        Assertions.assertThrows(
+                ContrainteNotNullPersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette entite
+                        = mapperManager.getRecetteMapper()
+                                .retrieve(identifiantAubergineRef);
+                entite.setNom(null);
+
+                mapperManager.getRecetteMapper()
+                        .update(entite);
+            }
+        });
+
+    }
+
 }
