@@ -1,5 +1,7 @@
 package recette.datasource.memory;
 
+import core.datasource.ContrainteNotNullPersistenceException;
+import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -25,7 +27,23 @@ public class UniteMapperImpl implements UniteMapper {
 
     @Override
     public Unite create(final Unite entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null) {
+            return null;
+        }
+
+        Unite nouvelleEntite = UniteBase.builder()
+                .unite(entite)
+                .identifiant(IdentifiantBase.builder().build())
+                .build();
+
+        checkContainteCodeNotNull(nouvelleEntite);
+        checkContrainteCodeUnique(nouvelleEntite);
+
+        this.mapperManager.getData().getUnites()
+                .put(nouvelleEntite.getIdentifiant(), nouvelleEntite);
+
+        return this.retrieve(nouvelleEntite.getIdentifiant());
+
     }
 
     @Override
@@ -80,6 +98,30 @@ public class UniteMapperImpl implements UniteMapper {
     @Override
     public void delete(final Unite entite) throws PersistenceException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    private void checkContrainteCodeUnique(final Unite entite)
+            throws ContrainteUniquePersistenceException {
+        for (Unite e : this.mapperManager.getData().getUnites().values()) {
+            if (!e.equals(entite) && e.getCode().equals(entite.getCode())) {
+                throw new ContrainteUniquePersistenceException(
+                        String.format(
+                                "Erreur: Le code de l'unité "
+                                + "n'est pas unique! (%s)",
+                                e.toString())
+                );
+            }
+
+        }
+    }
+
+    private void checkContainteCodeNotNull(final Unite entite)
+            throws ContrainteNotNullPersistenceException {
+        if (entite.getCode() == null) {
+            throw new ContrainteNotNullPersistenceException(
+                    String.format("Erreur: le code est null! (%s)",
+                            entite));
+        }
     }
 
 }
