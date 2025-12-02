@@ -30,7 +30,20 @@ public class UniteMapperImpl implements UniteMapper {
 
     @Override
     public Unite retrieve(final Identifiant id) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (id == null) {
+            return null;
+        }
+
+        Unite entite = mapperManager.getData().getUnites().get(id);
+        if (entite != null) {
+            entite = UniteBase.builder()
+                    .unite(entite)
+                    .identifiant(IdentifiantBase.builder()
+                            .identifiant(entite.getIdentifiant())
+                            .build())
+                    .build();
+        }
+        return entite;
     }
 
     @Override
