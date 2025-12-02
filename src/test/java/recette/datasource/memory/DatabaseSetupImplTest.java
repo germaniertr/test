@@ -25,6 +25,10 @@ public class DatabaseSetupImplTest {
     public void testDropCreateTable() throws Exception {
         mapperManager.getDatabaseSetup().dropTables();
         mapperManager.getDatabaseSetup().createTables();
+        
+        List<Unite> unites = mapperManager.getUniteMapper()
+                                .retrieve(".*");
+        Assertions.assertTrue(unites.isEmpty());        
     }
 
     @Test
@@ -32,6 +36,10 @@ public class DatabaseSetupImplTest {
         mapperManager.getDatabaseSetup().dropTables();
         mapperManager.getDatabaseSetup().createTables();
         mapperManager.getDatabaseSetup().insertData();
+        
+        List<Unite> unites = mapperManager.getUniteMapper()
+                                .retrieve(".*");
+        Assertions.assertFalse(unites.isEmpty());        
     }
 
 }
