@@ -2,6 +2,8 @@ package recette.datasource.memory;
 
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
+import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -10,6 +12,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import recette.datasource.UniteMapper;
+import recette.domain.Composant;
+import recette.domain.Recette;
 import recette.domain.Unite;
 import recette.domain.UniteBase;
 
@@ -97,7 +101,18 @@ public class UniteMapperImpl implements UniteMapper {
 
     @Override
     public void delete(final Unite entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null || entite.getIdentifiant() == null) {
+            return;
+        }
+        Unite e = this.mapperManager.getData()
+                .getUnites().get(entite.getIdentifiant());
+
+        checkEntiteInconnue(e, entite);
+        checkContrainteEntiteUtilisee(e);
+
+        this.mapperManager.getData()
+                .getUnites().remove(e.getIdentifiant());
+
     }
 
     private void checkContrainteCodeUnique(final Unite entite)
@@ -121,6 +136,30 @@ public class UniteMapperImpl implements UniteMapper {
             throw new ContrainteNotNullPersistenceException(
                     String.format("Erreur: le code est null! (%s)",
                             entite));
+        }
+    }
+
+    private void checkContrainteEntiteUtilisee(final Unite e)
+            throws EntiteUtiliseePersistenceException {
+        //Vérifie si l'unité est utilisée dans un composant de recette
+        for (Recette recette : this.mapperManager.getData()
+                .getRecettes().values()) {
+            for (Composant c : recette.getComposants()) {
+                if (e.equals(c.getUnite())) {
+                    throw new EntiteUtiliseePersistenceException(
+                            String.format("Erreur: L'unité est utilisée! (%s)",
+                                    e.toString()));
+                }
+            }
+        }
+    }
+
+    private void checkEntiteInconnue(final Unite e, final Unite entite)
+            throws EntiteInconnuePersistenceException {
+        if (e == null) {
+            throw new EntiteInconnuePersistenceException(
+                    String.format("Erreur: l'entité est inconnue! (%s)",
+                            entite.toString()));
         }
     }
 

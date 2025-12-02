@@ -1,5 +1,7 @@
 package recette.datasource.memory;
 
+import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.PersistenceException;
@@ -51,7 +53,7 @@ public class UniteMapperImplTest {
         nouvelleUniteRef = UniteBase.builder()
                 .code("nouvelle unité " + Instant.now().toString())
                 .build();
-        
+
     }
 
     @Test
@@ -111,8 +113,8 @@ public class UniteMapperImplTest {
         entite1.setCode(entite1.getCode() + " update entite1");
         Assertions.assertNotEquals(entite1.getCode(), entite2.getCode());
     }
-    
-@Test
+
+    @Test
     public void testCreate() throws Exception {
         Unite nouvelleEntite = mapperManager.getUniteMapper().create(nouvelleUniteRef);
 
@@ -149,5 +151,51 @@ public class UniteMapperImplTest {
                 mapperManager.getUniteMapper().create(nouvelleUniteRef);
             }
         });
-    }    
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        Unite nouvelleEntite = mapperManager.getUniteMapper().create(nouvelleUniteRef);
+        Unite entite = mapperManager.getUniteMapper().retrieve(nouvelleEntite.getIdentifiant());
+        Assertions.assertNotNull(entite);
+
+        mapperManager.getUniteMapper().delete(entite);
+
+        Unite entiteNull = mapperManager.getUniteMapper().retrieve(entite.getIdentifiant());
+        Assertions.assertNull(entiteNull);
+    }
+
+    @Test
+    public void testDeleteEntiteUtilisee() throws Exception {
+        Assertions.assertThrows(
+                EntiteUtiliseePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Unite entite = mapperManager.getUniteMapper()
+                        .retrieve(identifiantCS);
+
+                Assertions.assertNotNull(entite);
+
+                mapperManager.getUniteMapper().delete(entite);
+            }
+        });
+
+    }
+
+    @Test
+    public void testDeleteEntiteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Unite entite = UniteBase.builder()
+                        .unite(nouvelleUniteRef)
+                        .identifiant(IdentifiantBase.builder()
+                                .build())
+                        .build();
+                mapperManager.getUniteMapper().delete(entite);
+            }
+        });
+    }
+
 }
