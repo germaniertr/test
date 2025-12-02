@@ -332,4 +332,118 @@ public class IngredientMapperImplTest {
             }
         });
     }
+
+    @Test
+    public void testUpdate() throws Exception {
+
+        Ingredient nouvelleEntite
+                = mapperManager.getIngredientMapper()
+                        .create(nouvelleIngredientRef2);
+        Ingredient entite
+                = mapperManager.getIngredientMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+        Assertions.assertNotNull(entite.getIdentifiant());
+        Assertions.assertEquals(nouvelleIngredientRef2.getNom(),
+                entite.getNom());
+        Assertions.assertEquals(nouvelleIngredientRef2.getDetail(),
+                entite.getDetail());
+
+        Ingredient entiteMod
+                = IngredientBase.builder()
+                        .ingredient(entite)
+                        .build();
+        entiteMod.setNom(entiteMod.getNom() + " update" + Instant.now().toString());
+        entiteMod.setDetail(entiteMod.getDetail() + " update" + Instant.now().toString());
+        entiteMod.setRecette(
+                RecetteBase.builder()
+                        .identifiant(IdentifiantBase.builder()
+                                .uuid(DemoData.RECETTES.POIRES_AUX_AMANDES.UUID)
+                                .build())
+                        .build());
+
+        mapperManager.getIngredientMapper()
+                .update(entiteMod);
+        Ingredient entiteModifie
+                = mapperManager.getIngredientMapper()
+                        .retrieve(entiteMod
+                                .getIdentifiant());
+        Assertions.assertEquals(entiteMod, entiteModifie);
+
+        Assertions.assertEquals(entiteMod.getNom(),
+                entiteModifie.getNom());
+        Assertions.assertEquals(entiteMod.getDetail(),
+                entiteModifie.getDetail());
+
+    }
+
+    @Test
+    public void testUpdateEntiteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Ingredient entiteMod
+                        = IngredientBase.builder()
+                                .ingredient(nouvelleIngredientRef2)
+                                .identifiant(IdentifiantBase.builder()
+                                        .build())
+                                .build();
+
+                mapperManager.getIngredientMapper()
+                        .update(entiteMod);
+            }
+        });
+
+    }
+
+    @Disabled
+    @Test
+    public void testUpdateRecetteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Ingredient nouvelleEntite
+                        = mapperManager.getIngredientMapper()
+                                .create(nouvelleIngredientRef2);
+                Ingredient entite
+                        = mapperManager.getIngredientMapper()
+                                .retrieve(nouvelleEntite.getIdentifiant());
+
+                Ingredient entiteMod
+                        = IngredientBase.builder()
+                                .ingredient(entite)
+                                .recette(
+                                        RecetteBase.builder()
+                                                .identifiant(IdentifiantBase
+                                                        .builder()
+                                                        .build())
+                                                .build())
+                                .build();
+
+                mapperManager.getIngredientMapper()
+                        .update(entiteMod);
+            }
+        });
+
+    }
+
+    @Test
+    public void testUpdateNomNull() throws Exception {
+        Assertions.assertThrows(
+                ContrainteNotNullPersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Ingredient entite
+                        = mapperManager.getIngredientMapper()
+                                .retrieve(identifiantAubergine);
+                entite.setNom(null);
+
+                mapperManager.getIngredientMapper()
+                        .update(entite);
+            }
+        });
+    }
+
 }
