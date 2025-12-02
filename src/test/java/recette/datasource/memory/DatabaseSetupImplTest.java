@@ -25,15 +25,19 @@ public class DatabaseSetupImplTest {
     public void testDropCreateTable() throws Exception {
         mapperManager.getDatabaseSetup().dropTables();
         mapperManager.getDatabaseSetup().createTables();
-        
+
         List<Unite> unites = mapperManager.getUniteMapper()
-                                .retrieve(".*");
-        Assertions.assertTrue(unites.isEmpty());     
-        
+                .retrieve(".*");
+        Assertions.assertTrue(unites.isEmpty());
+
         List<Ingredient> ingredients = mapperManager.getIngredientMapper()
-                                .retrieve(".*");
-        Assertions.assertTrue(ingredients.isEmpty());        
-        
+                .retrieve(".*");
+        Assertions.assertTrue(ingredients.isEmpty());
+
+        List<Recette> recettes = mapperManager.getRecetteMapper()
+                .retrieve(".*");
+        Assertions.assertTrue(recettes.isEmpty());
+
     }
 
     @Test
@@ -41,16 +45,19 @@ public class DatabaseSetupImplTest {
         mapperManager.getDatabaseSetup().dropTables();
         mapperManager.getDatabaseSetup().createTables();
         mapperManager.getDatabaseSetup().insertData();
-        
+
         List<Unite> unites = mapperManager.getUniteMapper()
-                                .retrieve(".*");
-        Assertions.assertFalse(unites.isEmpty());        
-        
+                .retrieve(".*");
+        Assertions.assertFalse(unites.isEmpty());
+
         List<Ingredient> ingredients = mapperManager.getIngredientMapper()
-                                .retrieve(".*");
-        Assertions.assertFalse(ingredients.isEmpty());        
-        
-        
+                .retrieve(".*");
+        Assertions.assertFalse(ingredients.isEmpty());
+
+        List<Recette> recettes = mapperManager.getRecetteMapper()
+                .retrieve(".*");
+        Assertions.assertFalse(recettes.isEmpty());
+
     }
 
 }
