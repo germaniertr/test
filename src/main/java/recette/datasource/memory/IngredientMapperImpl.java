@@ -3,6 +3,7 @@ package recette.datasource.memory;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -12,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import recette.datasource.IngredientMapper;
 import recette.datasource.RecetteRef;
+import recette.domain.Composant;
 import recette.domain.Ingredient;
 import recette.domain.IngredientBase;
 import recette.domain.Recette;
@@ -121,7 +123,19 @@ public class IngredientMapperImpl implements IngredientMapper {
 
     @Override
     public void delete(final Ingredient entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null || entite.getIdentifiant() == null) {
+            return;
+        }
+
+        Ingredient e = this.mapperManager.getData()
+                .getIngredients().get(entite.getIdentifiant());
+
+        checkEntiteInconnue(e, entite);
+        checkContrainteEntiteUtilisee(e);
+
+        this.mapperManager.getData()
+                .getIngredients().remove(e.getIdentifiant());
+
     }
 
     private void checkContainteNomNotNull(final Ingredient entite)
@@ -157,6 +171,33 @@ public class IngredientMapperImpl implements IngredientMapper {
                             + " l'uuid %s est inconnue!",
                             recette.getIdentifiant().getUUID()));
         }
+    }
+
+    private void checkEntiteInconnue(final Ingredient e,
+            final Ingredient entite)
+            throws EntiteInconnuePersistenceException {
+        if (e == null) {
+            throw new EntiteInconnuePersistenceException(
+                    String.format("Erreur: l'entité est inconnue! (%s)",
+                            entite.toString()));
+        }
+    }
+
+    private void checkContrainteEntiteUtilisee(final Ingredient e)
+            throws EntiteUtiliseePersistenceException {
+        //Vérifie si l'unité est utilisée dans un composant de recette
+        for (Recette recette : this.mapperManager.getData()
+                .getRecettes().values()) {
+            for (Composant c : recette.getComposants()) {
+                if (e.equals(c.getIngredient())) {
+                    throw new EntiteUtiliseePersistenceException(
+                            String.format("Erreur: L'ingrédient "
+                                    + "est utilisé! (%s)",
+                                    e.toString()));
+                }
+            }
+        }
+
     }
 
 }

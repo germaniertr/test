@@ -7,6 +7,7 @@ package recette.datasource.memory;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -273,4 +274,62 @@ public class IngredientMapperImplTest {
 
     }
 
+    @Test
+    public void testDelete() throws Exception {
+        Ingredient nouvelleEntite
+                = mapperManager.getIngredientMapper()
+                        .create(nouvelleIngredientRef2);
+        final Ingredient entite
+                = mapperManager.getIngredientMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+        Assertions.assertNotNull(entite);
+
+        mapperManager.getIngredientMapper()
+                .delete(entite);
+
+        Ingredient entiteNull
+                = mapperManager.getIngredientMapper()
+                        .retrieve(entite.getIdentifiant());
+
+        Assertions.assertNull(entiteNull);
+    }
+
+    @Test
+    public void testDeleteEntiteUtilisee() throws Exception {
+        Assertions.assertThrows(
+                EntiteUtiliseePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Ingredient entite
+                        = mapperManager.getIngredientMapper()
+                                .retrieve(identifiantAubergine);
+                Assertions.assertNotNull(entite);
+
+                mapperManager.getIngredientMapper()
+                        .delete(entite);
+            }
+        });
+
+    }
+
+    @Test
+    public void testDeleteEntiteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+
+                Ingredient entite
+                        = IngredientBase.builder()
+                                .ingredient(nouvelleIngredientRef2)
+                                .identifiant(IdentifiantBase.builder()
+                                        .build())
+                                .build();
+
+                mapperManager.getIngredientMapper()
+                        .delete(entite);
+            }
+        });
+    }
 }
