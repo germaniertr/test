@@ -1,5 +1,7 @@
 package recette.datasource.memory;
 
+import core.datasource.ContrainteNotNullPersistenceException;
+import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
@@ -30,7 +32,51 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public Recette create(final Recette entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null) {
+            return null;
+        }
+
+        RecetteBase.Builder builder = RecetteBase.builder()
+                .identifiant(IdentifiantBase.builder()
+                        .build())
+                .nom(entite.getNom())
+                .detail(entite.getDetail())
+                .preparation(entite.getPreparation())
+                .nombrePersonnes(entite.getNombrePersonnes());
+
+        int numero = 0;
+        for (Composant c : entite.getComposants()) {
+            Ingredient ingredient = this.mapperManager.getIngredientMapper()
+                    .retrieve(c.getIngredient().getIdentifiant());
+            checkIngredientInconnu(ingredient, c);
+
+            Unite unite = null;
+            if (c.getUnite() != null) {
+                unite = this.mapperManager.getUniteMapper()
+                        .retrieve(c.getUnite().getIdentifiant());
+
+                checkUniteInconnue(unite, c);
+            }
+
+            numero += 1;
+            Composant composant = ComposantBase.builder()
+                    .composant(c)
+                    .ingredient(ingredient)
+                    .unite(unite)
+                    .build();
+
+            builder.composant(composant);
+        }
+
+        Recette nouvelleEntite = builder.build();
+
+        this.checkContainteNomNotNull(nouvelleEntite);
+        this.checkContrainteNomUnique(nouvelleEntite);
+
+        this.mapperManager.getData().getRecettes()
+                .put(nouvelleEntite.getIdentifiant(), nouvelleEntite);
+
+        return this.retrieve(nouvelleEntite.getIdentifiant());
     }
 
     @Override
@@ -135,6 +181,30 @@ public class RecetteMapperImpl implements RecetteMapper {
                     String.format("Erreur: L'unité avec"
                             + " l'uuid %s est inconnue!",
                             c.getUnite().getIdentifiant().getUUID()));
+        }
+    }
+
+    private void checkContainteNomNotNull(final Recette entite)
+            throws ContrainteNotNullPersistenceException {
+        if (entite.getNom() == null) {
+            throw new ContrainteNotNullPersistenceException(
+                    String.format("Erreur: le nom est null! (%s)",
+                            entite));
+        }
+    }
+
+    private void checkContrainteNomUnique(final Recette entite)
+            throws ContrainteUniquePersistenceException {
+        for (Recette e : this.mapperManager.getData()
+                .getRecettes().values()) {
+            if (!e.equals(entite) && e.getNom().equals(entite.getNom())) {
+                throw new ContrainteUniquePersistenceException(
+                        String.format(
+                                "Erreur: Le nom n'est pas unique! (%s)",
+                                e.toString())
+                );
+            }
+
         }
     }
 }
