@@ -4,19 +4,26 @@
  */
 package recette.datasource.memory;
 
+import core.datasource.ContrainteNotNullPersistenceException;
+import core.datasource.ContrainteUniquePersistenceException;
+import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import recette.datasource.MapperManager;
 import recette.datasource.RecetteRef;
 import recette.domain.DemoData;
 import recette.domain.Ingredient;
 import recette.domain.IngredientBase;
+import recette.domain.RecetteBase;
 
 /**
  *
@@ -28,6 +35,8 @@ public class IngredientMapperImplTest {
     private final String filtreRef;
     private Identifiant identifiantAubergine;
     private Ingredient ingredientAubergine;
+    private Ingredient nouvelleIngredientRef2;
+    private Ingredient nouvelleIngredientRef1;
 
     public IngredientMapperImplTest() throws PersistenceException {
         mapperManager = MemoryMapperManagerImpl.getInstance();
@@ -49,6 +58,22 @@ public class IngredientMapperImplTest {
                 .nom(DemoData.INGREDIENTS.AUBERGINE.NOM)
                 .detail(DemoData.INGREDIENTS.AUBERGINE.DETAIL)
                 .build();
+
+        nouvelleIngredientRef2 = IngredientBase.builder()
+                .nom("nouvelle ingredient " + Instant.now().toString())
+                .detail("description du nouvelle ingrédient")
+                .build();
+
+        nouvelleIngredientRef1 = IngredientBase.builder()
+                .nom("nouvelle ingredient " + Instant.now().toString())
+                .detail("description du nouvelle ingrédient")
+                .recette(RecetteBase.builder()
+                        .identifiant(IdentifiantBase.builder()
+                                .uuid(DemoData.RECETTES.POIVRONS_AU_FOUR.UUID)
+                                .build())
+                        .build())
+                .build();
+
     }
 
     @AfterEach
@@ -176,6 +201,76 @@ public class IngredientMapperImplTest {
         Assertions.assertNotSame(entite1, entite2);
         entite1.setNom(entite1.getNom() + " update entite1");
         Assertions.assertNotEquals(entite1.getNom(), entite2.getNom());
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+        Ingredient nouvelleEntite
+                = mapperManager.getIngredientMapper()
+                        .create(nouvelleIngredientRef1);
+
+        Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
+        Assertions.assertEquals(nouvelleIngredientRef1.getNom(),
+                nouvelleEntite.getNom());
+        Assertions.assertEquals(nouvelleIngredientRef1.getDetail(),
+                nouvelleEntite.getDetail());
+
+        Ingredient entite
+                = mapperManager.getIngredientMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+        Assertions.assertNotNull(entite);
+        Assertions.assertEquals(nouvelleEntite, entite);
+        Assertions.assertNotSame(nouvelleEntite, entite);
+        Assertions.assertEquals(nouvelleEntite.getNom(), entite.getNom());
+        Assertions.assertEquals(nouvelleEntite.getDetail(), entite.getDetail());
+    }
+
+    @Disabled
+    @Test
+    public void testCreateRecetteInconnue() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                nouvelleIngredientRef1.setRecette(
+                        RecetteBase.builder()
+                                .identifiant(IdentifiantBase
+                                        .builder()
+                                        .build())
+                                .build());
+                mapperManager.getIngredientMapper()
+                        .create(nouvelleIngredientRef1);
+            }
+        });
+
+    }
+
+    @Test
+    public void testCreateNomNotUnique() throws Exception {
+        Assertions.assertThrows(
+                ContrainteUniquePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                mapperManager.getIngredientMapper()
+                        .create(ingredientAubergine);
+            }
+        });
+    }
+
+    @Test
+    public void testCreateNomNull() throws Exception {
+        Assertions.assertThrows(
+                ContrainteNotNullPersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                nouvelleIngredientRef1.setNom(null);
+
+                mapperManager.getIngredientMapper()
+                        .create(nouvelleIngredientRef1);
+            }
+        });
+
     }
 
 }
