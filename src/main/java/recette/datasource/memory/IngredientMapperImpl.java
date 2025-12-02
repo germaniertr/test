@@ -31,7 +31,25 @@ public class IngredientMapperImpl implements IngredientMapper {
 
     @Override
     public Ingredient retrieve(final Identifiant id) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (id == null) {
+            return null;
+        }
+
+        Ingredient entite = mapperManager.getData().getIngredients().get(id);
+        if (entite != null) {
+            entite = IngredientBase.builder()
+                    .ingredient(entite)
+                    .identifiant(IdentifiantBase.builder()
+                            .identifiant(entite.getIdentifiant())
+                            .build())
+                    .build();
+
+            if (entite.getRecette() != null) {
+                entite.setRecette(new RecetteRef(entite.getRecette()));
+            }
+        }
+        return entite;
+
     }
 
     @Override
