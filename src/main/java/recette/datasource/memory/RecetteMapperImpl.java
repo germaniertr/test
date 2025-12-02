@@ -35,7 +35,17 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public Recette retrieve(final Identifiant id) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (id == null) {
+            return null;
+        }
+        Recette entite = null;
+
+        entite = this.mapperManager.getData().getRecettes().get(id);
+        if (entite != null) {
+            entite = deepClone(entite);
+        }
+
+        return entite;
     }
 
     @Override
