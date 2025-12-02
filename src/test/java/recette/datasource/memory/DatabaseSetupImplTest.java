@@ -28,7 +28,12 @@ public class DatabaseSetupImplTest {
         
         List<Unite> unites = mapperManager.getUniteMapper()
                                 .retrieve(".*");
-        Assertions.assertTrue(unites.isEmpty());        
+        Assertions.assertTrue(unites.isEmpty());     
+        
+        List<Ingredient> ingredients = mapperManager.getIngredientMapper()
+                                .retrieve(".*");
+        Assertions.assertTrue(ingredients.isEmpty());        
+        
     }
 
     @Test
@@ -40,6 +45,12 @@ public class DatabaseSetupImplTest {
         List<Unite> unites = mapperManager.getUniteMapper()
                                 .retrieve(".*");
         Assertions.assertFalse(unites.isEmpty());        
+        
+        List<Ingredient> ingredients = mapperManager.getIngredientMapper()
+                                .retrieve(".*");
+        Assertions.assertFalse(ingredients.isEmpty());        
+        
+        
     }
 
 }
