@@ -122,7 +122,18 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public void delete(final Recette entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null || entite.getIdentifiant() == null) {
+            return;
+        }
+
+        Recette e = this.mapperManager.getData()
+                .getRecettes().get(entite.getIdentifiant());
+
+        checkEntiteInconnue(e, entite);
+
+        this.mapperManager.getData()
+                .getRecettes().remove(entite.getIdentifiant());
+
     }
 
     private Recette deepClone(final Recette entite)
@@ -207,4 +218,14 @@ public class RecetteMapperImpl implements RecetteMapper {
 
         }
     }
+
+    private void checkEntiteInconnue(final Recette e, final Recette entite)
+            throws EntiteInconnuePersistenceException {
+        if (e == null) {
+            throw new EntiteInconnuePersistenceException(
+                    String.format("Erreur: l'entité est inconnue! (%s)",
+                            entite.toString()));
+        }
+    }
+
 }

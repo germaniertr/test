@@ -2,6 +2,7 @@ package recette.datasource.memory;
 
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
+import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -336,6 +337,44 @@ public class RecetteMapperImplTest {
 
                 mapperManager.getRecetteMapper()
                         .create(nouvelleEntiteRef);
+            }
+        });
+
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        Recette nouvelleEntite
+                = mapperManager.getRecetteMapper()
+                        .create(nouvelleEntiteRef);
+        Recette entite
+                = mapperManager.getRecetteMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+        Assertions.assertNotNull(entite);
+
+        mapperManager.getRecetteMapper()
+                .delete(entite);
+
+        Recette entiteDel
+                = mapperManager.getRecetteMapper()
+                        .retrieve(entite.getIdentifiant());
+        Assertions.assertNull(entiteDel);
+
+    }
+
+    @Test
+    public void testDeleteEntiteInconnu() throws Exception {
+        Assertions.assertThrows(
+                EntiteInconnuePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette entite = RecetteBase.builder()
+                        .recette(nouvelleEntiteRef)
+                        .identifiant(IdentifiantBase.builder().build())
+                        .build();
+
+                mapperManager.getRecetteMapper()
+                        .delete(entite);
             }
         });
 
