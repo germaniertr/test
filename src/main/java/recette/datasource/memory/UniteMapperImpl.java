@@ -2,9 +2,14 @@ package recette.datasource.memory;
 
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
+import core.domain.IdentifiantBase;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import recette.datasource.UniteMapper;
 import recette.domain.Unite;
+import recette.domain.UniteBase;
 
 /**
  *
@@ -29,8 +34,29 @@ public class UniteMapperImpl implements UniteMapper {
     }
 
     @Override
-    public List<Unite> retrieve(final String filtre) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<Unite> retrieve(final String regex) throws PersistenceException {
+        if (regex == null) {
+            return new ArrayList<>();
+        }
+
+        Pattern pattern = Pattern.compile(regex);
+
+        List<Unite> entites = new ArrayList<>();
+
+        for (Unite e : mapperManager.getData()
+                .getUnites().values()) {
+            Matcher matcher = pattern.matcher(e.getCode());
+            if (matcher.find()) {
+                entites.add(UniteBase.builder()
+                        .unite(e)
+                        .identifiant(IdentifiantBase.builder()
+                                .identifiant(e.getIdentifiant())
+                                .build())
+                        .build());
+            }
+        }
+
+        return entites;
     }
 
     @Override
