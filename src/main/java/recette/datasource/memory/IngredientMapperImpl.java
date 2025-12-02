@@ -37,12 +37,12 @@ public class IngredientMapperImpl implements IngredientMapper {
         }
 
         Recette recette = null;
-//        if (entite.getRecette() != null) {
-//            recette = this.mapperManager.getRecetteMapper()
-//                    .retrieve(entite.getRecette().getIdentifiant());
-//
-//            checkRecetteInconnue(recette, entite.getRecette());
-//        }
+        if (entite.getRecette() != null) {
+            recette = this.mapperManager.getRecetteMapper()
+                    .retrieve(entite.getRecette().getIdentifiant());
+
+            checkRecetteInconnue(recette, entite.getRecette());
+        }
 
         Ingredient nouvelleEntite = IngredientBase.builder()
                 .ingredient(entite)
@@ -123,12 +123,12 @@ public class IngredientMapperImpl implements IngredientMapper {
         }
 
         Recette recette = null;
-//        if (entite.getRecette() != null) {
-//            recette = this.mapperManager.getRecetteMapper()
-//                    .retrieve(entite.getRecette().getIdentifiant());
-//
-//            checkRecetteInconnue(recette, entite.getRecette());
-//        }
+        if (entite.getRecette() != null) {
+            recette = this.mapperManager.getRecetteMapper()
+                    .retrieve(entite.getRecette().getIdentifiant());
+
+            checkRecetteInconnue(recette, entite.getRecette());
+        }
 
         Ingredient e = this.mapperManager.getData()
                 .getIngredients().get(entite.getIdentifiant());

@@ -24,6 +24,7 @@ import recette.datasource.RecetteRef;
 import recette.domain.DemoData;
 import recette.domain.Ingredient;
 import recette.domain.IngredientBase;
+import recette.domain.Recette;
 import recette.domain.RecetteBase;
 
 /**
@@ -173,11 +174,11 @@ public class IngredientMapperImplTest {
 
         Assertions.assertTrue(entite.getRecette() instanceof RecetteRef);
 
-//        Recette recette = mapperManager.getRecetteMapper()
-//                        .retrieve(IdentifiantBase.builder()
-//                                .uuid(DemoData.RECETTES.SAUCE_TOMATES.UUID)
-//                                .build());
-//        Assertions.assertNotSame(recette, entite.getRecette());
+        Recette recette = mapperManager.getRecetteMapper()
+                        .retrieve(IdentifiantBase.builder()
+                                .uuid(DemoData.RECETTES.SAUCE_TOMATES.UUID)
+                                .build());
+        Assertions.assertNotSame(recette, entite.getRecette());
     }
 
     @Test
@@ -227,7 +228,6 @@ public class IngredientMapperImplTest {
         Assertions.assertEquals(nouvelleEntite.getDetail(), entite.getDetail());
     }
 
-    @Disabled
     @Test
     public void testCreateRecetteInconnue() throws Exception {
         Assertions.assertThrows(
@@ -397,7 +397,6 @@ public class IngredientMapperImplTest {
 
     }
 
-    @Disabled
     @Test
     public void testUpdateRecetteInconnu() throws Exception {
         Assertions.assertThrows(
