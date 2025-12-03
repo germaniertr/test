@@ -141,10 +141,16 @@ public final class SQL {
                 = SELECTION
                 + """
                   FROM ingredients i
-                  WHERE to_tsvector('french', coalesce(i.nom, '')) 
-                        || to_tsvector('french', coalesce(i.detail, '')) 
+                  WHERE to_tsvector('french', coalesce(i.nom, ''))
+                        || to_tsvector('french', coalesce(i.detail, ''))
                         @@ websearch_to_tsquery('french', ?)
-                                    
+                  """;
+
+        public static final String SELECT_BY_UUID
+                = SELECTION
+                + """
+                  FROM ingredients i
+                  WHERE i.uuid = ?
                   """;
 
         private INGREDIENTS() {

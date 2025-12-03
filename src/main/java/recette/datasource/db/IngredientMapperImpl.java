@@ -3,7 +3,6 @@ package recette.datasource.db;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
-import static java.lang.Runtime.version;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,9 +35,45 @@ public class IngredientMapperImpl implements IngredientMapper {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    private Ingredient retrieve(final Connection connection,
+            final Identifiant id) throws PersistenceException {
+        Ingredient unite = null;
+
+        try (PreparedStatement ps
+                = connection.prepareStatement(SQL.INGREDIENTS.SELECT_BY_UUID)) {
+            ps.setString(1, id.getUUID());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                unite = readEntite(rs);
+            }
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new PersistenceException(ex);
+        }
+
+        return unite;
+    }
+
     @Override
     public Ingredient retrieve(final Identifiant id) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (id == null) {
+            return null;
+        }
+        Ingredient entite = null;
+
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            entite = this.retrieve(connection, id);
+
+            connection.commit();
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new PersistenceException(ex);
+        }
+
+        return entite;
     }
 
     @Override
