@@ -1,12 +1,17 @@
 package recette.datasource.db;
 
+import core.datasource.ContrainteNotNullPersistenceException;
+import core.datasource.ContrainteUniquePersistenceException;
+import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.PersistenceException;
+import core.datasource.db.SQL_ERREUR_CODES;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,7 +35,73 @@ public class UniteMapperImpl implements UniteMapper {
 
     @Override
     public Unite create(final Unite entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null) {
+            return null;
+        }
+        Unite nouvelEntite = null;
+        Identifiant id = IdentifiantBase.builder().build();
+
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(SQL.UNITES.INSERT)) {
+
+                ps.setString(1, id.getUUID());
+
+                if (entite.getCode() != null) {
+                    ps.setString(2,
+                            entite.getCode());
+                } else {
+                    ps.setNull(2,
+                            Types.VARCHAR);
+                }
+
+                ps.executeUpdate();
+
+                nouvelEntite = this.retrieve(connection, id);
+            }
+
+            connection.commit();
+
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_NOT_NULL_VIOLATION)) {
+                throw new ContrainteNotNullPersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_UNIQUE_VIOLATION)) {
+                throw new ContrainteUniquePersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
+                throw new EntiteInconnuePersistenceException(ex);
+            }
+
+            throw new PersistenceException(ex);
+        }
+
+        return nouvelEntite;
+    }
+
+    private Unite retrieve(final Connection connection, final Identifiant id) throws PersistenceException {
+        Unite unite = null;
+
+        try (PreparedStatement ps
+                = connection.prepareStatement(SQL.UNITES.SELECT_BY_UUID)) {
+            ps.setString(1, id.getUUID());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                unite = readEntite(rs);
+            }
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new PersistenceException(ex);
+        }
+
+        return unite;
     }
 
     @Override
@@ -43,15 +114,7 @@ public class UniteMapperImpl implements UniteMapper {
         try (Connection connection = this.mapperManager.getConnection()) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.UNITES.SELECT_BY_UUID)) {
-                ps.setString(1, id.getUUID());
-
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    unite = readEntite(rs);
-                }
-            }
+            unite = this.retrieve(connection, id);
 
             connection.commit();
         } catch (SQLException ex) {
