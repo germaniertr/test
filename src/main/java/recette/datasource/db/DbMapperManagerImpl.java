@@ -25,6 +25,7 @@ public final class DbMapperManagerImpl implements MapperManager {
         return mapperManager;
     }
     private DatabaseSetupImpl databaseSetup;
+    private UniteMapperImpl uniteMapper;
 
     private DbMapperManagerImpl(final DataSource datasource) {
         this.datasource = datasource;
@@ -36,7 +37,10 @@ public final class DbMapperManagerImpl implements MapperManager {
 
     @Override
     public UniteMapper getUniteMapper() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (this.uniteMapper == null) {
+            this.uniteMapper = new UniteMapperImpl(this);
+        }
+        return this.uniteMapper;
     }
 
     @Override
