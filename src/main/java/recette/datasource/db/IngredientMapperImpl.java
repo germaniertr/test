@@ -21,6 +21,7 @@ import recette.domain.RecetteBase;
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
+//CHECKSTYLE.OFF: MagicNumber
 public class IngredientMapperImpl implements IngredientMapper {
 
     private final DbMapperManagerImpl mapperManager;
@@ -32,7 +33,72 @@ public class IngredientMapperImpl implements IngredientMapper {
 
     @Override
     public Ingredient create(final Ingredient entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null) {
+            return null;
+        }
+        Ingredient nouvelEntite = null;
+        Identifiant id = IdentifiantBase.builder().build();
+
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(SQL.INGREDIENTS.INSERT)) {
+
+                ps.setString(1,
+                        id.getUUID());
+
+                if (entite.getNom() != null) {
+                    ps.setString(2,
+                            entite.getNom());
+                } else {
+                    ps.setNull(2,
+                            Types.VARCHAR);
+                }
+                if (entite.getDetail() != null) {
+                    ps.setString(3,
+                            entite.getDetail());
+                } else {
+                    ps.setNull(3,
+                            Types.VARCHAR);
+                }
+                if (entite.getRecette() != null) {
+                    ps.setString(4,
+                            entite.getRecette()
+                                    .getIdentifiant()
+                                    .getUUID());
+                } else {
+                    ps.setNull(4,
+                            Types.VARCHAR);
+                }
+
+                ps.executeUpdate();
+
+                nouvelEntite = this.retrieve(connection, id);
+            }
+
+            connection.commit();
+
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_NOT_NULL_VIOLATION)) {
+                throw new ContrainteNotNullPersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_UNIQUE_VIOLATION)) {
+                throw new ContrainteUniquePersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
+                throw new EntiteInconnuePersistenceException(ex);
+            }
+
+            throw new PersistenceException(ex);
+        }
+
+        return nouvelEntite;
+
     }
 
     private Ingredient retrieve(final Connection connection,
@@ -159,5 +225,6 @@ public class IngredientMapperImpl implements IngredientMapper {
                 .uuid(uuid)
                 .build();
     }
-
 }
+//CHECKSTYLE.ON: MagicNumber
+
