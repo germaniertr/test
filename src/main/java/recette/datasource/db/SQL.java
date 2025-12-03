@@ -37,8 +37,31 @@ public final class SQL {
                   VALUES (?,?)
                   """;
 
+        public static final String SELECTION
+                = """
+                  SELECT u.uuid,
+                   u.code
+                  """;
+
+        public static final String SELECT_BY_FILTRE
+                = SELECTION
+                + """
+                  FROM unites u
+                  WHERE to_tsvector('french', u.code) @@ websearch_to_tsquery('french', ?)
+                  ORDER BY u.code
+                  """;
+
         private UNITES() {
         }
+
+        public static final class ATTRIBUTS {
+
+            public static final String CODE = "code";
+
+            private ATTRIBUTS() {
+            }
+        }
+
     }
 
     public static final class INGREDIENTS {
@@ -176,6 +199,20 @@ public final class SQL {
                   """;
 
         private COMPOSANTS() {
+        }
+    }
+
+    public static final class ENTITES {
+
+        private ENTITES() {
+        }
+
+        public static final class ATTRIBUTS {
+
+            public static final String UUID = "uuid";
+
+            private ATTRIBUTS() {
+            }
         }
     }
 //CHECKSTYLE.ON: TypeName
