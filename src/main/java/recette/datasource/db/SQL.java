@@ -58,6 +58,17 @@ public final class SQL {
                   WHERE u.uuid = ?
                   """;
 
+        public static final String DELETE
+                = """
+                  DELETE FROM unites
+                  """;
+
+        public static final String DELETE_BY_UUID
+                = DELETE
+                + """
+                  WHERE uuid = ?
+                  """;
+
         private UNITES() {
         }
 
