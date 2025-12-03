@@ -1,12 +1,18 @@
 package recette.datasource.db;
 
+import core.datasource.ContrainteNotNullPersistenceException;
+import core.datasource.ContrainteUniquePersistenceException;
+import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
+import core.datasource.db.SQL_ERREUR_CODES;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -184,7 +190,46 @@ public class IngredientMapperImpl implements IngredientMapper {
 
     @Override
     public void delete(final Ingredient entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        /*pré-condition*/
+        if (entite == null) {
+            return;
+        }
+
+        if (entite.getIdentifiant() == null) {
+            return;
+        }
+
+        Ingredient entiteTrouvee
+                = this.retrieve(entite.getIdentifiant());
+        if (entiteTrouvee == null) {
+            throw new EntiteInconnuePersistenceException(
+                    String.format("Erreur: l'entitée (%s) "
+                            + "n'est pas connue!",
+                            entite.toString()));
+        }
+
+        /* traitement*/
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(SQL.INGREDIENTS.DELETE_BY_UUID)) {
+                ps.setString(1, entite.getIdentifiant().getUUID());
+
+                ps.executeUpdate();
+            }
+
+            connection.commit();
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            if (ex.getSQLState().equals(
+                    SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
+                throw new EntiteUtiliseePersistenceException(ex);
+            }
+
+            throw new PersistenceException(ex);
+        }
+
     }
 
     private Ingredient readEntite(final ResultSet rs) throws SQLException {
