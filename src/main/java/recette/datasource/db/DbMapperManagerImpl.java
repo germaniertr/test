@@ -1,6 +1,7 @@
 package recette.datasource.db;
 
 import core.datasource.DatabaseSetup;
+import javax.sql.DataSource;
 import recette.datasource.IngredientMapper;
 import recette.datasource.MapperManager;
 import recette.datasource.RecetteMapper;
@@ -11,6 +12,20 @@ import recette.datasource.UniteMapper;
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
 public class DbMapperManagerImpl implements MapperManager {
+
+    private static DbMapperManagerImpl mapperManager;
+    private final DataSource datasource;
+
+    public static MapperManager getInstance(DataSource datasource) {
+        if (mapperManager == null) {
+            mapperManager = new DbMapperManagerImpl(datasource);
+        }
+        return mapperManager;
+    }
+
+    private DbMapperManagerImpl(DataSource datasource) {
+        this.datasource = datasource;
+    }
 
     @Override
     public UniteMapper getUniteMapper() {

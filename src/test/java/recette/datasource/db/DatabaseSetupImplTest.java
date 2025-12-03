@@ -1,36 +1,13 @@
 package recette.datasource.db;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 /**
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
-public class DatabaseSetupImplTest {
-    
+public class DatabaseSetupImplTest extends recette.datasource.DatabaseSetupImplTest {
+
     public DatabaseSetupImplTest() {
-    }
-    
-    @BeforeEach
-    public void setUp() {
-    }
-    
-    @AfterEach
-    public void tearDown() {
+        super(DbMapperManagerImpl.getInstance(TestDataSourceFactory.getInstance()));
     }
 
-    @Test
-    public void testCreateTables() throws Exception {
-    }
-
-    @Test
-    public void testDropTables() throws Exception {
-    }
-
-    @Test
-    public void testInsertData() throws Exception {
-    }
-    
 }
