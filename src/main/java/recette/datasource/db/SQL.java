@@ -51,6 +51,13 @@ public final class SQL {
                   ORDER BY u.code
                   """;
 
+        public static final String SELECT_BY_UUID
+                = SELECTION
+                + """
+                  FROM unites u
+                  WHERE u.uuid = ?
+                  """;
+
         private UNITES() {
         }
 

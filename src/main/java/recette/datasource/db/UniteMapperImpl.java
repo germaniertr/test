@@ -35,7 +35,31 @@ public class UniteMapperImpl implements UniteMapper {
 
     @Override
     public Unite retrieve(final Identifiant id) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (id == null) {
+            return null;
+        }
+        Unite unite = null;
+
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(SQL.UNITES.SELECT_BY_UUID)) {
+                ps.setString(1, id.getUUID());
+
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    unite = readEntite(rs);
+                }
+            }
+
+            connection.commit();
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new PersistenceException(ex);
+        }
+
+        return unite;
     }
 
     @Override
