@@ -69,6 +69,13 @@ public final class SQL {
                   WHERE uuid = ?
                   """;
 
+        public static final String UPDATE
+                = """
+                  UPDATE unites
+                  SET  code = ?
+                  WHERE uuid = ?
+                  """;
+
         private UNITES() {
         }
 
