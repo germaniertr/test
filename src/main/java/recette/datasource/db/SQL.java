@@ -164,6 +164,15 @@ public final class SQL {
                   WHERE uuid = ?
                   """;
 
+        public static final String UPDATE
+                = """
+                  UPDATE ingredients
+                  SET  nom = ?,
+                       detail = ?,
+                       recettes_uuid = ?
+                  WHERE uuid = ?
+                  """;
+
         private INGREDIENTS() {
         }
 
