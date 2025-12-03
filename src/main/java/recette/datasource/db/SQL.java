@@ -129,7 +129,35 @@ public final class SQL {
                   VALUES (?,?,?,?)
                   """;
 
+        public static final String SELECTION
+                = """
+                  SELECT i.uuid,
+                         i.nom,
+                         i.detail,
+                         i.recettes_uuid
+                   """;
+
+        public static final String SELECT_BY_FILTRE
+                = SELECTION
+                + """
+                  FROM ingredients i
+                  WHERE to_tsvector('french', coalesce(i.nom, '')) 
+                        || to_tsvector('french', coalesce(i.detail, '')) 
+                        @@ websearch_to_tsquery('french', ?)
+                                    
+                  """;
+
         private INGREDIENTS() {
+        }
+
+        public static final class ATTRIBUTS {
+
+            public static final String NOM = "nom";
+            public static final String DETAIL = "detail";
+            public static final String RECETTES_UUID = "recettes_uuid";
+
+            private ATTRIBUTS() {
+            }
         }
     }
 
