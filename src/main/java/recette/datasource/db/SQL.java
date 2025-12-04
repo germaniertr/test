@@ -221,7 +221,33 @@ public final class SQL {
                   VALUES(?,?,?,?,?)
                   """;
 
+        public static final String SELECTION
+                = """
+                  SELECT r.uuid,
+                     r.nom, r.detail,
+                     r.preparation,
+                     r.nombre_personnes
+                  """;
+
+        public static final String SELECT_BY_FILTRE
+                = SELECTION
+                + """
+                  FROM recettes r
+                  WHERE to_tsvector('french', coalesce(r.nom, ''))
+                       || to_tsvector('french', coalesce(r.detail, ''))
+                       || to_tsvector('french', coalesce(r.preparation, ''))
+                        @@ websearch_to_tsquery('french', ?)
+                  """;
+
         private RECETTES() {
+        }
+
+        public static final class ATTRIBUTS {
+
+            public static final String NOM = "nom";
+            public static final String DETAIL = "detail";
+            public static final String PREPARATION = "preparation";
+            public static final String NOMBRE_PERSONNES = "nombre_personnes";
         }
     }
 
@@ -277,7 +303,35 @@ public final class SQL {
                   VALUES(?,?,?,?,?,?,?)
                   """;
 
+        public static final String SELECTION
+                = """
+                  SELECT c.uuid,
+                  c.quantite,
+                  c.commentaire,
+                  c.ingredients_uuid,
+                  c.unites_uuid
+                  """;
+
+        public static final String SELECT_BY_UUID_RECETTE
+                = SELECTION
+                + """
+                  FROM composants c
+                  WHERE c.recettes_uuid = ?
+                  ORDER BY c.ordre\n
+                  """;
+
         private COMPOSANTS() {
+        }
+
+        public static final class ATTRIBUTS {
+
+            public static final String QUANTITE = "quantite";
+            public static final String COMMENTAIRE = "commentaire";
+            public static final String INGREDIENTS_UUID = "ingredients_uuid";
+            public static final String UNITES_UUID = "unites_uuid";
+
+            private ATTRIBUTS() {
+            }
         }
     }
 

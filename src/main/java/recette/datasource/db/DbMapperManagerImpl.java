@@ -27,6 +27,7 @@ public final class DbMapperManagerImpl implements MapperManager {
     private DatabaseSetupImpl databaseSetup;
     private UniteMapperImpl uniteMapper;
     private IngredientMapperImpl ingredientMapper;
+    private RecetteMapperImpl recetteMapper;
 
     private DbMapperManagerImpl(final DataSource datasource) {
         this.datasource = datasource;
@@ -54,7 +55,11 @@ public final class DbMapperManagerImpl implements MapperManager {
 
     @Override
     public RecetteMapper getRecetteMapper() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (this.recetteMapper == null) {
+            this.recetteMapper = new RecetteMapperImpl(this);
+        }
+        return this.recetteMapper;
+
     }
 
     @Override

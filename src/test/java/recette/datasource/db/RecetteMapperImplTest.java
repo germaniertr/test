@@ -11,7 +11,7 @@ public class RecetteMapperImplTest  extends recette.datasource.RecetteMapperImpl
     public RecetteMapperImplTest() throws PersistenceException {
         super(DbMapperManagerImpl.getInstance(TestDataSourceFactory.getInstance()));  
         
-        filtreRef1 = "poire or poivron or tomate";
+        filtreRef1 = "poire or poivron or tomate !aubergine";
         filtreRef2 = "aubergine";
         
     }
