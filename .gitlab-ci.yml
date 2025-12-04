@@ -1,4 +1,4 @@
-image: maven:3.9.3-amazoncorretto-17-debian
+image: maven:3.9.9-eclipse-temurin-21
 
 stages:
 - validate
@@ -9,16 +9,14 @@ stages:
 variables:
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
-  POSTGRES_DB: $POSTGRES_DB
-  POSTGRES_USER: $POSTGRES_USER
-  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_DB: $POSTGRESQL_DB
+  POSTGRES_USER: $POSTGRESQL_USER
   POSTGRES_HOST_AUTH_METHOD: trust
 
 default:
   services:
-    - name: postgres:12.2-alpine
-      alias: $POSTGRES_HOST
-
+    - name: postgres:15.3-alpine
+      alias: $POSTGRESQL_HOST
 cache:
   paths:
   - .m2/repository
