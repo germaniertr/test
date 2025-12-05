@@ -1,12 +1,17 @@
 package recette.datasource.db;
 
+import core.datasource.ContrainteNotNullPersistenceException;
+import core.datasource.ContrainteUniquePersistenceException;
+import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.PersistenceException;
+import core.datasource.db.SQL_ERREUR_CODES;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,6 +28,7 @@ import recette.domain.Unite;
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
+//CHECKSTYLE.OFF: MagicNumber
 public class RecetteMapperImpl implements RecetteMapper {
 
     private final DbMapperManagerImpl mapperManager;
@@ -34,7 +40,115 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public Recette create(final Recette entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null) {
+            return null;
+        }
+        Recette nouvelEntite = null;
+        Identifiant id = IdentifiantBase.builder().build();
+
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(SQL.RECETTES.INSERT)) {
+
+                ps.setString(1,
+                        id.getUUID());
+
+                if (entite.getNom() != null) {
+                    ps.setString(2,
+                            entite.getNom());
+                } else {
+                    ps.setNull(2,
+                            Types.VARCHAR);
+                }
+
+                if (entite.getDetail() != null) {
+                    ps.setString(3,
+                            entite.getDetail());
+                } else {
+                    ps.setNull(3,
+                            Types.VARCHAR);
+                }
+
+                if (entite.getPreparation() != null) {
+                    ps.setString(4,
+                            entite.getPreparation());
+                } else {
+                    ps.setNull(4,
+                            Types.VARCHAR);
+                }
+
+                if (entite.getNombrePersonnes() != null) {
+                    ps.setInt(5,
+                            entite.getNombrePersonnes());
+                } else {
+                    ps.setNull(5,
+                            Types.INTEGER);
+                }
+
+                ps.executeUpdate();
+
+                if (!entite.getComposants().isEmpty()) {
+                    insertComposants(
+                            connection,
+                            id,
+                            entite.getComposants());
+                }
+
+                nouvelEntite = this.retrieve(connection, id);
+            }
+
+            connection.commit();
+
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_NOT_NULL_VIOLATION)) {
+                throw new ContrainteNotNullPersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_UNIQUE_VIOLATION)) {
+                throw new ContrainteUniquePersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
+                throw new EntiteInconnuePersistenceException(ex);
+            }
+
+            throw new PersistenceException(ex);
+        }
+
+        return nouvelEntite;
+
+    }
+
+    private Recette retrieve(final Connection connection,
+            final Identifiant id) throws PersistenceException {
+        Recette entite = null;
+
+        try (PreparedStatement ps
+                = connection.prepareStatement(SQL.RECETTES.SELECT_BY_UUID)) {
+            ps.setString(1, id.getUUID());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                entite = readEntite(rs);
+                if (entite != null) {
+                    List<Composant> composants
+                            = this.retrieveComposantByUuidRecette(
+                                    connection,
+                                    entite.getIdentifiant());
+                    for (Composant c : composants) {
+                        entite.getComposants().add(c);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new PersistenceException(ex);
+        }
+        return entite;
     }
 
     @Override
@@ -47,27 +161,7 @@ public class RecetteMapperImpl implements RecetteMapper {
         try (Connection connection = this.mapperManager.getConnection()) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.RECETTES.SELECT_BY_UUID)) {
-                ps.setString(1, id.getUUID());
-
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    entite = readEntite(rs);
-                    if (entite != null) {
-                        List<Composant> composants
-                                = this.retrieveComposantByUuidRecette(
-                                        connection,
-                                        entite.getIdentifiant());
-                        for (Composant c : composants) {
-                            entite.getComposants().add(c);
-                        }
-                    }
-                }
-            } catch (SQLException ex) {
-                LOG.log(Level.SEVERE, null, ex);
-                throw new PersistenceException(ex);
-            }
+            entite = this.retrieve(connection, id);
 
             connection.commit();
         } catch (SQLException ex) {
@@ -230,4 +324,44 @@ public class RecetteMapperImpl implements RecetteMapper {
         return entite;
     }
 
+    private void insertComposants(
+            final Connection connection,
+            final Identifiant id,
+            final List<Composant> composants) throws SQLException, PersistenceException {
+        try (PreparedStatement ps
+                = connection.prepareStatement(SQL.COMPOSANTS.INSERT)) {
+            for (int ordre = 0; ordre < composants.size(); ordre += 1) {
+                Composant c = composants.get(ordre);
+
+                ps.setString(1, c.getIdentifiant() != null
+                        ? c.getIdentifiant().getUUID()
+                        : IdentifiantBase.builder().build().getUUID());
+                ps.setString(2, id.getUUID());
+                ps.setInt(3, ordre);
+                if (c.getQuantite() != null) {
+                    ps.setDouble(4,
+                            c.getQuantite());
+                } else {
+                    ps.setNull(4,
+                            java.sql.Types.DOUBLE);
+                }
+                ps.setString(5,
+                        c.getCommentaire());
+                ps.setString(6,
+                        c.getIngredient().getIdentifiant().getUUID());
+                if (c.getUnite() != null) {
+                    ps.setString(7,
+                            c.getUnite().getIdentifiant().getUUID());
+                } else {
+                    ps.setNull(7,
+                            java.sql.Types.VARCHAR);
+                }
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+        }
+    }
 }
+//CHECKSTYLE.ON: MagicNumber
