@@ -239,6 +239,13 @@ public final class SQL {
                         @@ websearch_to_tsquery('french', ?)
                   """;
 
+        public static final String SELECT_BY_UUID
+                = SELECTION
+                + """
+                  FROM recettes r
+                  WHERE r.uuid = ?
+                  """;
+
         private RECETTES() {
         }
 

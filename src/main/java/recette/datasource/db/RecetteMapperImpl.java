@@ -39,7 +39,44 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public Recette retrieve(final Identifiant id) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (id == null) {
+            return null;
+        }
+        Recette entite = null;
+
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(SQL.RECETTES.SELECT_BY_UUID)) {
+                ps.setString(1, id.getUUID());
+
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    entite = readEntite(rs);
+                    if (entite != null) {
+                        List<Composant> composants
+                                = this.retrieveComposantByUuidRecette(
+                                        connection,
+                                        entite.getIdentifiant());
+                        for (Composant c : composants) {
+                            entite.getComposants().add(c);
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+                throw new PersistenceException(ex);
+            }
+
+            connection.commit();
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new PersistenceException(ex);
+        }
+
+        return entite;
+
     }
 
     @Override
