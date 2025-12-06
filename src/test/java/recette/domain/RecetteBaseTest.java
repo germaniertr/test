@@ -28,6 +28,7 @@ public class RecetteBaseTest {
     private Composant composantRef2;
     private Composant composantRef3;
     private List<Composant> composantsRef;
+    private Long versionRef;
 
     public RecetteBaseTest() {
     }
@@ -35,6 +36,8 @@ public class RecetteBaseTest {
     @BeforeEach
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
+        versionRef = 123L;
+
         nomRef = "nom recette";
         detailRef = "description recette";
         preparationRef = "preparation recette";
@@ -83,6 +86,7 @@ public class RecetteBaseTest {
 
         entiteRef = RecetteBase.builder()
                 .identifiant(identifiantRef)
+                .version(versionRef)
                 .nom(nomRef)
                 .detail(detailRef)
                 .preparation(preparationRef)
@@ -106,6 +110,7 @@ public class RecetteBaseTest {
     @Test
     public void testGet() {
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, this.entiteRef.getVersion());
         Assertions.assertEquals(nomRef, this.entiteRef.getNom());
         Assertions.assertEquals(detailRef, this.entiteRef.getDetail());
         Assertions.assertEquals(preparationRef, this.entiteRef.getPreparation());
@@ -168,6 +173,7 @@ public class RecetteBaseTest {
         this.entiteRef.getComposants().add(composant4);
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, this.entiteRef.getVersion());
         Assertions.assertEquals(nom, this.entiteRef.getNom());
         Assertions.assertEquals(detail, this.entiteRef.getDetail());
         Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
@@ -269,6 +275,7 @@ public class RecetteBaseTest {
         this.entiteRef.update(entite);
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, this.entiteRef.getVersion());
         Assertions.assertEquals(nom, this.entiteRef.getNom());
         Assertions.assertEquals(detail, this.entiteRef.getDetail());
         Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
@@ -327,6 +334,8 @@ public class RecetteBaseTest {
 
         Assertions.assertEquals(this.entiteRef.getIdentifiant(),
                 entite.getIdentifiant());
+        Assertions.assertEquals(this.entiteRef.getVersion(),
+                entite.getVersion());
 
         Assertions.assertEquals(this.entiteRef.getNom(),
                 entite.getNom());
@@ -359,5 +368,4 @@ public class RecetteBaseTest {
                     RecetteBase.builder().recette((Recette) null).build();
                 });
     }
-
 }

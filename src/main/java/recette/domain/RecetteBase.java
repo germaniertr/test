@@ -18,7 +18,7 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
     private final List<Composant> composants;
 
     private RecetteBase(final Builder b) {
-        super(b.identifiant);
+        super(b.identifiant, b.version);
         this.nom = b.nom;
         this.detail = b.detail;
         this.preparation = b.preparation;
@@ -132,6 +132,7 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
     public static class Builder {
 
         private Identifiant identifiant = null;
+        private Long version = 0L;
         private String nom;
         private String detail;
         private String preparation;
@@ -147,6 +148,7 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
                 throw new IllegalArgumentException("Erreur: l'argument recette ne peut pas être null");
             }
             this.identifiant = pRecette.getIdentifiant();
+            this.version = pRecette.getVersion();
             this.nom = pRecette.getNom();
             this.detail = pRecette.getDetail();
             this.preparation = pRecette.getPreparation();
@@ -163,6 +165,11 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
 
         public Builder identifiant(final Identifiant pIdentifiant) {
             this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Builder version(final Long pVersion) {
+            this.version = pVersion;
             return this;
         }
 

@@ -10,9 +10,12 @@ public abstract class EntiteBase<E extends Entite>
         implements Entite<E> {
 
     private final Identifiant identifiant;
+    private final Long version;
 
-    protected EntiteBase(final Identifiant identifiant) {
+    protected EntiteBase(final Identifiant identifiant,
+            final Long version) {
         this.identifiant = identifiant;
+        this.version = version;
     }
 
     @Override
@@ -21,8 +24,13 @@ public abstract class EntiteBase<E extends Entite>
     }
 
     @Override
+    public Long getVersion() {
+        return this.version;
+    }
+
+    @Override
     public String toString() {
-        return "EntiteBase{" + "identifiant=" + identifiant + '}';
+        return "EntiteBase{" + "identifiant=" + identifiant + ", version=" + version + '}';
     }
 
     @Override

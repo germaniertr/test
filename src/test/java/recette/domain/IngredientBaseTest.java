@@ -21,6 +21,7 @@ public class IngredientBaseTest {
     private String detailRef;
     private Ingredient entiteRef;
     private Recette recetteRef;
+    private Long versionRef;
 
     public IngredientBaseTest() {
     }
@@ -28,6 +29,7 @@ public class IngredientBaseTest {
     @BeforeEach
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
+        versionRef = 123L;
         nomRef = "nom de référence";
         detailRef = "détail de référence";
         recetteRef = RecetteBase.builder()
@@ -36,6 +38,7 @@ public class IngredientBaseTest {
 
         entiteRef = IngredientBase.builder()
                 .identifiant(identifiantRef)
+                .version(versionRef)
                 .nom(nomRef)
                 .detail(detailRef)
                 .recette(recetteRef)
@@ -65,6 +68,7 @@ public class IngredientBaseTest {
         this.entiteRef.setRecette(recette);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, entiteRef.getVersion());
         Assertions.assertEquals(nom, entiteRef.getNom());
         Assertions.assertEquals(detail, entiteRef.getDetail());
         Assertions.assertEquals(recette, entiteRef.getRecette());
@@ -121,6 +125,7 @@ public class IngredientBaseTest {
         this.entiteRef.update(entite);
 
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, entiteRef.getVersion());
         Assertions.assertEquals(nom, entiteRef.getNom());
         Assertions.assertEquals(detail, entiteRef.getDetail());
         Assertions.assertEquals(recette, entiteRef.getRecette());
@@ -145,6 +150,7 @@ public class IngredientBaseTest {
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
 
         Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
+        Assertions.assertEquals(this.entiteRef.getVersion(), entite.getVersion());
 
         Assertions.assertEquals(this.entiteRef.getNom(), entite.getNom());
         Assertions.assertEquals(this.entiteRef.getDetail(), entite.getDetail());

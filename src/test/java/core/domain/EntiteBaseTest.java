@@ -16,15 +16,18 @@ public class EntiteBaseTest {
     private Entite entiteRef;
     private Identifiant idRef;
     private String uuidRef;
+    private Long versionRef;
 
     @BeforeEach
     public void setUp() {
         uuidRef = "12345678-1234-1234-123456789012";
+        versionRef = 123L;
+
         idRef = IdentifiantBase.builder()
                 .uuid(uuidRef)
                 .build();
 
-        entiteRef = new EntiteBase(idRef) {
+        entiteRef = new EntiteBase(idRef, versionRef) {
             @Override
             public void update(Entite entite) {
                 throw new UnsupportedOperationException("Not supported yet.");
@@ -35,6 +38,7 @@ public class EntiteBaseTest {
     @Test
     public void testGet() {
         Assertions.assertEquals(idRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, entiteRef.getVersion());
     }
 
     @Test
@@ -45,7 +49,7 @@ public class EntiteBaseTest {
 
     @Test
     public void testEquals() {
-        Entite entite = new EntiteBase(idRef) {
+        Entite entite = new EntiteBase(idRef, versionRef) {
             @Override
             public void update(Entite entite) {
                 throw new UnsupportedOperationException("Not supported yet.");

@@ -12,7 +12,7 @@ public final class UniteBase extends EntiteBase<Unite> implements Unite {
     private String code;
 
     private UniteBase(final Builder b) {
-        super(b.identifiant);
+        super(b.identifiant, b.version);
         this.code = b.code;
     }
 
@@ -65,6 +65,7 @@ public final class UniteBase extends EntiteBase<Unite> implements Unite {
     public static class Builder {
 
         private Identifiant identifiant = null;
+        private Long version = 0L;
         private String code = null;
 
         protected Builder() {
@@ -76,6 +77,7 @@ public final class UniteBase extends EntiteBase<Unite> implements Unite {
             }
 
             this.identifiant = pUnite.getIdentifiant();
+            this.version = pUnite.getVersion();
             this.code = pUnite.getCode();
 
             return this;
@@ -83,6 +85,11 @@ public final class UniteBase extends EntiteBase<Unite> implements Unite {
 
         public Builder identifiant(final Identifiant pIdentifiant) {
             this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Builder version(final Long pVersion) {
+            this.version = pVersion;
             return this;
         }
 

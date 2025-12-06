@@ -18,6 +18,7 @@ public class UniteBaseTest {
     private Identifiant identifiantRef;
     private String codeRef;
     private Unite entiteRef;
+    private Long versionRef;
 
     public UniteBaseTest() {
     }
@@ -25,9 +26,11 @@ public class UniteBaseTest {
     @BeforeEach
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
+        versionRef = 123L;
         codeRef = "code référence";
         entiteRef = UniteBase.builder()
                 .identifiant(identifiantRef)
+                .version(versionRef)
                 .code(codeRef)
                 .build();
     }
@@ -37,6 +40,7 @@ public class UniteBaseTest {
         String code = "code modifié";
         entiteRef.setCode(code);
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, entiteRef.getVersion());
         Assertions.assertEquals(code, entiteRef.getCode());
     }
 
@@ -91,6 +95,7 @@ public class UniteBaseTest {
         this.entiteRef.update(entite);
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
+        Assertions.assertEquals(versionRef, entiteRef.getVersion());
         Assertions.assertEquals(code, this.entiteRef.getCode());
     }
 
@@ -113,6 +118,7 @@ public class UniteBaseTest {
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
 
         Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
+        Assertions.assertEquals(this.entiteRef.getVersion(), entite.getVersion());
 
         Assertions.assertEquals(this.entiteRef.getCode(), entite.getCode());
 

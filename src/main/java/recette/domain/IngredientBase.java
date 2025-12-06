@@ -14,7 +14,7 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
     private Recette recette;
 
     private IngredientBase(final Builder b) {
-        super(b.identifiant);
+        super(b.identifiant, b.version);
 
         this.nom = b.nom;
         this.detail = b.detail;
@@ -92,6 +92,7 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
     public static class Builder {
 
         private Identifiant identifiant = null;
+        private Long version = 0L;
         private String nom;
         private String detail;
         private Recette recette;
@@ -105,6 +106,7 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
             }
 
             this.identifiant = pIngredient.getIdentifiant();
+            this.version = pIngredient.getVersion();
             this.nom = pIngredient.getNom();
             this.detail = pIngredient.getDetail();
             this.recette = pIngredient.getRecette();
@@ -114,6 +116,11 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
 
         public Builder identifiant(final Identifiant pIdentifiant) {
             this.identifiant = pIdentifiant;
+            return this;
+        }
+
+        public Builder version(final Long pVersion) {
+            this.version = pVersion;
             return this;
         }
 

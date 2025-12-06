@@ -14,6 +14,8 @@ public class RecetteRef implements Recette {
     private Identifiant identifiant;
     private String nom;
     private String detail;
+    private Long verison;
+    private Long version;
 
     /**
      *
@@ -22,6 +24,7 @@ public class RecetteRef implements Recette {
     public RecetteRef(final Recette recette) {
         if (recette != null) {
             this.identifiant = recette.getIdentifiant();
+            this.version = recette.getVersion();
             this.nom = recette.getNom();
             this.detail = recette.getDetail();
         }
@@ -30,6 +33,11 @@ public class RecetteRef implements Recette {
     @Override
     public Identifiant getIdentifiant() {
         return this.identifiant;
+    }
+
+    @Override
+    public Long getVersion() {
+        return this.verison;
     }
 
     @Override

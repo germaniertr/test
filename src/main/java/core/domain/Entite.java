@@ -8,5 +8,7 @@ public interface Entite<E extends Entite> {
 
     Identifiant getIdentifiant();
 
+    Long getVersion();
+
     void update(E entite);
 }
