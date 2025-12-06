@@ -43,6 +43,12 @@ public class DatabaseSetupImpl implements DatabaseSetup {
                 requete.addBatch(SQL.COMPOSANTS.ALTER_TABLE);
                 requete.addBatch(SQL.RECETTES.ALTER_TABLE);
 
+                requete.addBatch(SQL.VERROU_OPTIMISTE.CREATE_PROCEDURE);
+                requete.addBatch(SQL.UNITES.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
+
                 requete.executeBatch();
             }
             connection.commit();
@@ -58,6 +64,11 @@ public class DatabaseSetupImpl implements DatabaseSetup {
         try (Connection connection = this.mapperManager.getConnection()) {
             connection.setAutoCommit(false);
             try (Statement requete = connection.createStatement();) {
+
+                requete.addBatch(SQL.UNITES.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.RECETTES.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_VERROU_OPTIMISTE);
 
                 requete.addBatch(SQL.COMPOSANTS.DROP_TABLE);
                 requete.addBatch(SQL.INGREDIENTS.DROP_TABLE);

@@ -7,7 +7,43 @@ package recette.datasource.db;
 //CHECKSTYLE.OFF: TypeName
 public final class SQL {
 
+    public static final class VERROU_OPTIMISTE {
+
+        public static final String CREATE_PROCEDURE
+                = """
+                  CREATE OR REPLACE FUNCTION F_maj_version() RETURNS TRIGGER AS $FUNCT$
+                  BEGIN
+                    IF (TG_OP = 'INSERT') THEN
+                      NEW.version := 1;
+                    ELSIF (TG_OP = 'UPDATE') THEN
+                      NEW.version := OLD.version + 1;
+                    END IF ;
+                    RETURN NEW;
+                  END;
+                  $FUNCT$ LANGUAGE plpgsql;
+                  """;
+
+        public static final String DROP_PROCEDURE
+                = "DROP FUNCTION IF EXISTS F_maj_version();\n";
+
+    }
+
     public static final class UNITES {
+
+        public static final String CREATE_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  CREATE TRIGGER TR_BIUS_unites_verrou
+                  BEFORE INSERT OR UPDATE
+                  ON unites FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_version()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_unites_verrou ON unites
+                  ;
+                  """;
 
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS unites CASCADE";
@@ -17,6 +53,8 @@ public final class SQL {
                   CREATE TABLE IF NOT EXISTS unites (
                       uuid TEXT, -- aid
                       code TEXT NOT NULL,
+
+                      version INTEGER DEFAULT 1,
 
                       CONSTRAINT pk_unites
                           PRIMARY KEY (uuid)
@@ -91,6 +129,21 @@ public final class SQL {
 
     public static final class INGREDIENTS {
 
+        public static final String CREATE_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  CREATE TRIGGER TR_BIUS_ingredients_verrou
+                  BEFORE INSERT OR UPDATE
+                  ON ingredients FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_version()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_ingredients_verrou ON unites
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS ingredients CASCADE";
 
@@ -101,6 +154,8 @@ public final class SQL {
                       nom TEXT NOT NULL,
                       detail TEXT,
                       recettes_uuid VARCHAR, -- aid
+
+                      version INTEGER DEFAULT 1,
 
                       CONSTRAINT pk_ingredients
                           PRIMARY KEY (uuid)
@@ -189,6 +244,21 @@ public final class SQL {
 
     public static final class RECETTES {
 
+        public static final String CREATE_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  CREATE TRIGGER TR_BIUS_recettes_verrou
+                  BEFORE INSERT OR UPDATE
+                  ON recettes FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_version()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_recettes_verrou ON unites
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS recettes CASCADE";
 
@@ -200,6 +270,8 @@ public final class SQL {
                       detail TEXT,
                       preparation TEXT,
                       nombre_personnes INTEGER DEFAULT 4,
+
+                      version INTEGER DEFAULT 1,
 
                       CONSTRAINT pk_recettes
                           PRIMARY KEY (uuid)
@@ -281,6 +353,21 @@ public final class SQL {
 
     public static final class COMPOSANTS {
 
+        public static final String CREATE_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  CREATE TRIGGER TR_BIUS_composants_verrou
+                  BEFORE INSERT OR UPDATE
+                  ON composants FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_version()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_VERROU_OPTIMISTE
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_composants_verrou ON unites
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS composants CASCADE";
 
@@ -295,6 +382,8 @@ public final class SQL {
                       commentaire TEXT,
                       ingredients_uuid VARCHAR NOT NULL, -- aid
                       unites_uuid VARCHAR, -- aid
+
+                      version INTEGER DEFAULT 1,
 
                       CONSTRAINT pk_composants
                           PRIMARY KEY (uuid)
