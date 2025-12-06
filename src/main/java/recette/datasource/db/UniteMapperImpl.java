@@ -3,6 +3,7 @@ package recette.datasource.db;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.datasource.db.SQL_ERREUR_CODES;
@@ -197,7 +198,15 @@ public class UniteMapperImpl implements UniteMapper {
                 ps.setString(2,
                         entite.getIdentifiant().getUUID());
 
-                ps.executeUpdate();
+                ps.setLong(3,
+                        entite.getVersion());
+
+                int row = ps.executeUpdate();
+                if (row == 0) {
+                    throw new EntiteTropAnciennePersistenceException(
+                            entite.toString());
+                }
+
             }
 
             connection.commit();
@@ -250,8 +259,15 @@ public class UniteMapperImpl implements UniteMapper {
             try (PreparedStatement ps
                     = connection.prepareStatement(SQL.UNITES.DELETE_BY_UUID)) {
                 ps.setString(1, entite.getIdentifiant().getUUID());
+                ps.setLong(2,
+                        entite.getVersion());
 
-                ps.executeUpdate();
+                int row = ps.executeUpdate();
+                if (row == 0) {
+                    throw new EntiteTropAnciennePersistenceException(
+                            entite.toString());
+                }
+
             }
 
             connection.commit();
@@ -270,9 +286,11 @@ public class UniteMapperImpl implements UniteMapper {
         Identifiant identifiant = readIdentifiant(rs);
 
         String code = rs.getString(SQL.UNITES.ATTRIBUTS.CODE);
+        Long version = rs.getLong(SQL.ENTITES.ATTRIBUTS.VERSION);
 
         Unite entite = UniteBase.builder()
                 .identifiant(identifiant)
+                .version(version)
                 .code(code)
                 .build();
 

@@ -78,6 +78,7 @@ public final class SQL {
         public static final String SELECTION
                 = """
                   SELECT u.uuid,
+                   u.version,
                    u.code
                   """;
 
@@ -104,14 +105,14 @@ public final class SQL {
         public static final String DELETE_BY_UUID
                 = DELETE
                 + """
-                  WHERE uuid = ?
+                  WHERE uuid = ? AND version = ?
                   """;
 
         public static final String UPDATE
                 = """
                   UPDATE unites
                   SET  code = ?
-                  WHERE uuid = ?
+                  WHERE uuid = ? AND version = ?
                   """;
 
         private UNITES() {
@@ -471,6 +472,7 @@ public final class SQL {
         public static final class ATTRIBUTS {
 
             public static final String UUID = "uuid";
+            public static final String VERSION = "version";            
 
             private ATTRIBUTS() {
             }
