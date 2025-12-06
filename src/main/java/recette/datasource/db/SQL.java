@@ -188,6 +188,7 @@ public final class SQL {
         public static final String SELECTION
                 = """
                   SELECT i.uuid,
+                         i.version,
                          i.nom,
                          i.detail,
                          i.recettes_uuid
@@ -217,7 +218,7 @@ public final class SQL {
         public static final String DELETE_BY_UUID
                 = DELETE
                 + """
-                  WHERE uuid = ?
+                  WHERE uuid = ? AND version = ?
                   """;
 
         public static final String UPDATE
@@ -226,7 +227,7 @@ public final class SQL {
                   SET  nom = ?,
                        detail = ?,
                        recettes_uuid = ?
-                  WHERE uuid = ?
+                  WHERE uuid = ? AND version = ?
                   """;
 
         private INGREDIENTS() {

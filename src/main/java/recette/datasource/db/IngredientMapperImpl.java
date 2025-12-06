@@ -3,6 +3,7 @@ package recette.datasource.db;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.datasource.db.SQL_ERREUR_CODES;
@@ -235,7 +236,14 @@ public class IngredientMapperImpl implements IngredientMapper {
                 ps.setString(4,
                         entite.getIdentifiant().getUUID());
 
-                ps.executeUpdate();
+                ps.setLong(5,
+                        entite.getVersion());
+
+                int row = ps.executeUpdate();
+                if (row == 0) {
+                    throw new EntiteTropAnciennePersistenceException(
+                            entite.toString());
+                }
             }
 
             connection.commit();
@@ -288,7 +296,14 @@ public class IngredientMapperImpl implements IngredientMapper {
                     = connection.prepareStatement(SQL.INGREDIENTS.DELETE_BY_UUID)) {
                 ps.setString(1, entite.getIdentifiant().getUUID());
 
-                ps.executeUpdate();
+                ps.setLong(2,
+                        entite.getVersion());
+
+                int row = ps.executeUpdate();
+                if (row == 0) {
+                    throw new EntiteTropAnciennePersistenceException(
+                            entite.toString());
+                }
             }
 
             connection.commit();
@@ -307,6 +322,7 @@ public class IngredientMapperImpl implements IngredientMapper {
     private Ingredient readEntite(final ResultSet rs) throws SQLException {
         Identifiant identifiant
                 = readIdentifiant(rs);
+        Long version = rs.getLong(SQL.ENTITES.ATTRIBUTS.VERSION);
         String nom
                 = rs.getString(SQL.INGREDIENTS.ATTRIBUTS.NOM);
         String detail
@@ -317,6 +333,7 @@ public class IngredientMapperImpl implements IngredientMapper {
         IngredientBase.Builder builder
                 = IngredientBase.builder()
                         .identifiant(identifiant)
+                        .version(version)
                         .nom(nom)
                         .detail(detail);
 
