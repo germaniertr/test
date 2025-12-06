@@ -257,6 +257,16 @@ public final class SQL {
                   WHERE uuid = ?
                   """;
 
+        public static final String UPDATE
+                = """
+                  UPDATE recettes
+                  SET  nom = ?,
+                       detail = ?,
+                       preparation = ?,
+                       nombre_personnes = ?
+                  WHERE uuid = ?
+                  """;
+
         private RECETTES() {
         }
 
@@ -336,6 +346,17 @@ public final class SQL {
                   FROM composants c
                   WHERE c.recettes_uuid = ?
                   ORDER BY c.ordre\n
+                  """;
+
+        public static final String DELETE
+                = """
+                  DELETE FROM composants
+                  """;
+
+        public static final String DELETE_BY_UUID_RECETTES
+                = DELETE
+                + """
+                  WHERE recettes_uuid = ?
                   """;
 
         private COMPOSANTS() {

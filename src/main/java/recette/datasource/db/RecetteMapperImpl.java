@@ -218,7 +218,95 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     @Override
     public void update(final Recette entite) throws PersistenceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (entite == null) {
+            return;
+        }
+
+        if (entite.getIdentifiant() == null) {
+            return;
+        }
+
+        Recette entiteTrouvee
+                = this.retrieve(entite.getIdentifiant());
+        if (entiteTrouvee == null) {
+            throw new EntiteInconnuePersistenceException(
+                    String.format("Erreur: l'entitée (%s) "
+                            + "n'est pas connue!",
+                            entite.toString()));
+        }
+
+        /* traitement*/
+        try (Connection connection = this.mapperManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps
+                    = connection.prepareStatement(
+                            SQL.RECETTES.UPDATE)) {
+                if (entite.getNom() != null) {
+                    ps.setString(1,
+                            entite.getNom());
+                } else {
+                    ps.setNull(1,
+                            Types.VARCHAR);
+                }
+
+                if (entite.getDetail() != null) {
+                    ps.setString(2,
+                            entite.getDetail());
+                } else {
+                    ps.setNull(2,
+                            Types.VARCHAR);
+                }
+
+                if (entite.getPreparation() != null) {
+                    ps.setString(3,
+                            entite.getPreparation());
+                } else {
+                    ps.setNull(3,
+                            Types.VARCHAR);
+                }
+
+                if (entite.getNombrePersonnes() != null) {
+                    ps.setInt(4,
+                            entite.getNombrePersonnes());
+                } else {
+                    ps.setNull(4,
+                            Types.INTEGER);
+                }
+
+                ps.setString(5,
+                        entite.getIdentifiant().getUUID());
+
+                ps.executeUpdate();
+
+                if (!entite.getComposants().isEmpty()) {
+                    updateComposants(
+                            connection,
+                            entite.getIdentifiant(),
+                            entite.getComposants());
+                }
+            }
+
+            connection.commit();
+
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_NOT_NULL_VIOLATION)) {
+                throw new ContrainteNotNullPersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_UNIQUE_VIOLATION)) {
+                throw new ContrainteUniquePersistenceException(ex);
+            }
+            if (ex.getSQLState()
+                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
+                throw new EntiteInconnuePersistenceException(ex);
+            }
+
+            throw new PersistenceException(ex);
+        }
+
     }
 
     @Override
@@ -262,7 +350,6 @@ public class RecetteMapperImpl implements RecetteMapper {
 
             throw new PersistenceException(ex);
         }
-
 
     }
 
@@ -363,6 +450,33 @@ public class RecetteMapperImpl implements RecetteMapper {
                 .build();
 
         return entite;
+    }
+
+    private void updateComposants(
+            final Connection connection,
+            final Identifiant identifiant,
+            final List<Composant> composants)
+            throws SQLException, PersistenceException {
+        deleteComposants(
+                connection,
+                identifiant);
+        insertComposants(
+                connection,
+                identifiant,
+                composants);
+
+    }
+
+    private void deleteComposants(final Connection connection, final Identifiant id)
+            throws SQLException, PersistenceException {
+        try (PreparedStatement ps
+                = connection.prepareStatement(SQL.COMPOSANTS.DELETE_BY_UUID_RECETTES)) {
+            ps.setString(1,
+                    id.getUUID());
+
+            ps.executeUpdate();
+
+        }
     }
 
     private void insertComposants(
