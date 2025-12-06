@@ -246,6 +246,17 @@ public final class SQL {
                   WHERE r.uuid = ?
                   """;
 
+        public static final String DELETE
+                = """
+                  DELETE FROM recettes
+                  """;
+
+        public static final String DELETE_BY_UUID
+                = DELETE
+                + """
+                  WHERE uuid = ?
+                  """;
+
         private RECETTES() {
         }
 
