@@ -3,6 +3,7 @@ package recette.datasource;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -182,6 +183,7 @@ public abstract class RecetteMapperImplTest {
 
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(recetteAubergineRef, entite);
+        Assertions.assertTrue(entite.getVersion() > 0);
         Assertions.assertEquals(recetteAubergineRef.getNom(),
                 entite.getNom());
         Assertions.assertEquals(recetteAubergineRef.getDetail(),
@@ -248,6 +250,8 @@ public abstract class RecetteMapperImplTest {
                 .create(nouvelleEntiteRef);
 
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
+        Assertions.assertEquals(Long.valueOf(1),
+                nouvelleEntite.getVersion());
         Assertions.assertEquals(nouvelleEntiteRef.getNom(),
                 nouvelleEntite.getNom());
         Assertions.assertEquals(nouvelleEntiteRef.getDetail(),
@@ -276,6 +280,8 @@ public abstract class RecetteMapperImplTest {
                 .retrieve(nouvelleEntite.getIdentifiant());
 
         Assertions.assertEquals(nouvelleEntite, entite);
+        Assertions.assertEquals(Long.valueOf(1),
+                nouvelleEntite.getVersion());
         Assertions.assertEquals(nouvelleEntite.getDetail(),
                 entite.getDetail());
         Assertions.assertEquals(nouvelleEntite.getPreparation(),
@@ -340,6 +346,27 @@ public abstract class RecetteMapperImplTest {
     }
 
     @Test
+    public void testDeleteEntiteTropAncienne() throws Exception {
+        Assertions.assertThrows(
+                EntiteTropAnciennePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette nouvelleEntite = mapperManager.getRecetteMapper()
+                        .create(nouvelleEntiteRef);
+                Recette entite = mapperManager.getRecetteMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+                Assertions.assertNotNull(entite);
+
+                mapperManager.getRecetteMapper().update(entite);
+
+                mapperManager.getRecetteMapper().delete(entite);
+            }
+        });
+
+    }
+
+    @Test
     public void testDeleteEntiteInconnu() throws Exception {
         Assertions.assertThrows(EntiteInconnuePersistenceException.class, new Executable() {
             @Override
@@ -361,11 +388,17 @@ public abstract class RecetteMapperImplTest {
                 .create(nouvelleEntiteRef);
         Recette entite = mapperManager.getRecetteMapper()
                 .retrieve(nouvelleEntite.getIdentifiant());
+
+        Assertions.assertNotNull(entite.getIdentifiant());
+        Assertions.assertEquals(Long.valueOf(1),
+                entite.getVersion());
+
         Recette entiteModifie
                 = //thym
                 //brin
                 RecetteBase.builder()
                         .identifiant(entite.getIdentifiant())
+                        .version(entite.getVersion())
                         .nom(entite.getNom() + " update")
                         .detail(entite.getDetail() + " update")
                         .preparation(entite.getPreparation() + " update")
@@ -399,6 +432,8 @@ public abstract class RecetteMapperImplTest {
                 .retrieve(entiteModifie.getIdentifiant());
 
         Assertions.assertEquals(entiteModifie, entiteMod);
+        Assertions.assertEquals(Long.valueOf(2),
+                entiteMod.getVersion());
         Assertions.assertEquals(entiteModifie.getDetail(),
                 entiteMod.getDetail());
         Assertions.assertEquals(entiteModifie.getPreparation(),
@@ -421,6 +456,62 @@ public abstract class RecetteMapperImplTest {
             Assertions.assertEquals(entiteModifie.getComposants().get(i).getCommentaire(),
                     entiteMod.getComposants().get(i).getCommentaire());
         }
+    }
+
+    @Test
+    public void testUpdateEntiteTropAncienne() throws Exception {
+        Assertions.assertThrows(
+                EntiteTropAnciennePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Recette nouvelleEntite = mapperManager.getRecetteMapper()
+                        .create(nouvelleEntiteRef);
+                Recette entite = mapperManager.getRecetteMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+                Assertions.assertNotNull(entite.getIdentifiant());
+                Assertions.assertEquals(Long.valueOf(1),
+                        entite.getVersion());
+
+                Recette entiteModifie
+                        = //thym
+                        //brin
+                        RecetteBase.builder()
+                                .identifiant(entite.getIdentifiant())
+                                .nom(entite.getNom() + " update")
+                                .detail(entite.getDetail() + " update")
+                                .preparation(entite.getPreparation() + " update")
+                                .nombrePersonnes(entite.getNombrePersonnes() * 10)
+                                .composant(entite.getComposants().get(2))
+                                .composant( //thym
+                                        //brin
+                                        ComposantBase.builder()
+                                                .ingredient( //thym
+                                                        IngredientBase.builder()
+                                                                .identifiant( //thym
+                                                                        IdentifiantBase.builder()
+                                                                                .uuid(DemoData.INGREDIENTS.THYM.UUID) //thym
+                                                                                .build())
+                                                                .build())
+                                                .quantite(1.0)
+                                                .unite( //brin
+                                                        UniteBase.builder().identifiant( //brin
+                                                                IdentifiantBase.builder()
+                                                                        .uuid(DemoData.UNITES.BRINS.UUID) //brin
+                                                                        .build())
+                                                                .build())
+                                                .commentaire("commentaire update")
+                                                .build())
+                                .build();
+
+                mapperManager.getRecetteMapper()
+                        .update(entiteModifie);
+
+                mapperManager.getRecetteMapper()
+                        .update(entiteModifie);
+            }
+        });
+
     }
 
     @Test

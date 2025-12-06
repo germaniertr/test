@@ -3,6 +3,7 @@ package recette.datasource;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
@@ -28,7 +29,7 @@ import recette.domain.RecetteBase;
 public abstract class IngredientMapperImplTest {
 
     private static final Logger LOG = Logger.getLogger(IngredientMapperImplTest.class.getName());
-    
+
     protected MapperManager mapperManager;
     protected String filtreRef;
     protected Identifiant identifiantAubergine;
@@ -146,6 +147,7 @@ public abstract class IngredientMapperImplTest {
         Assertions.assertNotNull(entite);
 
         Assertions.assertEquals(ingredientAubergine, entite);
+        Assertions.assertTrue(entite.getVersion() > 0);
         Assertions.assertEquals(ingredientAubergine.getNom(),
                 entite.getNom());
         Assertions.assertEquals(ingredientAubergine.getDetail(),
@@ -211,6 +213,8 @@ public abstract class IngredientMapperImplTest {
                         .create(nouvelleIngredientRef1);
 
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
+        Assertions.assertEquals(Long.valueOf(1),
+                nouvelleEntite.getVersion());
         Assertions.assertEquals(nouvelleIngredientRef1.getNom(),
                 nouvelleEntite.getNom());
         Assertions.assertEquals(nouvelleIngredientRef1.getDetail(),
@@ -221,6 +225,8 @@ public abstract class IngredientMapperImplTest {
                         .retrieve(nouvelleEntite.getIdentifiant());
 
         Assertions.assertNotNull(entite);
+        Assertions.assertEquals(Long.valueOf(1),
+                nouvelleEntite.getVersion());
         Assertions.assertEquals(nouvelleEntite, entite);
         Assertions.assertNotSame(nouvelleEntite, entite);
         Assertions.assertEquals(nouvelleEntite.getNom(), entite.getNom());
@@ -295,6 +301,29 @@ public abstract class IngredientMapperImplTest {
     }
 
     @Test
+    public void testDeleteEntiteTropAncienne() throws Exception {
+        Assertions.assertThrows(
+                EntiteTropAnciennePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Ingredient nouvelleEntite = mapperManager.getIngredientMapper()
+                        .create(nouvelleIngredientRef1);
+                Ingredient entite = mapperManager.getIngredientMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+                Assertions.assertNotNull(entite);
+
+                mapperManager.getIngredientMapper()
+                        .update(entite);
+
+                mapperManager.getIngredientMapper()
+                        .delete(entite);
+            }
+        });
+
+    }
+
+    @Test
     public void testDeleteEntiteUtilisee() throws Exception {
         Assertions.assertThrows(
                 EntiteUtiliseePersistenceException.class, new Executable() {
@@ -343,6 +372,8 @@ public abstract class IngredientMapperImplTest {
                         .retrieve(nouvelleEntite.getIdentifiant());
 
         Assertions.assertNotNull(entite.getIdentifiant());
+        Assertions.assertEquals(Long.valueOf(1),
+                entite.getVersion());
         Assertions.assertEquals(nouvelleIngredientRef2.getNom(),
                 entite.getNom());
         Assertions.assertEquals(nouvelleIngredientRef2.getDetail(),
@@ -368,11 +399,57 @@ public abstract class IngredientMapperImplTest {
                         .retrieve(entiteMod
                                 .getIdentifiant());
         Assertions.assertEquals(entiteMod, entiteModifie);
-
+        Assertions.assertEquals(Long.valueOf(2),
+                entiteModifie.getVersion());
         Assertions.assertEquals(entiteMod.getNom(),
                 entiteModifie.getNom());
         Assertions.assertEquals(entiteMod.getDetail(),
                 entiteModifie.getDetail());
+
+    }
+
+    @Test
+    public void testUpdateEntiteTropAncienne() throws Exception {
+        Assertions.assertThrows(
+                EntiteTropAnciennePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Ingredient nouvelleEntite
+                        = mapperManager.getIngredientMapper()
+                                .create(nouvelleIngredientRef2);
+                Ingredient entite
+                        = mapperManager.getIngredientMapper()
+                                .retrieve(nouvelleEntite.getIdentifiant());
+
+                Assertions.assertNotNull(entite.getIdentifiant());
+                Assertions.assertEquals(Long.valueOf(1),
+                        entite.getVersion());
+                Assertions.assertEquals(nouvelleIngredientRef2.getNom(),
+                        entite.getNom());
+                Assertions.assertEquals(nouvelleIngredientRef2.getDetail(),
+                        entite.getDetail());
+
+                Ingredient entiteMod
+                        = IngredientBase.builder()
+                                .ingredient(entite)
+                                .build();
+                entiteMod.setNom(entiteMod.getNom() + " update" + Instant.now().toString());
+                entiteMod.setDetail(entiteMod.getDetail() + " update" + Instant.now().toString());
+                entiteMod.setRecette(
+                        RecetteBase.builder()
+                                .identifiant(IdentifiantBase.builder()
+                                        .uuid(DemoData.RECETTES.POIRES_AUX_AMANDES.UUID)
+                                        .build())
+                                .build());
+
+                mapperManager.getIngredientMapper()
+                        .update(entiteMod);
+
+                mapperManager.getIngredientMapper()
+                        .update(entiteMod);
+
+            }
+        });
 
     }
 

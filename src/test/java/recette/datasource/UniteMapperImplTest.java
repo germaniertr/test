@@ -3,6 +3,7 @@ package recette.datasource;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
@@ -26,7 +27,7 @@ import recette.domain.UniteBase;
 public abstract class UniteMapperImplTest {
 
     private static final Logger LOG = Logger.getLogger(UniteMapperImplTest.class.getName());
-    
+
     protected MapperManager mapperManager;
     protected String filtreRef;
     protected Identifiant identifiantCS;
@@ -35,12 +36,11 @@ public abstract class UniteMapperImplTest {
 
     public UniteMapperImplTest(MapperManager mapperManager) throws PersistenceException {
         this.mapperManager = mapperManager;
-        
+
         this.mapperManager.getDatabaseSetup().dropTables();
         this.mapperManager.getDatabaseSetup().createTables();
         this.mapperManager.getDatabaseSetup().insertData();
 
-        
     }
 
     @BeforeEach
@@ -102,6 +102,7 @@ public abstract class UniteMapperImplTest {
 
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(uniteCS, entite);
+        Assertions.assertTrue(entite.getVersion() > 0);
         Assertions.assertEquals(uniteCS.getCode(), entite.getCode());
     }
 
@@ -133,12 +134,16 @@ public abstract class UniteMapperImplTest {
                 .create(nouvelleUniteRef);
 
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
+        Assertions.assertEquals(Long.valueOf(1),
+                nouvelleEntite.getVersion());
         Assertions.assertEquals(nouvelleUniteRef.getCode(), nouvelleEntite.getCode());
 
         Unite entite = mapperManager.getUniteMapper()
                 .retrieve(nouvelleEntite.getIdentifiant());
 
         Assertions.assertNotNull(entite);
+        Assertions.assertEquals(Long.valueOf(1),
+                nouvelleEntite.getVersion());
         Assertions.assertEquals(nouvelleEntite, entite);
         Assertions.assertNotSame(nouvelleEntite, entite);
         Assertions.assertEquals(nouvelleEntite.getCode(), entite.getCode());
@@ -186,6 +191,29 @@ public abstract class UniteMapperImplTest {
     }
 
     @Test
+    public void testDeleteEntiteTropAncienne() throws Exception {
+        Assertions.assertThrows(
+                EntiteTropAnciennePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Unite nouvelleEntite = mapperManager.getUniteMapper()
+                        .create(nouvelleUniteRef);
+                Unite entite = mapperManager.getUniteMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+                Assertions.assertNotNull(entite);
+
+                mapperManager.getUniteMapper()
+                        .update(entite);
+
+                mapperManager.getUniteMapper()
+                        .delete(entite);
+            }
+        });
+
+    }
+
+    @Test
     public void testDeleteEntiteUtilisee() throws Exception {
         Assertions.assertThrows(EntiteUtiliseePersistenceException.class,
                 new Executable() {
@@ -226,6 +254,8 @@ public abstract class UniteMapperImplTest {
                 .retrieve(nouvelleEntite.getIdentifiant());
 
         Assertions.assertNotNull(entite.getIdentifiant());
+        Assertions.assertEquals(Long.valueOf(1),
+                entite.getVersion());
         Assertions.assertEquals(nouvelleUniteRef.getCode(), entite.getCode());
 
         Unite entiteMod = UniteBase.builder()
@@ -239,7 +269,41 @@ public abstract class UniteMapperImplTest {
                 .retrieve(entiteMod.getIdentifiant());
 
         Assertions.assertEquals(entiteMod, entiteModifie);
+        Assertions.assertEquals(Long.valueOf(2),
+                entiteModifie.getVersion());
         Assertions.assertEquals(entiteMod.getCode(), entiteModifie.getCode());
+    }
+
+    @Test
+    public void testUpdateEntiteTropAncienne() throws Exception {
+        Assertions.assertThrows(
+                EntiteTropAnciennePersistenceException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                Unite nouvelleEntite = mapperManager.getUniteMapper()
+                        .create(nouvelleUniteRef);
+                Unite entite = mapperManager.getUniteMapper()
+                        .retrieve(nouvelleEntite.getIdentifiant());
+
+                Assertions.assertNotNull(entite.getIdentifiant());
+                Assertions.assertEquals(Long.valueOf(1),
+                        entite.getVersion());
+                Assertions.assertEquals(nouvelleUniteRef.getCode(), entite.getCode());
+
+                Unite entiteMod = UniteBase.builder()
+                        .unite(entite)
+                        .build();
+                entiteMod.setCode(entite.getCode() + " update");
+
+                mapperManager.getUniteMapper()
+                        .update(entiteMod);
+
+                mapperManager.getUniteMapper()
+                        .update(entiteMod);
+
+            }
+        });
+
     }
 
     @Test
