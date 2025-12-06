@@ -298,6 +298,7 @@ public final class SQL {
         public static final String SELECTION
                 = """
                   SELECT r.uuid,
+                     r.version,
                      r.nom, r.detail,
                      r.preparation,
                      r.nombre_personnes
@@ -328,7 +329,7 @@ public final class SQL {
         public static final String DELETE_BY_UUID
                 = DELETE
                 + """
-                  WHERE uuid = ?
+                  WHERE uuid = ?  AND version = ?
                   """;
 
         public static final String UPDATE
@@ -338,7 +339,7 @@ public final class SQL {
                        detail = ?,
                        preparation = ?,
                        nombre_personnes = ?
-                  WHERE uuid = ?
+                  WHERE uuid = ?  AND version = ?
                   """;
 
         private RECETTES() {
@@ -424,7 +425,7 @@ public final class SQL {
 
         public static final String SELECTION
                 = """
-                  SELECT c.uuid,
+                  SELECT c.uuid, c.version,
                   c.quantite,
                   c.commentaire,
                   c.ingredients_uuid,
@@ -473,7 +474,7 @@ public final class SQL {
         public static final class ATTRIBUTS {
 
             public static final String UUID = "uuid";
-            public static final String VERSION = "version";            
+            public static final String VERSION = "version";
 
             private ATTRIBUTS() {
             }
