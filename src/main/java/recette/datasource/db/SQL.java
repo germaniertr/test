@@ -258,6 +258,8 @@ public final class SQL {
                 = """
                   SELECT i.uuid,
                          i.version,
+                         i.instant_creation, i.user_creation,
+                         i.instant_modification, i.user_modification,
                          i.nom,
                          i.detail,
                          i.recettes_uuid
