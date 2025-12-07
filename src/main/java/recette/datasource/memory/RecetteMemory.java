@@ -1,6 +1,9 @@
 package recette.datasource.memory;
 
+import core.domain.Audit;
+import core.domain.AuditBase;
 import core.domain.Identifiant;
+import java.time.Instant;
 import java.util.List;
 import recette.domain.Composant;
 import recette.domain.Recette;
@@ -14,6 +17,7 @@ public class RecetteMemory implements Recette {
 
     private Long version;
     private Recette entite;
+    private Audit audit;
 
     public RecetteMemory(final Recette entite) {
         if (entite == null) {
@@ -26,6 +30,11 @@ public class RecetteMemory implements Recette {
         if (entite.getVersion() != null && entite.getVersion() != 0) {
             this.version = entite.getVersion();
         }
+
+        this.audit = AuditBase.builder()
+                .dateCreation(Instant.now())
+                .build();
+
     }
 
     @Override
@@ -84,6 +93,11 @@ public class RecetteMemory implements Recette {
     }
 
     @Override
+    public Audit getAudit() {
+        return this.audit;
+    }
+
+    @Override
     public void update(final Recette pEntite) {
         this.entite.update(pEntite);
     }
@@ -100,6 +114,13 @@ public class RecetteMemory implements Recette {
 
     public void incrementVersion() {
         this.version = this.version + 1;
+    }
+
+    public void setDateModificationNow() {
+        this.audit = AuditBase.builder()
+                .audit(this.audit)
+                .dateModification(Instant.now())
+                .build();
     }
 
 }

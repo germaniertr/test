@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.Audit;
 import core.domain.EntiteBase;
 import core.domain.Identifiant;
 
@@ -15,7 +16,7 @@ public final class ComposantBase extends EntiteBase<Composant> implements Compos
     private Unite unite;
 
     private ComposantBase(final Builder b) {
-        super(b.identifiant, b.version);
+        super(b.identifiant, b.version, b.audit);
         this.ingredient = b.ingredient;
         this.commentaire = b.commentaire;
         this.quantite = b.quantite;
@@ -95,6 +96,7 @@ public final class ComposantBase extends EntiteBase<Composant> implements Compos
 
         private Identifiant identifiant = null;
         private Long version = 0L;
+        private Audit audit = null;
         private Ingredient ingredient;
         private String commentaire;
         private Double quantite;
@@ -108,6 +110,7 @@ public final class ComposantBase extends EntiteBase<Composant> implements Compos
                 throw new IllegalArgumentException("Erreur: l'argument composant ne peut pas être null");
             }
             this.identifiant = pComposant.getIdentifiant();
+            this.audit = pComposant.getAudit();
             this.version = pComposant.getVersion();
             this.ingredient = pComposant.getIngredient();
             this.commentaire = pComposant.getCommentaire();
@@ -124,6 +127,11 @@ public final class ComposantBase extends EntiteBase<Composant> implements Compos
 
         public Builder version(final Long pVersion) {
             this.version = pVersion;
+            return this;
+        }
+
+        public Builder audit(final Audit pAudit) {
+            this.audit = pAudit;
             return this;
         }
 

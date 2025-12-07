@@ -1,7 +1,10 @@
 package recette.domain;
 
+import core.domain.Audit;
+import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
+import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +23,7 @@ public class ComposantBaseTest {
     private Unite uniteRef;
     private Composant entiteRef;
     private Long versionRef;
+    private Audit auditRef;
 
     public ComposantBaseTest() {
     }
@@ -28,6 +32,13 @@ public class ComposantBaseTest {
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
         versionRef = 123L;
+        auditRef = AuditBase.builder()
+                .dateCreation(Instant.now())
+                .userCreation("user creation")
+                .dateModification(Instant.now().plusSeconds(60))
+                .userModification("user modification")
+                .build();
+
         quantiteRef = 2.5;
         commentaireRef = "commentaire";
 
@@ -47,6 +58,7 @@ public class ComposantBaseTest {
         entiteRef = ComposantBase.builder()
                 .identifiant(identifiantRef)
                 .version(versionRef)
+                .audit(auditRef)
                 .ingredient(ingredientRef)
                 .commentaire(commentaireRef)
                 .quantite(quantiteRef)
@@ -62,10 +74,20 @@ public class ComposantBaseTest {
     public void testGet() {
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(this.quantiteRef, this.entiteRef.getQuantite());
         Assertions.assertEquals(this.commentaireRef, this.entiteRef.getCommentaire());
         Assertions.assertEquals(this.ingredientRef, this.entiteRef.getIngredient());
         Assertions.assertEquals(this.uniteRef, this.entiteRef.getUnite());
+    }
+
+    private void testAudit(Audit ref, Audit audit) {
+        Assertions.assertEquals(ref, audit);
+        Assertions.assertEquals(ref.getUserCreation(),
+                audit.getUserCreation());
+        Assertions.assertEquals(ref.getUserModification(),
+                audit.getUserModification());
     }
 
     @Test
@@ -143,6 +165,8 @@ public class ComposantBaseTest {
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(quantite, this.entiteRef.getQuantite());
         Assertions.assertEquals(commentaire, this.entiteRef.getCommentaire());
         Assertions.assertEquals(this.ingredientRef, this.entiteRef.getIngredient());
@@ -171,7 +195,8 @@ public class ComposantBaseTest {
         Assertions.assertEquals(this.entiteRef.hashCode(), entite.hashCode());
 
         Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
-        Assertions.assertEquals(this.entiteRef.getVersion(), entite.getVersion());        
+        Assertions.assertEquals(this.entiteRef.getVersion(), entite.getVersion());
+        testAudit(this.entiteRef.getAudit(), entite.getAudit());
 
         Assertions.assertEquals(this.entiteRef.getQuantite(), entite.getQuantite());
         Assertions.assertEquals(this.entiteRef.getCommentaire(), entite.getCommentaire());

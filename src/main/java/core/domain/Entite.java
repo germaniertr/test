@@ -10,5 +10,7 @@ public interface Entite<E extends Entite> {
 
     Long getVersion();
 
+    Audit getAudit();
+
     void update(E entite);
 }

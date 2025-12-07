@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.Audit;
 import core.domain.EntiteBase;
 import core.domain.Identifiant;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
     private final List<Composant> composants;
 
     private RecetteBase(final Builder b) {
-        super(b.identifiant, b.version);
+        super(b.identifiant, b.version, b.audit);
         this.nom = b.nom;
         this.detail = b.detail;
         this.preparation = b.preparation;
@@ -133,6 +134,7 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
 
         private Identifiant identifiant = null;
         private Long version = 0L;
+        private Audit audit = null;
         private String nom;
         private String detail;
         private String preparation;
@@ -148,6 +150,7 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
                 throw new IllegalArgumentException("Erreur: l'argument recette ne peut pas être null");
             }
             this.identifiant = pRecette.getIdentifiant();
+            this.audit = pRecette.getAudit();
             this.version = pRecette.getVersion();
             this.nom = pRecette.getNom();
             this.detail = pRecette.getDetail();
@@ -170,6 +173,11 @@ public final class RecetteBase extends EntiteBase<Recette> implements Recette {
 
         public Builder version(final Long pVersion) {
             this.version = pVersion;
+            return this;
+        }
+
+        public Builder audit(final Audit pAudit) {
+            this.audit = pAudit;
             return this;
         }
 

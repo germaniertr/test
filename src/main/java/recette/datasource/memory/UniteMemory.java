@@ -1,6 +1,9 @@
 package recette.datasource.memory;
 
+import core.domain.Audit;
+import core.domain.AuditBase;
 import core.domain.Identifiant;
+import java.time.Instant;
 import recette.domain.Unite;
 import recette.domain.UniteBase;
 
@@ -12,6 +15,7 @@ public class UniteMemory implements Unite {
 
     private Long version;
     private Unite entite;
+    private Audit audit;
 
     public UniteMemory(final Unite entite) {
         if (entite == null) {
@@ -25,6 +29,11 @@ public class UniteMemory implements Unite {
         if (entite.getVersion() != null && entite.getVersion() != 0) {
             this.version = entite.getVersion();
         }
+
+        this.audit = AuditBase.builder()
+                .dateCreation(Instant.now())
+                .build();
+
     }
 
     @Override
@@ -48,6 +57,11 @@ public class UniteMemory implements Unite {
     }
 
     @Override
+    public Audit getAudit() {
+        return this.audit;
+    }
+
+    @Override
     public void update(final Unite pEntite) {
         this.entite.update(pEntite);
     }
@@ -64,6 +78,13 @@ public class UniteMemory implements Unite {
 
     public void incrementVersion() {
         this.version = this.version + 1;
+    }
+
+    public void setDateModificationNow() {
+        this.audit = AuditBase.builder()
+                .audit(this.audit)
+                .dateModification(Instant.now())
+                .build();
     }
 
 }

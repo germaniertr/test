@@ -11,11 +11,14 @@ public abstract class EntiteBase<E extends Entite>
 
     private final Identifiant identifiant;
     private final Long version;
+    private final Audit audit;
 
     protected EntiteBase(final Identifiant identifiant,
-            final Long version) {
+            final Long version,
+            final Audit audit) {
         this.identifiant = identifiant;
         this.version = version;
+        this.audit = audit;
     }
 
     @Override
@@ -29,8 +32,15 @@ public abstract class EntiteBase<E extends Entite>
     }
 
     @Override
+    public Audit getAudit() {
+        return audit;
+    }
+
+    @Override
     public String toString() {
-        return "EntiteBase{" + "identifiant=" + identifiant + ", version=" + version + '}';
+        return "EntiteBase{" + "identifiant=" + identifiant
+                + ", version=" + version
+                + ", audit=" + audit + '}';
     }
 
     @Override

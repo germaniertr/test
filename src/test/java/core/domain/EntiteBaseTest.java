@@ -1,5 +1,6 @@
 package core.domain;
 
+import java.time.Instant;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,11 @@ public class EntiteBaseTest {
     private Identifiant idRef;
     private String uuidRef;
     private Long versionRef;
+    private Instant dateCreationRef;
+    private String userCreationRef;
+    private Instant dateModificationRef;
+    private String userModificationRef;
+    private Audit auditRef;
 
     @BeforeEach
     public void setUp() {
@@ -26,8 +32,21 @@ public class EntiteBaseTest {
         idRef = IdentifiantBase.builder()
                 .uuid(uuidRef)
                 .build();
+        
+        dateCreationRef = Instant.MIN;
+        userCreationRef = "user creation";
+        dateModificationRef = Instant.now();
+        userModificationRef = "user modification";
 
-        entiteRef = new EntiteBase(idRef, versionRef) {
+        auditRef = AuditBase.builder()
+                .dateCreation(this.dateCreationRef)
+                .userCreation(this.userCreationRef)
+                .dateModification(this.dateModificationRef)
+                .userModification(this.userModificationRef)
+                .build();
+        
+
+        entiteRef = new EntiteBase(idRef, versionRef, auditRef) {
             @Override
             public void update(Entite entite) {
                 throw new UnsupportedOperationException("Not supported yet.");
@@ -39,6 +58,20 @@ public class EntiteBaseTest {
     public void testGet() {
         Assertions.assertEquals(idRef, entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, entiteRef.getVersion());
+        
+        Assertions.assertEquals(
+                auditRef.getDateCreation(),
+                this.entiteRef.getAudit().getDateCreation());
+        Assertions.assertEquals(
+                auditRef.getUserCreation(),
+                this.entiteRef.getAudit().getUserCreation());
+        Assertions.assertEquals(
+                auditRef.getDateModification(),
+                this.entiteRef.getAudit().getDateModification());
+        Assertions.assertEquals(
+                auditRef.getUserModification(),
+                this.entiteRef.getAudit().getUserModification());
+        
     }
 
     @Test
@@ -49,7 +82,7 @@ public class EntiteBaseTest {
 
     @Test
     public void testEquals() {
-        Entite entite = new EntiteBase(idRef, versionRef) {
+        Entite entite = new EntiteBase(idRef, versionRef, auditRef) {
             @Override
             public void update(Entite entite) {
                 throw new UnsupportedOperationException("Not supported yet.");

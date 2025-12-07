@@ -1,5 +1,6 @@
 package recette.domain;
 
+import core.domain.Audit;
 import core.domain.EntiteBase;
 import core.domain.Identifiant;
 
@@ -14,7 +15,7 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
     private Recette recette;
 
     private IngredientBase(final Builder b) {
-        super(b.identifiant, b.version);
+        super(b.identifiant, b.version, b.audit);
 
         this.nom = b.nom;
         this.detail = b.detail;
@@ -93,6 +94,7 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
 
         private Identifiant identifiant = null;
         private Long version = 0L;
+        private Audit audit = null;
         private String nom;
         private String detail;
         private Recette recette;
@@ -107,6 +109,7 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
 
             this.identifiant = pIngredient.getIdentifiant();
             this.version = pIngredient.getVersion();
+            this.audit = pIngredient.getAudit();
             this.nom = pIngredient.getNom();
             this.detail = pIngredient.getDetail();
             this.recette = pIngredient.getRecette();
@@ -121,6 +124,11 @@ public final class IngredientBase extends EntiteBase<Ingredient> implements Ingr
 
         public Builder version(final Long pVersion) {
             this.version = pVersion;
+            return this;
+        }
+
+        public Builder audit(final Audit pAudit) {
+            this.audit = pAudit;
             return this;
         }
 

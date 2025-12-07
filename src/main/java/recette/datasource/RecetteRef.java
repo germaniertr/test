@@ -1,5 +1,6 @@
 package recette.datasource;
 
+import core.domain.Audit;
 import core.domain.Identifiant;
 import java.util.List;
 import recette.domain.Composant;
@@ -14,7 +15,6 @@ public class RecetteRef implements Recette {
     private Identifiant identifiant;
     private String nom;
     private String detail;
-    private Long verison;
     private Long version;
 
     /**
@@ -37,7 +37,12 @@ public class RecetteRef implements Recette {
 
     @Override
     public Long getVersion() {
-        return this.verison;
+        return this.version;
+    }
+
+    @Override
+    public Audit getAudit() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

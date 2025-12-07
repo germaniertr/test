@@ -1,7 +1,10 @@
 package recette.domain;
 
+import core.domain.Audit;
+import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
+import java.time.Instant;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +22,7 @@ public class UniteBaseTest {
     private String codeRef;
     private Unite entiteRef;
     private Long versionRef;
+    private Audit auditRef;
 
     public UniteBaseTest() {
     }
@@ -27,10 +31,18 @@ public class UniteBaseTest {
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
         versionRef = 123L;
+        auditRef = AuditBase.builder()
+                .dateCreation(Instant.now())
+                .userCreation("user creation")
+                .dateModification(Instant.now().plusSeconds(60))
+                .userModification("user modification")
+                .build();
+
         codeRef = "code référence";
         entiteRef = UniteBase.builder()
                 .identifiant(identifiantRef)
                 .version(versionRef)
+                .audit(auditRef)
                 .code(codeRef)
                 .build();
     }
@@ -41,7 +53,17 @@ public class UniteBaseTest {
         entiteRef.setCode(code);
         Assertions.assertEquals(identifiantRef, entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(code, entiteRef.getCode());
+    }
+
+    private void testAudit(Audit ref, Audit audit) {
+        Assertions.assertEquals(ref, audit);
+        Assertions.assertEquals(ref.getUserCreation(),
+                audit.getUserCreation());
+        Assertions.assertEquals(ref.getUserModification(),
+                audit.getUserModification());
     }
 
     @Test
@@ -96,6 +118,8 @@ public class UniteBaseTest {
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(code, this.entiteRef.getCode());
     }
 
@@ -119,6 +143,7 @@ public class UniteBaseTest {
 
         Assertions.assertEquals(this.entiteRef.getIdentifiant(), entite.getIdentifiant());
         Assertions.assertEquals(this.entiteRef.getVersion(), entite.getVersion());
+        testAudit(this.entiteRef.getAudit(), entite.getAudit());
 
         Assertions.assertEquals(this.entiteRef.getCode(), entite.getCode());
 

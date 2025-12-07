@@ -1,7 +1,10 @@
 package recette.domain;
 
+import core.domain.Audit;
+import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -29,6 +32,7 @@ public class RecetteBaseTest {
     private Composant composantRef3;
     private List<Composant> composantsRef;
     private Long versionRef;
+    private Audit auditRef;
 
     public RecetteBaseTest() {
     }
@@ -37,6 +41,12 @@ public class RecetteBaseTest {
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
         versionRef = 123L;
+        auditRef = AuditBase.builder()
+                .dateCreation(Instant.now())
+                .userCreation("user creation")
+                .dateModification(Instant.now().plusSeconds(60))
+                .userModification("user modification")
+                .build();
 
         nomRef = "nom recette";
         detailRef = "description recette";
@@ -86,6 +96,7 @@ public class RecetteBaseTest {
 
         entiteRef = RecetteBase.builder()
                 .identifiant(identifiantRef)
+                .audit(auditRef)
                 .version(versionRef)
                 .nom(nomRef)
                 .detail(detailRef)
@@ -111,6 +122,8 @@ public class RecetteBaseTest {
     public void testGet() {
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, this.entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(nomRef, this.entiteRef.getNom());
         Assertions.assertEquals(detailRef, this.entiteRef.getDetail());
         Assertions.assertEquals(preparationRef, this.entiteRef.getPreparation());
@@ -128,6 +141,14 @@ public class RecetteBaseTest {
                     this.entiteRef.getComposants().get(i).getUnite());
         }
 
+    }
+
+    private void testAudit(Audit ref, Audit audit) {
+        Assertions.assertEquals(ref, audit);
+        Assertions.assertEquals(ref.getUserCreation(),
+                audit.getUserCreation());
+        Assertions.assertEquals(ref.getUserModification(),
+                audit.getUserModification());
     }
 
     @Test
@@ -174,6 +195,8 @@ public class RecetteBaseTest {
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, this.entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(nom, this.entiteRef.getNom());
         Assertions.assertEquals(detail, this.entiteRef.getDetail());
         Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
@@ -276,6 +299,8 @@ public class RecetteBaseTest {
 
         Assertions.assertEquals(identifiantRef, this.entiteRef.getIdentifiant());
         Assertions.assertEquals(versionRef, this.entiteRef.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
+
         Assertions.assertEquals(nom, this.entiteRef.getNom());
         Assertions.assertEquals(detail, this.entiteRef.getDetail());
         Assertions.assertEquals(preparation, this.entiteRef.getPreparation());
@@ -336,6 +361,7 @@ public class RecetteBaseTest {
                 entite.getIdentifiant());
         Assertions.assertEquals(this.entiteRef.getVersion(),
                 entite.getVersion());
+        testAudit(this.auditRef, this.entiteRef.getAudit());
 
         Assertions.assertEquals(this.entiteRef.getNom(),
                 entite.getNom());
