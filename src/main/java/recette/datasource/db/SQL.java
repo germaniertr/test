@@ -126,6 +126,8 @@ public final class SQL {
                 = """
                   SELECT u.uuid,
                    u.version,
+                   u.instant_creation, u.user_creation,
+                   u.instant_modification, u.user_modification,
                    u.code
                   """;
 
@@ -582,6 +584,10 @@ public final class SQL {
 
             public static final String UUID = "uuid";
             public static final String VERSION = "version";
+            public static final String DATE_CREATION = "instant_creation";
+            public static final String USER_CREATION = "user_creation";
+            public static final String DATE_MODIFICATION = "instant_modification";
+            public static final String USER_MODIFICATION = "user_modification";
 
             private ATTRIBUTS() {
             }

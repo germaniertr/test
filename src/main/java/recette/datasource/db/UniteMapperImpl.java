@@ -7,12 +7,15 @@ import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.datasource.db.SQL_ERREUR_CODES;
+import core.domain.Audit;
+import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -287,10 +290,12 @@ public class UniteMapperImpl implements UniteMapper {
 
         String code = rs.getString(SQL.UNITES.ATTRIBUTS.CODE);
         Long version = rs.getLong(SQL.ENTITES.ATTRIBUTS.VERSION);
+        Audit audit = readAudit(rs);
 
         Unite entite = UniteBase.builder()
                 .identifiant(identifiant)
                 .version(version)
+                .audit(audit)
                 .code(code)
                 .build();
 
@@ -305,4 +310,31 @@ public class UniteMapperImpl implements UniteMapper {
                 .uuid(uuid)
                 .build();
     }
+
+    protected Audit readAudit(final ResultSet rs)
+            throws SQLException {
+        Timestamp rsDateCreation
+                = rs.getTimestamp(SQL.ENTITES.ATTRIBUTS.DATE_CREATION);
+        String rsUserCreation
+                = rs.getString(SQL.ENTITES.ATTRIBUTS.USER_CREATION);
+        Timestamp rsDateModification
+                = rs.getTimestamp(SQL.ENTITES.ATTRIBUTS.DATE_MODIFICATION);
+        String rsUserModification
+                = rs.getString(SQL.ENTITES.ATTRIBUTS.USER_MODIFICATION);
+
+        AuditBase.Builder builder = AuditBase.builder()
+                .userCreation(rsUserCreation)
+                .userModification(rsUserModification);
+
+        if (rsDateCreation != null) {
+            builder.dateCreation(rsDateCreation.toInstant());
+        }
+
+        if (rsDateModification != null) {
+            builder.dateModification(rsDateModification.toInstant());
+        }
+
+        return builder.build();
+    }
+
 }
