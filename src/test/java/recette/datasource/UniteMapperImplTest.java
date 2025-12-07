@@ -103,6 +103,8 @@ public abstract class UniteMapperImplTest {
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(uniteCS, entite);
         Assertions.assertTrue(entite.getVersion() > 0);
+        Assertions.assertNotNull(entite.getAudit());
+
         Assertions.assertEquals(uniteCS.getCode(), entite.getCode());
     }
 
@@ -136,6 +138,13 @@ public abstract class UniteMapperImplTest {
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
+
+        Assertions.assertNotNull(nouvelleEntite.getAudit());
+        Assertions.assertNull(nouvelleEntite.getAudit().getUserModification());
+        Assertions.assertTrue(Instant.now()
+                .isAfter(nouvelleEntite.getAudit()
+                        .getDateCreation()));
+
         Assertions.assertEquals(nouvelleUniteRef.getCode(), nouvelleEntite.getCode());
 
         Unite entite = mapperManager.getUniteMapper()
@@ -144,6 +153,8 @@ public abstract class UniteMapperImplTest {
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
+        Assertions.assertNotNull(entite.getAudit());
+
         Assertions.assertEquals(nouvelleEntite, entite);
         Assertions.assertNotSame(nouvelleEntite, entite);
         Assertions.assertEquals(nouvelleEntite.getCode(), entite.getCode());
@@ -271,6 +282,15 @@ public abstract class UniteMapperImplTest {
         Assertions.assertEquals(entiteMod, entiteModifie);
         Assertions.assertEquals(Long.valueOf(2),
                 entiteModifie.getVersion());
+
+        Assertions.assertNotNull(entiteModifie.getAudit());
+        Assertions.assertTrue(Instant.now()
+                .isAfter(entiteModifie.getAudit()
+                        .getDateCreation()));
+        Assertions.assertTrue(Instant.now()
+                .isAfter(entiteModifie.getAudit()
+                        .getDateModification()));
+
         Assertions.assertEquals(entiteMod.getCode(), entiteModifie.getCode());
     }
 

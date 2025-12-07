@@ -148,6 +148,8 @@ public abstract class IngredientMapperImplTest {
 
         Assertions.assertEquals(ingredientAubergine, entite);
         Assertions.assertTrue(entite.getVersion() > 0);
+        Assertions.assertNotNull(entite.getAudit());
+
         Assertions.assertEquals(ingredientAubergine.getNom(),
                 entite.getNom());
         Assertions.assertEquals(ingredientAubergine.getDetail(),
@@ -215,6 +217,13 @@ public abstract class IngredientMapperImplTest {
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
+
+        Assertions.assertNotNull(nouvelleEntite.getAudit());
+        Assertions.assertNull(nouvelleEntite.getAudit().getUserModification());
+        Assertions.assertTrue(Instant.now()
+                .isAfter(nouvelleEntite.getAudit()
+                        .getDateCreation()));
+
         Assertions.assertEquals(nouvelleIngredientRef1.getNom(),
                 nouvelleEntite.getNom());
         Assertions.assertEquals(nouvelleIngredientRef1.getDetail(),
@@ -227,6 +236,8 @@ public abstract class IngredientMapperImplTest {
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
+        Assertions.assertNotNull(entite.getAudit());
+
         Assertions.assertEquals(nouvelleEntite, entite);
         Assertions.assertNotSame(nouvelleEntite, entite);
         Assertions.assertEquals(nouvelleEntite.getNom(), entite.getNom());
@@ -401,6 +412,15 @@ public abstract class IngredientMapperImplTest {
         Assertions.assertEquals(entiteMod, entiteModifie);
         Assertions.assertEquals(Long.valueOf(2),
                 entiteModifie.getVersion());
+
+        Assertions.assertNotNull(entiteModifie.getAudit());
+        Assertions.assertTrue(Instant.now()
+                .isAfter(entiteModifie.getAudit()
+                        .getDateCreation()));
+        Assertions.assertTrue(Instant.now()
+                .isAfter(entiteModifie.getAudit()
+                        .getDateModification()));
+
         Assertions.assertEquals(entiteMod.getNom(),
                 entiteModifie.getNom());
         Assertions.assertEquals(entiteMod.getDetail(),

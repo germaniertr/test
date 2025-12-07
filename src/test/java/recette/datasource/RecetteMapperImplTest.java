@@ -184,6 +184,8 @@ public abstract class RecetteMapperImplTest {
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(recetteAubergineRef, entite);
         Assertions.assertTrue(entite.getVersion() > 0);
+        Assertions.assertNotNull(entite.getAudit());
+        
         Assertions.assertEquals(recetteAubergineRef.getNom(),
                 entite.getNom());
         Assertions.assertEquals(recetteAubergineRef.getDetail(),
@@ -252,6 +254,13 @@ public abstract class RecetteMapperImplTest {
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
+        
+        Assertions.assertNotNull(nouvelleEntite.getAudit());
+        Assertions.assertNull(nouvelleEntite.getAudit().getUserModification());
+        Assertions.assertTrue(Instant.now()
+                .isAfter(nouvelleEntite.getAudit()
+                        .getDateCreation()));
+        
         Assertions.assertEquals(nouvelleEntiteRef.getNom(),
                 nouvelleEntite.getNom());
         Assertions.assertEquals(nouvelleEntiteRef.getDetail(),
@@ -282,6 +291,8 @@ public abstract class RecetteMapperImplTest {
         Assertions.assertEquals(nouvelleEntite, entite);
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
+        Assertions.assertNotNull(entite.getAudit());
+        
         Assertions.assertEquals(nouvelleEntite.getDetail(),
                 entite.getDetail());
         Assertions.assertEquals(nouvelleEntite.getPreparation(),
@@ -434,6 +445,16 @@ public abstract class RecetteMapperImplTest {
         Assertions.assertEquals(entiteModifie, entiteMod);
         Assertions.assertEquals(Long.valueOf(2),
                 entiteMod.getVersion());
+        
+        Assertions.assertNotNull(entiteMod.getAudit());
+        Assertions.assertTrue(Instant.now()
+                .isAfter(entiteMod.getAudit()
+                        .getDateCreation()));
+        Assertions.assertTrue(Instant.now()
+                .isAfter(entiteMod.getAudit()
+                        .getDateModification()));
+
+        
         Assertions.assertEquals(entiteModifie.getDetail(),
                 entiteMod.getDetail());
         Assertions.assertEquals(entiteModifie.getPreparation(),
