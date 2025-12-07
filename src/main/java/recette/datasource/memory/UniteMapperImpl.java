@@ -3,6 +3,7 @@ package recette.datasource.memory;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
@@ -35,10 +36,10 @@ public class UniteMapperImpl implements UniteMapper {
             return null;
         }
 
-        Unite nouvelleEntite = UniteBase.builder()
+        Unite nouvelleEntite = new UniteMemory(UniteBase.builder()
                 .unite(entite)
                 .identifiant(IdentifiantBase.builder().build())
-                .build();
+                .build());
 
         checkContainteCodeNotNull(nouvelleEntite);
         checkContrainteCodeUnique(nouvelleEntite);
@@ -106,7 +107,15 @@ public class UniteMapperImpl implements UniteMapper {
         checkEntiteInconnue(e, entite);
         checkContainteCodeNotNull(entite);
 
+        if (e.getVersion()
+                > entite.getVersion()) {
+            throw new EntiteTropAnciennePersistenceException();
+        }
+
         e.update(entite);
+        if (e instanceof UniteMemory um) {
+            um.incrementVersion();
+        }
     }
 
     @Override
@@ -119,6 +128,11 @@ public class UniteMapperImpl implements UniteMapper {
 
         checkEntiteInconnue(e, entite);
         checkContrainteEntiteUtilisee(e);
+
+        if (e.getVersion()
+                > entite.getVersion()) {
+            throw new EntiteTropAnciennePersistenceException();
+        }
 
         this.mapperManager.getData()
                 .getUnites().remove(e.getIdentifiant());
