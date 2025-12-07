@@ -44,10 +44,16 @@ public class DatabaseSetupImpl implements DatabaseSetup {
                 requete.addBatch(SQL.RECETTES.ALTER_TABLE);
 
                 requete.addBatch(SQL.VERROU_OPTIMISTE.CREATE_PROCEDURE);
+                requete.addBatch(SQL.AUDIT.CREATE_PROCEDURE);
+
                 requete.addBatch(SQL.UNITES.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.UNITES.CREATE_TRIGGER_AUDIT);
                 requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_AUDIT);
                 requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_AUDIT);
                 requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_AUDIT);
 
                 requete.executeBatch();
             }
@@ -66,14 +72,21 @@ public class DatabaseSetupImpl implements DatabaseSetup {
             try (Statement requete = connection.createStatement();) {
 
                 requete.addBatch(SQL.UNITES.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.UNITES.DROP_TRIGGER_AUDIT);
                 requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_AUDIT);
                 requete.addBatch(SQL.RECETTES.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.RECETTES.DROP_TRIGGER_AUDIT);
                 requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_VERROU_OPTIMISTE);
+                requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_AUDIT);
 
                 requete.addBatch(SQL.COMPOSANTS.DROP_TABLE);
                 requete.addBatch(SQL.INGREDIENTS.DROP_TABLE);
                 requete.addBatch(SQL.UNITES.DROP_TABLE);
                 requete.addBatch(SQL.RECETTES.DROP_TABLE);
+
+                requete.addBatch(SQL.VERROU_OPTIMISTE.DROP_PROCEDURE);
+                requete.addBatch(SQL.AUDIT.DROP_PROCEDURE);
 
                 requete.executeBatch();
             }

@@ -28,6 +28,33 @@ public final class SQL {
 
     }
 
+    public static final class AUDIT {
+
+        public static final String CREATE_PROCEDURE
+                = """
+                  CREATE OR REPLACE FUNCTION F_maj_audit() RETURNS TRIGGER AS $FUNCT$
+                  BEGIN
+                    IF (TG_OP = 'INSERT') THEN
+                      NEW.instant_creation := current_timestamp;
+                      NEW.user_creation := current_user;
+                      NEW.instant_modification := NULL;
+                      NEW.user_modification := NULL;
+                    ELSIF (TG_OP = 'UPDATE') THEN
+                      NEW.instant_creation := OLD.instant_creation;
+                      NEW.user_creation := OLD.user_creation;
+                      NEW.instant_modification := current_timestamp;
+                      NEW.user_modification := current_user;
+                    END IF ;
+                    RETURN NEW;
+                  END;
+                  $FUNCT$ LANGUAGE plpgsql;
+                  """;
+
+        public static final String DROP_PROCEDURE
+                = "DROP FUNCTION IF EXISTS F_maj_audit();\n";
+
+    }
+
     public static final class UNITES {
 
         public static final String CREATE_TRIGGER_VERROU_OPTIMISTE
@@ -45,6 +72,21 @@ public final class SQL {
                   ;
                   """;
 
+        public static final String CREATE_TRIGGER_AUDIT
+                = """
+                  CREATE TRIGGER TR_BIUS_unites_audit
+                  BEFORE INSERT OR UPDATE
+                  ON unites FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_audit()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_AUDIT
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_unites_audit ON unites
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS unites CASCADE";
 
@@ -55,6 +97,11 @@ public final class SQL {
                       code TEXT NOT NULL,
 
                       version INTEGER DEFAULT 1,
+
+                      instant_creation TIMESTAMP DEFAULT now(),
+                      user_creation TEXT,
+                      instant_modification TIMESTAMP,
+                      user_modification TEXT,
 
                       CONSTRAINT pk_unites
                           PRIMARY KEY (uuid)
@@ -145,6 +192,21 @@ public final class SQL {
                   ;
                   """;
 
+        public static final String CREATE_TRIGGER_AUDIT
+                = """
+                  CREATE TRIGGER TR_BIUS_ingredients_audit
+                  BEFORE INSERT OR UPDATE
+                  ON ingredients FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_audit()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_AUDIT
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_ingredients_audit ON ingredients
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS ingredients CASCADE";
 
@@ -157,6 +219,11 @@ public final class SQL {
                       recettes_uuid VARCHAR, -- aid
 
                       version INTEGER DEFAULT 1,
+
+                      instant_creation TIMESTAMP DEFAULT now(),
+                      user_creation TEXT,
+                      instant_modification TIMESTAMP,
+                      user_modification TEXT,
 
                       CONSTRAINT pk_ingredients
                           PRIMARY KEY (uuid)
@@ -261,6 +328,21 @@ public final class SQL {
                   ;
                   """;
 
+        public static final String CREATE_TRIGGER_AUDIT
+                = """
+                  CREATE TRIGGER TR_BIUS_recettes_audit
+                  BEFORE INSERT OR UPDATE
+                  ON recettes FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_audit()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_AUDIT
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_recettes_audit ON recettes
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS recettes CASCADE";
 
@@ -274,6 +356,11 @@ public final class SQL {
                       nombre_personnes INTEGER DEFAULT 4,
 
                       version INTEGER DEFAULT 1,
+
+                      instant_creation TIMESTAMP DEFAULT now(),
+                      user_creation TEXT,
+                      instant_modification TIMESTAMP,
+                      user_modification TEXT,
 
                       CONSTRAINT pk_recettes
                           PRIMARY KEY (uuid)
@@ -371,6 +458,21 @@ public final class SQL {
                   ;
                   """;
 
+        public static final String CREATE_TRIGGER_AUDIT
+                = """
+                  CREATE TRIGGER TR_BIUS_composants_audit
+                  BEFORE INSERT OR UPDATE
+                  ON composants FOR EACH ROW
+                  EXECUTE PROCEDURE F_maj_audit()
+                  ;
+                  """;
+
+        public static final String DROP_TRIGGER_AUDIT
+                = """
+                  DROP TRIGGER IF EXISTS TR_BIUS_composants_audit ON composants
+                  ;
+                  """;
+
         public static final String DROP_TABLE
                 = "DROP TABLE IF EXISTS composants CASCADE";
 
@@ -387,6 +489,11 @@ public final class SQL {
                       unites_uuid VARCHAR, -- aid
 
                       version INTEGER DEFAULT 1,
+
+                      instant_creation TIMESTAMP DEFAULT now(),
+                      user_creation TEXT,
+                      instant_modification TIMESTAMP,
+                      user_modification TEXT,
 
                       CONSTRAINT pk_composants
                           PRIMARY KEY (uuid)
