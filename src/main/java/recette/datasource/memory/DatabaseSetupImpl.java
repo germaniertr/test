@@ -6,11 +6,8 @@ import recette.domain.Composant;
 import recette.domain.ComposantBase;
 import recette.domain.DemoData;
 import recette.domain.Ingredient;
-import recette.domain.IngredientBase;
 import recette.domain.Recette;
-import recette.domain.RecetteBase;
 import recette.domain.Unite;
-import recette.domain.UniteBase;
 
 /**
  *
@@ -45,22 +42,16 @@ public class DatabaseSetupImpl implements DatabaseSetup {
 
         for (Unite e : newData.getUnites().values()) {
             this.mapperManager.getData().getUnites()
-                    .put(e.getIdentifiant(),
-                            UniteBase.builder()
-                                    .unite(e)
-                                    .build());
+                    .put(e.getIdentifiant(), new UniteMemory(e));
         }
 
         for (Ingredient e : newData.getIngredients().values()) {
             this.mapperManager.getData().getIngredients()
-                    .put(e.getIdentifiant(),
-                            IngredientBase.builder().
-                                    ingredient(e).
-                                    build());
+                    .put(e.getIdentifiant(), new IngredientMemory(e));
         }
 
         for (Recette e : newData.getRecettes().values()) {
-            Recette em = RecetteBase.builder().recette(e).build();
+            Recette em = new RecetteMemory(e);
             em.getComposants().clear();
             for (Composant c : e.getComposants()) {
                 Unite um = null;
