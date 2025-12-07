@@ -3,6 +3,7 @@ package recette.datasource.memory;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
@@ -44,12 +45,12 @@ public class IngredientMapperImpl implements IngredientMapper {
             checkRecetteInconnue(recette, entite.getRecette());
         }
 
-        Ingredient nouvelleEntite = IngredientBase.builder()
+        Ingredient nouvelleEntite = new IngredientMemory(IngredientBase.builder()
                 .ingredient(entite)
                 .identifiant(IdentifiantBase.builder()
                         .build())
                 .recette(recette)
-                .build();
+                .build());
 
         checkContainteNomNotNull(nouvelleEntite);
         checkContrainteNomUnique(nouvelleEntite);
@@ -136,8 +137,17 @@ public class IngredientMapperImpl implements IngredientMapper {
         checkEntiteInconnue(e, entite);
         checkContainteNomNotNull(entite);
 
+        if (e.getVersion()
+                > entite.getVersion()) {
+            throw new EntiteTropAnciennePersistenceException();
+        }
+
         e.update(entite);
         e.setRecette(recette);
+        if (e instanceof IngredientMemory um) {
+            um.incrementVersion();
+        }
+
     }
 
     @Override
@@ -151,6 +161,11 @@ public class IngredientMapperImpl implements IngredientMapper {
 
         checkEntiteInconnue(e, entite);
         checkContrainteEntiteUtilisee(e);
+
+        if (e.getVersion()
+                > entite.getVersion()) {
+            throw new EntiteTropAnciennePersistenceException();
+        }
 
         this.mapperManager.getData()
                 .getIngredients().remove(e.getIdentifiant());
