@@ -390,6 +390,8 @@ public final class SQL {
                 = """
                   SELECT r.uuid,
                      r.version,
+                     r.instant_creation, r.user_creation,
+                     r.instant_modification, r.user_modification,
                      r.nom, r.detail,
                      r.preparation,
                      r.nombre_personnes
@@ -537,6 +539,8 @@ public final class SQL {
         public static final String SELECTION
                 = """
                   SELECT c.uuid, c.version,
+                  c.instant_creation, c.user_creation,
+                  c.instant_modification, c.user_modification,
                   c.quantite,
                   c.commentaire,
                   c.ingredients_uuid,
