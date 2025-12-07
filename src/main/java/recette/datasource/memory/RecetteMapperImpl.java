@@ -3,6 +3,7 @@ package recette.datasource.memory;
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
+import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
@@ -68,7 +69,7 @@ public class RecetteMapperImpl implements RecetteMapper {
             builder.composant(composant);
         }
 
-        Recette nouvelleEntite = builder.build();
+        Recette nouvelleEntite = new RecetteMemory(builder.build());
 
         this.checkContainteNomNotNull(nouvelleEntite);
         this.checkContrainteNomUnique(nouvelleEntite);
@@ -128,6 +129,7 @@ public class RecetteMapperImpl implements RecetteMapper {
 
         RecetteBase.Builder builder = RecetteBase.builder()
                 .identifiant(entite.getIdentifiant())
+                .version(entite.getVersion())
                 .nom(entite.getNom())
                 .detail(entite.getDetail())
                 .preparation(entite.getPreparation())
@@ -156,13 +158,20 @@ public class RecetteMapperImpl implements RecetteMapper {
 
         }
 
-        Recette entiteModifie = builder
-                .build();
+        Recette entiteModifie = new RecetteMemory(builder.build());
 
         this.checkContainteNomNotNull(entiteModifie);
         this.checkContrainteNomUnique(entiteModifie);
 
+        if (e.getVersion()
+                > entite.getVersion()) {
+            throw new EntiteTropAnciennePersistenceException();
+        }
+
         e.update(entiteModifie);
+        if (e instanceof RecetteMemory um) {
+            um.incrementVersion();
+        }
 
     }
 
@@ -177,6 +186,11 @@ public class RecetteMapperImpl implements RecetteMapper {
 
         checkEntiteInconnue(e, entite);
 
+        if (e.getVersion()
+                > entite.getVersion()) {
+            throw new EntiteTropAnciennePersistenceException();
+        }
+
         this.mapperManager.getData()
                 .getRecettes().remove(entite.getIdentifiant());
 
@@ -188,6 +202,7 @@ public class RecetteMapperImpl implements RecetteMapper {
                 .identifiant(IdentifiantBase.builder()
                         .identifiant(entite.getIdentifiant())
                         .build())
+                .version(entite.getVersion())
                 .nom(entite.getNom())
                 .detail(entite.getDetail())
                 .preparation(entite.getPreparation())
@@ -217,7 +232,7 @@ public class RecetteMapperImpl implements RecetteMapper {
             builder.composant(composant);
         }
 
-        return builder.build();
+        return new RecetteMemory(builder.build());
     }
 
     private void checkIngredientInconnu(final Ingredient ingredient,
