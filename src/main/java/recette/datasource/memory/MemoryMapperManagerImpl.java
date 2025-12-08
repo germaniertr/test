@@ -13,23 +13,14 @@ import recette.domain.DemoData;
  */
 public final class MemoryMapperManagerImpl implements MapperManager {
 
-    private static MemoryMapperManagerImpl mapperManager;
-
     private final DemoData data;
     private DatabaseSetup databaseSetup;
     private UniteMapper uniteMapper;
     private IngredientMapper ingredientMapper;
     private RecetteMapper recetteMapper;
 
-    private MemoryMapperManagerImpl() {
-        this.data = new DemoData();
-    }
-
-    public static MapperManager getInstance() {
-        if (mapperManager == null) {
-            mapperManager = new MemoryMapperManagerImpl();
-        }
-        return mapperManager;
+    MemoryMapperManagerImpl(final DemoData data) {
+        this.data = data;
     }
 
     @Override
