@@ -6,6 +6,7 @@ import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
+import core.datasource.TransactionManager;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.time.Instant;
@@ -30,20 +31,23 @@ public abstract class IngredientMapperImplTest {
 
     private static final Logger LOG = Logger.getLogger(IngredientMapperImplTest.class.getName());
 
-    protected MapperManager mapperManager;
     protected String filtreRef;
     protected Identifiant identifiantAubergine;
     protected Ingredient ingredientAubergine;
     protected Ingredient nouvelleIngredientRef2;
     protected Ingredient nouvelleIngredientRef1;
+    private final TransactionManager transactionManager;
 
-    public IngredientMapperImplTest(MapperManager mapperManager) throws PersistenceException {
-        this.mapperManager = mapperManager;
+    public IngredientMapperImplTest(TransactionManager tm) throws PersistenceException {
+        this.transactionManager = tm;
 
-        this.mapperManager.getDatabaseSetup().dropTables();
-        this.mapperManager.getDatabaseSetup().createTables();
-        this.mapperManager.getDatabaseSetup().insertData();
-
+        transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getDatabaseSetup().dropTables();
+                    mm.getDatabaseSetup().createTables();
+                    mm.getDatabaseSetup().insertData();
+                    return null;
+                });
     }
 
     @BeforeEach
@@ -80,9 +84,11 @@ public abstract class IngredientMapperImplTest {
 
     @Test
     public void testRetrieve_String() throws Exception {
-        List<Ingredient> entites
-                = mapperManager.getIngredientMapper()
-                        .retrieve(filtreRef);
+        List<Ingredient> entites = (List<Ingredient>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(filtreRef);
+                });
 
         Assertions.assertEquals(4, entites.size());
         for (Ingredient i : entites) {
@@ -95,9 +101,11 @@ public abstract class IngredientMapperImplTest {
 
     @Test
     public void testRetrieve_String_RecetteRef() throws Exception {
-        List<Ingredient> entites
-                = mapperManager.getIngredientMapper()
-                        .retrieve(filtreRef);
+        List<Ingredient> entites = (List<Ingredient>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(filtreRef);
+                });
 
         Assertions.assertEquals(4, entites.size());
         for (Ingredient i : entites) {
@@ -112,12 +120,17 @@ public abstract class IngredientMapperImplTest {
 
     @Test
     public void testRetrieve_String_Detacher() throws Exception {
-        List<Ingredient> entites1
-                = mapperManager.getIngredientMapper()
-                        .retrieve(filtreRef);
-        List<Ingredient> entites2
-                = mapperManager.getIngredientMapper()
-                        .retrieve(filtreRef);
+        List<Ingredient> entites1 = (List<Ingredient>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(filtreRef);
+                });
+
+        List<Ingredient> entites2 = (List<Ingredient>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(filtreRef);
+                });
 
         Assertions.assertEquals(entites1, entites2);
         Assertions.assertNotSame(entites1, entites2);
@@ -131,18 +144,23 @@ public abstract class IngredientMapperImplTest {
     @Test
     public void testRetrieve_StringNull() throws Exception {
         String filtre = null;
-        List<Ingredient> entites1
-                = mapperManager.getIngredientMapper()
-                        .retrieve(filtre);
 
-        Assertions.assertEquals(0, entites1.size());
+        List<Ingredient> entites = (List<Ingredient>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(filtre);
+                });
+
+        Assertions.assertEquals(0, entites.size());
     }
 
     @Test
     public void testRetrieve_Identifiant() throws Exception {
-        Ingredient entite
-                = mapperManager.getIngredientMapper()
-                        .retrieve(identifiantAubergine);
+        Ingredient entite = (Ingredient) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(identifiantAubergine);
+                });
 
         Assertions.assertNotNull(entite);
 
@@ -158,11 +176,13 @@ public abstract class IngredientMapperImplTest {
 
     @Test
     public void testRetrieve_SauceTomate() throws Exception {
-        Ingredient entite
-                = mapperManager.getIngredientMapper()
-                        .retrieve(IdentifiantBase.builder()
-                                .uuid(DemoData.INGREDIENTS.SAUCE_TOMATES.UUID)
-                                .build());
+        Ingredient entite = (Ingredient) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(IdentifiantBase.builder()
+                                    .uuid(DemoData.INGREDIENTS.SAUCE_TOMATES.UUID)
+                                    .build());
+                });
 
         Assertions.assertNotNull(entite);
 
@@ -177,30 +197,44 @@ public abstract class IngredientMapperImplTest {
 
         Assertions.assertTrue(entite.getRecette() instanceof RecetteRef);
 
-        Recette recette = mapperManager.getRecetteMapper()
-                .retrieve(IdentifiantBase.builder()
-                        .uuid(DemoData.RECETTES.SAUCE_TOMATES.UUID)
-                        .build());
+        Recette recette = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(IdentifiantBase.builder()
+                                    .uuid(DemoData.RECETTES.SAUCE_TOMATES.UUID)
+                                    .build());
+                });
+
         Assertions.assertNotSame(recette, entite.getRecette());
     }
 
     @Test
     public void testRetrieve_IdentifiantNull() throws Exception {
         Identifiant identifiant = null;
-        Ingredient entite
-                = mapperManager.getIngredientMapper()
-                        .retrieve(identifiant);
+
+        Ingredient entite = (Ingredient) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getIngredientMapper()
+                            .retrieve(identifiant);
+                });
+
         Assertions.assertNull(entite);
     }
 
     @Test
     public void testRetrieve_Identifiant_Detacher() throws Exception {
         Ingredient entite1
-                = mapperManager.getIngredientMapper()
-                        .retrieve(identifiantAubergine);
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .retrieve(identifiantAubergine);
+                        });
         Ingredient entite2
-                = mapperManager.getIngredientMapper()
-                        .retrieve(identifiantAubergine);
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .retrieve(identifiantAubergine);
+                        });
 
         Assertions.assertEquals(entite1, entite2);
         Assertions.assertNotSame(entite1, entite2);
@@ -211,8 +245,11 @@ public abstract class IngredientMapperImplTest {
     @Test
     public void testCreate() throws Exception {
         Ingredient nouvelleEntite
-                = mapperManager.getIngredientMapper()
-                        .create(nouvelleIngredientRef1);
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .create(nouvelleIngredientRef1);
+                        });
 
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
@@ -230,8 +267,11 @@ public abstract class IngredientMapperImplTest {
                 nouvelleEntite.getDetail());
 
         Ingredient entite
-                = mapperManager.getIngredientMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(Long.valueOf(1),
@@ -256,8 +296,11 @@ public abstract class IngredientMapperImplTest {
                                         .builder()
                                         .build())
                                 .build());
-                mapperManager.getIngredientMapper()
-                        .create(nouvelleIngredientRef1);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .create(nouvelleIngredientRef1);
+                        });
             }
         });
 
@@ -269,8 +312,11 @@ public abstract class IngredientMapperImplTest {
                 ContrainteUniquePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                mapperManager.getIngredientMapper()
-                        .create(ingredientAubergine);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .create(ingredientAubergine);
+                        });
             }
         });
     }
@@ -283,8 +329,11 @@ public abstract class IngredientMapperImplTest {
             public void execute() throws Throwable {
                 nouvelleIngredientRef1.setNom(null);
 
-                mapperManager.getIngredientMapper()
-                        .create(nouvelleIngredientRef1);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .create(nouvelleIngredientRef1);
+                        });
             }
         });
 
@@ -292,21 +341,29 @@ public abstract class IngredientMapperImplTest {
 
     @Test
     public void testDelete() throws Exception {
-        Ingredient nouvelleEntite
-                = mapperManager.getIngredientMapper()
-                        .create(nouvelleIngredientRef2);
         final Ingredient entite
-                = mapperManager.getIngredientMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Ingredient nouvelleEntite = mm.getIngredientMapper()
+                                    .create(nouvelleIngredientRef2);
+                            return mm.getIngredientMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
         Assertions.assertNotNull(entite);
 
-        mapperManager.getIngredientMapper()
-                .delete(entite);
+        transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getIngredientMapper().delete(entite);
+                    return null;
+                });
 
         Ingredient entiteNull
-                = mapperManager.getIngredientMapper()
-                        .retrieve(entite.getIdentifiant());
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getIngredientMapper()
+                                    .retrieve(entite.getIdentifiant());
+                        });
 
         Assertions.assertNull(entiteNull);
     }
@@ -317,18 +374,28 @@ public abstract class IngredientMapperImplTest {
                 EntiteTropAnciennePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Ingredient nouvelleEntite = mapperManager.getIngredientMapper()
-                        .create(nouvelleIngredientRef1);
-                Ingredient entite = mapperManager.getIngredientMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                final Ingredient entite
+                        = (Ingredient) transactionManager.executeTransaction(
+                                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                                    Ingredient nouvelleEntite = mm.getIngredientMapper()
+                                            .create(nouvelleIngredientRef2);
+                                    return mm.getIngredientMapper()
+                                            .retrieve(nouvelleEntite.getIdentifiant());
+                                });
 
                 Assertions.assertNotNull(entite);
 
-                mapperManager.getIngredientMapper()
-                        .update(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper().update(entite);
+                            return null;
+                        });
 
-                mapperManager.getIngredientMapper()
-                        .delete(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper().delete(entite);
+                            return null;
+                        });
             }
         });
 
@@ -340,13 +407,18 @@ public abstract class IngredientMapperImplTest {
                 EntiteUtiliseePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Ingredient entite
-                        = mapperManager.getIngredientMapper()
-                                .retrieve(identifiantAubergine);
-                Assertions.assertNotNull(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
 
-                mapperManager.getIngredientMapper()
-                        .delete(entite);
+                            Ingredient entite
+                            = mm.getIngredientMapper()
+                                    .retrieve(identifiantAubergine);
+                            Assertions.assertNotNull(entite);
+
+                            mm.getIngredientMapper()
+                                    .delete(entite);
+                            return null;
+                        });
             }
         });
 
@@ -358,7 +430,6 @@ public abstract class IngredientMapperImplTest {
                 EntiteInconnuePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-
                 Ingredient entite
                         = IngredientBase.builder()
                                 .ingredient(nouvelleIngredientRef2)
@@ -366,8 +437,13 @@ public abstract class IngredientMapperImplTest {
                                         .build())
                                 .build();
 
-                mapperManager.getIngredientMapper()
-                        .delete(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper()
+                                    .delete(entite);
+                            return null;
+                        });
+
             }
         });
     }
@@ -375,12 +451,15 @@ public abstract class IngredientMapperImplTest {
     @Test
     public void testUpdate() throws Exception {
 
-        Ingredient nouvelleEntite
-                = mapperManager.getIngredientMapper()
-                        .create(nouvelleIngredientRef2);
-        Ingredient entite
-                = mapperManager.getIngredientMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+        final Ingredient entite
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Ingredient nouvelleEntite
+                            = mm.getIngredientMapper()
+                                    .create(nouvelleIngredientRef2);
+                            return mm.getIngredientMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
         Assertions.assertNotNull(entite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
@@ -403,12 +482,16 @@ public abstract class IngredientMapperImplTest {
                                 .build())
                         .build());
 
-        mapperManager.getIngredientMapper()
-                .update(entiteMod);
-        Ingredient entiteModifie
-                = mapperManager.getIngredientMapper()
-                        .retrieve(entiteMod
-                                .getIdentifiant());
+        final Ingredient entiteModifie
+                = (Ingredient) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper()
+                                    .update(entiteMod);
+                            return mm.getIngredientMapper()
+                                    .retrieve(entiteMod
+                                            .getIdentifiant());
+                        });
+
         Assertions.assertEquals(entiteMod, entiteModifie);
         Assertions.assertEquals(Long.valueOf(2),
                 entiteModifie.getVersion());
@@ -434,12 +517,15 @@ public abstract class IngredientMapperImplTest {
                 EntiteTropAnciennePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Ingredient nouvelleEntite
-                        = mapperManager.getIngredientMapper()
-                                .create(nouvelleIngredientRef2);
-                Ingredient entite
-                        = mapperManager.getIngredientMapper()
-                                .retrieve(nouvelleEntite.getIdentifiant());
+                final Ingredient entite
+                        = (Ingredient) transactionManager.executeTransaction(
+                                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                                    Ingredient nouvelleEntite
+                                    = mm.getIngredientMapper()
+                                            .create(nouvelleIngredientRef2);
+                                    return mm.getIngredientMapper()
+                                            .retrieve(nouvelleEntite.getIdentifiant());
+                                });
 
                 Assertions.assertNotNull(entite.getIdentifiant());
                 Assertions.assertEquals(Long.valueOf(1),
@@ -462,11 +548,19 @@ public abstract class IngredientMapperImplTest {
                                         .build())
                                 .build());
 
-                mapperManager.getIngredientMapper()
-                        .update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
 
-                mapperManager.getIngredientMapper()
-                        .update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
 
             }
         });
@@ -486,8 +580,12 @@ public abstract class IngredientMapperImplTest {
                                         .build())
                                 .build();
 
-                mapperManager.getIngredientMapper()
-                        .update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
             }
         });
 
@@ -499,12 +597,15 @@ public abstract class IngredientMapperImplTest {
                 EntiteInconnuePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Ingredient nouvelleEntite
-                        = mapperManager.getIngredientMapper()
-                                .create(nouvelleIngredientRef2);
-                Ingredient entite
-                        = mapperManager.getIngredientMapper()
-                                .retrieve(nouvelleEntite.getIdentifiant());
+                final Ingredient entite
+                        = (Ingredient) transactionManager.executeTransaction(
+                                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                                    Ingredient nouvelleEntite
+                                    = mm.getIngredientMapper()
+                                            .create(nouvelleIngredientRef2);
+                                    return mm.getIngredientMapper()
+                                            .retrieve(nouvelleEntite.getIdentifiant());
+                                });
 
                 Ingredient entiteMod
                         = IngredientBase.builder()
@@ -517,8 +618,12 @@ public abstract class IngredientMapperImplTest {
                                                 .build())
                                 .build();
 
-                mapperManager.getIngredientMapper()
-                        .update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getIngredientMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
             }
         });
 
@@ -530,13 +635,18 @@ public abstract class IngredientMapperImplTest {
                 ContrainteNotNullPersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Ingredient entite
-                        = mapperManager.getIngredientMapper()
-                                .retrieve(identifiantAubergine);
-                entite.setNom(null);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Ingredient entite
+                            = mm.getIngredientMapper()
+                                    .retrieve(identifiantAubergine);
+                            entite.setNom(null);
 
-                mapperManager.getIngredientMapper()
-                        .update(entite);
+                            mm.getIngredientMapper()
+                                    .update(entite);
+                            return null;
+                        });
+
             }
         });
     }

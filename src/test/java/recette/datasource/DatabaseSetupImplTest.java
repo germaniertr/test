@@ -1,6 +1,7 @@
 package recette.datasource;
 
-import org.junit.jupiter.api.Disabled;
+import core.datasource.TransactionManager;
+import core.datasource.TransactionManager.Operation;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -9,16 +10,21 @@ import org.junit.jupiter.api.Test;
  */
 public abstract class DatabaseSetupImplTest {
 
-    protected final MapperManager mapperManager;
+    private final TransactionManager transactionManager;
 
-    public DatabaseSetupImplTest(MapperManager mapperManager) {
-        this.mapperManager = mapperManager;
+    public DatabaseSetupImplTest(TransactionManager tm) {
+        this.transactionManager = tm;
     }
 
     @Test
     public void testDropCreateTable() throws Exception {
-        mapperManager.getDatabaseSetup().dropTables();
-        mapperManager.getDatabaseSetup().createTables();
+        transactionManager.executeTransaction(
+                (Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getDatabaseSetup().dropTables();
+                    mm.getDatabaseSetup().createTables();
+                    return null;
+                });
+
 //        List<Unite> unites = mapperManager.getUniteMapper().retrieve(".*");
 //        Assertions.assertTrue(unites.isEmpty());
 //        List<Ingredient> ingredients = mapperManager.getIngredientMapper().retrieve(".*");
@@ -29,9 +35,14 @@ public abstract class DatabaseSetupImplTest {
 
     @Test
     public void testDropCreateTablesInsertData() throws Exception {
-        mapperManager.getDatabaseSetup().dropTables();
-        mapperManager.getDatabaseSetup().createTables();
-        mapperManager.getDatabaseSetup().insertData();
+        transactionManager.executeTransaction(
+                (Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getDatabaseSetup().dropTables();
+                    mm.getDatabaseSetup().createTables();
+                    mm.getDatabaseSetup().insertData();
+                    return null;
+                });
+
 //        List<Unite> unites = mapperManager.getUniteMapper().retrieve(".*");
 //        Assertions.assertFalse(unites.isEmpty());
 //        List<Ingredient> ingredients = mapperManager.getIngredientMapper().retrieve(".*");

@@ -9,7 +9,7 @@ import core.datasource.PersistenceException;
 public class RecetteMapperImplTest extends recette.datasource.RecetteMapperImplTest {
 
     public RecetteMapperImplTest() throws PersistenceException {
-        super(MemoryMapperManagerImpl.getInstance());
+        super(MemoryTransactionManagerImpl.getInstance());
 
         filtreRef1 = "^.*(Poires|Poivrons|tomates).*$";
         filtreRef2 = "^.*(Aubergine).*$";

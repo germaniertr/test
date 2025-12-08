@@ -7,7 +7,8 @@ package recette.datasource.db;
 public class DatabaseSetupImplTest extends recette.datasource.DatabaseSetupImplTest {
 
     public DatabaseSetupImplTest() {
-        super(DbMapperManagerImpl.getInstance(TestDataSourceFactory.getInstance()));
+        super(DbTransactionManagerImpl.getInstance(
+                TestDataSourceFactory.getInstance()));
     }
 
 }

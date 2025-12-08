@@ -5,6 +5,7 @@ import core.datasource.ContrainteUniquePersistenceException;
 import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.PersistenceException;
+import core.datasource.TransactionManager;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.time.Instant;
@@ -29,20 +30,24 @@ public abstract class RecetteMapperImplTest {
 
     private static final Logger LOG = Logger.getLogger(UniteMapperImplTest.class.getName());
 
-    protected MapperManager mapperManager;
     protected String filtreRef1;
     protected String filtreRef2;
     protected Identifiant identifiantAubergineRef;
     protected DemoData demoData;
     protected Recette recetteAubergineRef;
     protected Recette nouvelleEntiteRef;
+    private final TransactionManager transactionManager;
 
-    public RecetteMapperImplTest(MapperManager mapperManager) throws PersistenceException {
-        this.mapperManager = mapperManager;
+    public RecetteMapperImplTest(TransactionManager tm) throws PersistenceException {
+        this.transactionManager = tm;
 
-        this.mapperManager.getDatabaseSetup().dropTables();
-        this.mapperManager.getDatabaseSetup().createTables();
-        this.mapperManager.getDatabaseSetup().insertData();
+        transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getDatabaseSetup().dropTables();
+                    mm.getDatabaseSetup().createTables();
+                    mm.getDatabaseSetup().insertData();
+                    return null;
+                });
 
         this.demoData = new DemoData();
         this.demoData.initialisation();
@@ -108,8 +113,11 @@ public abstract class RecetteMapperImplTest {
 
     @Test
     public void testRetrieve_String() throws Exception {
-        List<Recette> entites = mapperManager.getRecetteMapper()
-                .retrieve(filtreRef1);
+        List<Recette> entites = (List<Recette>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(filtreRef1);
+                });
 
         Assertions.assertEquals(3, entites.size());
         for (Recette i : entites) {
@@ -121,8 +129,11 @@ public abstract class RecetteMapperImplTest {
 
     @Test
     public void testRetrieve_String_Aubergine() throws Exception {
-        List<Recette> entites = mapperManager.getRecetteMapper()
-                .retrieve(filtreRef2);
+        List<Recette> entites = (List<Recette>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(filtreRef2);
+                });
 
         Assertions.assertEquals(1, entites.size());
         for (Recette i : entites) {
@@ -135,10 +146,16 @@ public abstract class RecetteMapperImplTest {
 
     @Test
     public void testRetrieve_String_Detacher() throws Exception {
-        List<Recette> entites1 = mapperManager.getRecetteMapper()
-                .retrieve(filtreRef1);
-        List<Recette> entites2 = mapperManager.getRecetteMapper()
-                .retrieve(filtreRef1);
+        List<Recette> entites1 = (List<Recette>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(filtreRef1);
+                });
+        List<Recette> entites2 = (List<Recette>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(filtreRef1);
+                });
 
         Assertions.assertEquals(entites1, entites2);
         Assertions.assertNotSame(entites1, entites2);
@@ -170,22 +187,28 @@ public abstract class RecetteMapperImplTest {
     @Test
     public void testRetrieve_StringNull() throws Exception {
         String regex = null;
-        List<Recette> entites1 = mapperManager.getRecetteMapper()
-                .retrieve(regex);
+        List<Recette> entites1 = (List<Recette>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(regex);
+                });
 
         Assertions.assertEquals(0, entites1.size());
     }
 
     @Test
     public void testRetrieve_Identifiant() throws Exception {
-        Recette entite = mapperManager.getRecetteMapper()
-                .retrieve(identifiantAubergineRef);
+        Recette entite = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(identifiantAubergineRef);
+                });
 
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(recetteAubergineRef, entite);
         Assertions.assertTrue(entite.getVersion() > 0);
         Assertions.assertNotNull(entite.getAudit());
-        
+
         Assertions.assertEquals(recetteAubergineRef.getNom(),
                 entite.getNom());
         Assertions.assertEquals(recetteAubergineRef.getDetail(),
@@ -211,11 +234,17 @@ public abstract class RecetteMapperImplTest {
 
     @Test
     public void testRetrieve_Identifiant_Detacher() throws Exception {
-        Recette entite1 = mapperManager.getRecetteMapper()
-                .retrieve(identifiantAubergineRef);
+        Recette entite1 = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(identifiantAubergineRef);
+                });
 
-        Recette entite2 = mapperManager.getRecetteMapper()
-                .retrieve(identifiantAubergineRef);
+        Recette entite2 = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(identifiantAubergineRef);
+                });
 
         Assertions.assertEquals(entite1, entite2);
         Assertions.assertNotSame(entite1, entite2);
@@ -240,27 +269,33 @@ public abstract class RecetteMapperImplTest {
     @Test
     public void testRetrieve_IdentifiantNull() throws Exception {
         Identifiant identifiant = null;
-        Recette entite = mapperManager.getRecetteMapper()
-                .retrieve(identifiant);
+        Recette entite = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(identifiant);
+                });
 
         Assertions.assertNull(entite);
     }
 
     @Test
     public void testCreate() throws Exception {
-        Recette nouvelleEntite = mapperManager.getRecetteMapper()
-                .create(nouvelleEntiteRef);
+        Recette nouvelleEntite = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .create(nouvelleEntiteRef);
+                });
 
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
-        
+
         Assertions.assertNotNull(nouvelleEntite.getAudit());
         Assertions.assertNull(nouvelleEntite.getAudit().getUserModification());
         Assertions.assertTrue(Instant.now()
                 .isAfter(nouvelleEntite.getAudit()
                         .getDateCreation()));
-        
+
         Assertions.assertEquals(nouvelleEntiteRef.getNom(),
                 nouvelleEntite.getNom());
         Assertions.assertEquals(nouvelleEntiteRef.getDetail(),
@@ -285,14 +320,17 @@ public abstract class RecetteMapperImplTest {
                     nouvelleEntite.getComposants().get(i).getCommentaire());
         }
 
-        Recette entite = mapperManager.getRecetteMapper()
-                .retrieve(nouvelleEntite.getIdentifiant());
+        Recette entite = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getRecetteMapper()
+                            .retrieve(nouvelleEntite.getIdentifiant());
+                });
 
         Assertions.assertEquals(nouvelleEntite, entite);
         Assertions.assertEquals(Long.valueOf(1),
                 nouvelleEntite.getVersion());
         Assertions.assertNotNull(entite.getAudit());
-        
+
         Assertions.assertEquals(nouvelleEntite.getDetail(),
                 entite.getDetail());
         Assertions.assertEquals(nouvelleEntite.getPreparation(),
@@ -322,8 +360,11 @@ public abstract class RecetteMapperImplTest {
         Assertions.assertThrows(ContrainteUniquePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                mapperManager.getRecetteMapper()
-                        .create(recetteAubergineRef);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getRecetteMapper()
+                                    .create(recetteAubergineRef);
+                        });
             }
         });
     }
@@ -334,52 +375,75 @@ public abstract class RecetteMapperImplTest {
             @Override
             public void execute() throws Throwable {
                 nouvelleEntiteRef.setNom(null);
-                mapperManager.getRecetteMapper()
-                        .create(nouvelleEntiteRef);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getRecetteMapper()
+                                    .create(nouvelleEntiteRef);
+                        });
             }
         });
     }
 
     @Test
     public void testDelete() throws Exception {
-        Recette nouvelleEntite = mapperManager.getRecetteMapper()
-                .create(nouvelleEntiteRef);
-        Recette entite = mapperManager.getRecetteMapper()
-                .retrieve(nouvelleEntite.getIdentifiant());
+        Recette entite = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    Recette nouvelleEntite = mm.getRecetteMapper()
+                            .create(nouvelleEntiteRef);
+                    return mm.getRecetteMapper()
+                            .retrieve(nouvelleEntite.getIdentifiant());
+                });
 
         Assertions.assertNotNull(entite);
 
-        mapperManager.getRecetteMapper().delete(entite);
-        Recette entiteDel = mapperManager.getRecetteMapper()
-                .retrieve(entite.getIdentifiant());
+        Recette entiteDel = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getRecetteMapper().delete(entite);
+                    return mm.getRecetteMapper()
+                            .retrieve(entite.getIdentifiant());
 
+                });
         Assertions.assertNull(entiteDel);
     }
 
     @Test
     public void testDeleteEntiteTropAncienne() throws Exception {
         Assertions.assertThrows(
-                EntiteTropAnciennePersistenceException.class, new Executable() {
+                EntiteTropAnciennePersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
-                Recette nouvelleEntite = mapperManager.getRecetteMapper()
-                        .create(nouvelleEntiteRef);
-                Recette entite = mapperManager.getRecetteMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                Recette entite = (Recette) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Recette nouvelleEntite = mm.getRecetteMapper()
+                                    .create(nouvelleEntiteRef);
+                            return mm.getRecetteMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
                 Assertions.assertNotNull(entite);
 
-                mapperManager.getRecetteMapper().update(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper().update(entite);
+                            return null;
+                        });
 
-                mapperManager.getRecetteMapper().delete(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper().delete(entite);
+                            return null;
+                        });
             }
-        });
+        }
+        );
 
     }
 
     @Test
     public void testDeleteEntiteInconnu() throws Exception {
-        Assertions.assertThrows(EntiteInconnuePersistenceException.class, new Executable() {
+        Assertions.assertThrows(EntiteInconnuePersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
                 Recette entite = RecetteBase.builder()
@@ -387,18 +451,25 @@ public abstract class RecetteMapperImplTest {
                         .identifiant(IdentifiantBase.builder()
                                 .build())
                         .build();
-                mapperManager.getRecetteMapper()
-                        .delete(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper().delete(entite);
+                            return null;
+                        });
             }
-        });
+        }
+        );
     }
 
     @Test
     public void testUpdate() throws Exception {
-        Recette nouvelleEntite = mapperManager.getRecetteMapper()
-                .create(nouvelleEntiteRef);
-        Recette entite = mapperManager.getRecetteMapper()
-                .retrieve(nouvelleEntite.getIdentifiant());
+        Recette entite = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    Recette nouvelleEntite = mm.getRecetteMapper()
+                            .create(nouvelleEntiteRef);
+                    return mm.getRecetteMapper()
+                            .retrieve(nouvelleEntite.getIdentifiant());
+                });
 
         Assertions.assertNotNull(entite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
@@ -436,16 +507,19 @@ public abstract class RecetteMapperImplTest {
                                         .build())
                         .build();
 
-        mapperManager.getRecetteMapper()
-                .update(entiteModifie);
+        Recette entiteMod = (Recette) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getRecetteMapper()
+                            .update(entiteModifie);
 
-        Recette entiteMod = mapperManager.getRecetteMapper()
-                .retrieve(entiteModifie.getIdentifiant());
+                    return mm.getRecetteMapper()
+                            .retrieve(entiteModifie.getIdentifiant());
+                });
 
         Assertions.assertEquals(entiteModifie, entiteMod);
         Assertions.assertEquals(Long.valueOf(2),
                 entiteMod.getVersion());
-        
+
         Assertions.assertNotNull(entiteMod.getAudit());
         Assertions.assertTrue(Instant.now()
                 .isAfter(entiteMod.getAudit()
@@ -454,7 +528,6 @@ public abstract class RecetteMapperImplTest {
                 .isAfter(entiteMod.getAudit()
                         .getDateModification()));
 
-        
         Assertions.assertEquals(entiteModifie.getDetail(),
                 entiteMod.getDetail());
         Assertions.assertEquals(entiteModifie.getPreparation(),
@@ -482,13 +555,17 @@ public abstract class RecetteMapperImplTest {
     @Test
     public void testUpdateEntiteTropAncienne() throws Exception {
         Assertions.assertThrows(
-                EntiteTropAnciennePersistenceException.class, new Executable() {
+                EntiteTropAnciennePersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
-                Recette nouvelleEntite = mapperManager.getRecetteMapper()
-                        .create(nouvelleEntiteRef);
-                Recette entite = mapperManager.getRecetteMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                Recette entite = (Recette) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Recette nouvelleEntite = mm.getRecetteMapper()
+                                    .create(nouvelleEntiteRef);
+                            return mm.getRecetteMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
                 Assertions.assertNotNull(entite.getIdentifiant());
                 Assertions.assertEquals(Long.valueOf(1),
@@ -525,19 +602,29 @@ public abstract class RecetteMapperImplTest {
                                                 .build())
                                 .build();
 
-                mapperManager.getRecetteMapper()
-                        .update(entiteModifie);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper()
+                                    .update(entiteModifie);
+                            return null;
+                        });
 
-                mapperManager.getRecetteMapper()
-                        .update(entiteModifie);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper()
+                                    .update(entiteModifie);
+                            return null;
+                        });
             }
-        });
+        }
+        );
 
     }
 
     @Test
     public void testUpdateEntiteInconnu() throws Exception {
-        Assertions.assertThrows(EntiteInconnuePersistenceException.class, new Executable() {
+        Assertions.assertThrows(EntiteInconnuePersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
                 Recette entiteMod = RecetteBase.builder()
@@ -545,36 +632,61 @@ public abstract class RecetteMapperImplTest {
                         .identifiant(IdentifiantBase.builder()
                                 .build())
                         .build();
-                mapperManager.getRecetteMapper()
-                        .update(entiteMod);
+
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
+
             }
-        });
+        }
+        );
     }
 
     @Test
     public void testUpdateIngredientInconnu() throws Exception {
-        Assertions.assertThrows(EntiteInconnuePersistenceException.class, new Executable() {
+        Assertions.assertThrows(EntiteInconnuePersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
-                Recette entite = mapperManager.getRecetteMapper()
-                        .retrieve(identifiantAubergineRef);
+                Recette entite = (Recette) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getRecetteMapper()
+                                    .retrieve(identifiantAubergineRef);
+                        });
+
                 entite.getComposants().add(ComposantBase.builder()
                         .ingredient(IngredientBase.builder()
                                 .identifiant(IdentifiantBase.builder()
                                         .build())
                                 .build())
                         .build());
-                mapperManager.getRecetteMapper().update(entite);
+
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper()
+                                    .update(entite);
+                            return null;
+                        });
             }
-        });
+        }
+        );
     }
 
     @Test
     public void testUpdateUniteInconnu() throws Exception {
-        Assertions.assertThrows(EntiteInconnuePersistenceException.class, new Executable() {
+        Assertions.assertThrows(EntiteInconnuePersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
-                Recette entite = mapperManager.getRecetteMapper().retrieve(identifiantAubergineRef);
+                Recette entite = (Recette) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            return mm.getRecetteMapper()
+                                    .retrieve(identifiantAubergineRef);
+                        });
+
                 entite.getComposants().add(ComposantBase.builder()
                         .ingredient(IngredientBase.builder()
                                 .identifiant(IdentifiantBase.builder()
@@ -586,23 +698,38 @@ public abstract class RecetteMapperImplTest {
                                         .build())
                                 .build())
                         .build());
-                mapperManager.getRecetteMapper().update(entite);
+
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getRecetteMapper()
+                                    .update(entite);
+                            return null;
+                        });
+
             }
-        });
+        }
+        );
     }
 
     @Test
     public void testUpdateNomNull() throws Exception {
-        Assertions.assertThrows(ContrainteNotNullPersistenceException.class, new Executable() {
+        Assertions.assertThrows(ContrainteNotNullPersistenceException.class,
+                new Executable() {
             @Override
             public void execute() throws Throwable {
-                Recette entite = mapperManager.getRecetteMapper()
-                        .retrieve(identifiantAubergineRef);
-                entite.setNom(null);
-                mapperManager.getRecetteMapper()
-                        .update(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Recette entite = mm.getRecetteMapper()
+                                    .retrieve(identifiantAubergineRef);
+                            entite.setNom(null);
+                            mm.getRecetteMapper()
+                                    .update(entite);
+                            return null;
+                        });
+
             }
-        });
+        }
+        );
     }
 
 }

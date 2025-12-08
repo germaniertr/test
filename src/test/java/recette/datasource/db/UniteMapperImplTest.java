@@ -6,12 +6,13 @@ import core.datasource.PersistenceException;
  *
  * @author dominique huguenin (dominique.huguenin at rpn.ch)
  */
-public class UniteMapperImplTest  extends recette.datasource.UniteMapperImplTest {
-    
+public class UniteMapperImplTest extends recette.datasource.UniteMapperImplTest {
+
     public UniteMapperImplTest() throws PersistenceException {
-        super(DbMapperManagerImpl.getInstance(TestDataSourceFactory.getInstance()));  
-        
+        super(DbTransactionManagerImpl.getInstance(
+                TestDataSourceFactory.getInstance()));
+
         filtreRef = "c.s or g or brin";
-        
+
     }
 }

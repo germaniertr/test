@@ -7,7 +7,7 @@ package recette.datasource.memory;
 public class DatabaseSetupImplTest extends recette.datasource.DatabaseSetupImplTest {
 
     public DatabaseSetupImplTest() {
-        super(MemoryMapperManagerImpl.getInstance());
+        super(MemoryTransactionManagerImpl.getInstance());
     }
 
 }

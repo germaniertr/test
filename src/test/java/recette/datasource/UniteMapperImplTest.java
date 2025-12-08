@@ -6,6 +6,7 @@ import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
+import core.datasource.TransactionManager;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.time.Instant;
@@ -28,19 +29,22 @@ public abstract class UniteMapperImplTest {
 
     private static final Logger LOG = Logger.getLogger(UniteMapperImplTest.class.getName());
 
-    protected MapperManager mapperManager;
     protected String filtreRef;
     protected Identifiant identifiantCS;
     protected Unite uniteCS;
     protected Unite nouvelleUniteRef;
+    private final TransactionManager transactionManager;
 
-    public UniteMapperImplTest(MapperManager mapperManager) throws PersistenceException {
-        this.mapperManager = mapperManager;
+    public UniteMapperImplTest(TransactionManager tm) throws PersistenceException {
+        this.transactionManager = tm;
 
-        this.mapperManager.getDatabaseSetup().dropTables();
-        this.mapperManager.getDatabaseSetup().createTables();
-        this.mapperManager.getDatabaseSetup().insertData();
-
+        transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getDatabaseSetup().dropTables();
+                    mm.getDatabaseSetup().createTables();
+                    mm.getDatabaseSetup().insertData();
+                    return null;
+                });
     }
 
     @BeforeEach
@@ -59,8 +63,11 @@ public abstract class UniteMapperImplTest {
     @Test
     public void testRetrieve_String() throws Exception {
         Pattern pattern = Pattern.compile(filtreRef);
-        List<Unite> entites1 = mapperManager.getUniteMapper()
-                .retrieve(filtreRef);
+        List<Unite> entites1 = (List<Unite>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(filtreRef);
+                });
 
         Assertions.assertEquals(3, entites1.size());
         for (Unite i : entites1) {
@@ -73,18 +80,27 @@ public abstract class UniteMapperImplTest {
     @Test
     public void testRetrieve_StringNull() throws Exception {
         String filtre = null;
-        List<Unite> entites1 = mapperManager.getUniteMapper()
-                .retrieve(filtre);
+        List<Unite> entites1 = (List<Unite>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(filtre);
+                });
 
         Assertions.assertEquals(0, entites1.size());
     }
 
     @Test
     public void testRetrieve_String_Detacher() throws Exception {
-        List<Unite> entites1 = mapperManager.getUniteMapper()
-                .retrieve(filtreRef);
-        List<Unite> entites2 = mapperManager.getUniteMapper()
-                .retrieve(filtreRef);
+        List<Unite> entites1 = (List<Unite>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(filtreRef);
+                });
+        List<Unite> entites2 = (List<Unite>) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(filtreRef);
+                });
 
         Assertions.assertEquals(entites1, entites2);
         Assertions.assertNotSame(entites1, entites2);
@@ -97,8 +113,11 @@ public abstract class UniteMapperImplTest {
 
     @Test
     public void testRetrieve_Identifiant() throws Exception {
-        Unite entite = mapperManager.getUniteMapper()
-                .retrieve(identifiantCS);
+        Unite entite = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(identifiantCS);
+                });
 
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(uniteCS, entite);
@@ -111,18 +130,27 @@ public abstract class UniteMapperImplTest {
     @Test
     public void testRetrieve_IdentifiantNull() throws Exception {
         Identifiant identifiant = null;
-        Unite entite = mapperManager.getUniteMapper()
-                .retrieve(identifiant);
+        Unite entite = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(identifiant);
+                });
 
         Assertions.assertNull(entite);
     }
 
     @Test
     public void testRetrieve_Identifiant_Detacher() throws Exception {
-        Unite entite1 = mapperManager.getUniteMapper()
-                .retrieve(identifiantCS);
-        Unite entite2 = mapperManager.getUniteMapper()
-                .retrieve(identifiantCS);
+        Unite entite1 = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(identifiantCS);
+                });
+        Unite entite2 = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(identifiantCS);
+                });
 
         Assertions.assertEquals(entite1, entite2);
         Assertions.assertNotSame(entite1, entite2);
@@ -132,8 +160,11 @@ public abstract class UniteMapperImplTest {
 
     @Test
     public void testCreate() throws Exception {
-        Unite nouvelleEntite = mapperManager.getUniteMapper()
-                .create(nouvelleUniteRef);
+        Unite nouvelleEntite = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .create(nouvelleUniteRef);
+                });
 
         Assertions.assertNotNull(nouvelleEntite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
@@ -147,8 +178,11 @@ public abstract class UniteMapperImplTest {
 
         Assertions.assertEquals(nouvelleUniteRef.getCode(), nouvelleEntite.getCode());
 
-        Unite entite = mapperManager.getUniteMapper()
-                .retrieve(nouvelleEntite.getIdentifiant());
+        Unite entite = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(nouvelleEntite.getIdentifiant());
+                });
 
         Assertions.assertNotNull(entite);
         Assertions.assertEquals(Long.valueOf(1),
@@ -166,8 +200,12 @@ public abstract class UniteMapperImplTest {
                 new Executable() {
             @Override
             public void execute() throws Throwable {
-                mapperManager.getUniteMapper().create(nouvelleUniteRef);
-                mapperManager.getUniteMapper().create(nouvelleUniteRef);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper().create(nouvelleUniteRef);
+                            mm.getUniteMapper().create(nouvelleUniteRef);
+                            return null;
+                        });
             }
         });
     }
@@ -179,24 +217,39 @@ public abstract class UniteMapperImplTest {
             @Override
             public void execute() throws Throwable {
                 nouvelleUniteRef.setCode(null);
-                mapperManager.getUniteMapper().create(nouvelleUniteRef);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper().create(nouvelleUniteRef);
+                            return null;
+                        });
             }
         });
     }
 
     @Test
     public void testDelete() throws Exception {
-        Unite nouvelleEntite = mapperManager.getUniteMapper()
-                .create(nouvelleUniteRef);
-        Unite entite = mapperManager.getUniteMapper()
-                .retrieve(nouvelleEntite.getIdentifiant());
+        Unite entite = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    Unite nouvelleEntite = mm.getUniteMapper()
+                            .create(nouvelleUniteRef);
+                    return mm.getUniteMapper()
+                            .retrieve(nouvelleEntite.getIdentifiant());
+                });
 
         Assertions.assertNotNull(entite);
 
-        mapperManager.getUniteMapper()
-                .delete(entite);
-        Unite entiteNull = mapperManager.getUniteMapper()
-                .retrieve(entite.getIdentifiant());
+        transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getUniteMapper()
+                            .delete(entite);
+                    return null;
+                });
+
+        Unite entiteNull = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    return mm.getUniteMapper()
+                            .retrieve(entite.getIdentifiant());
+                });
 
         Assertions.assertNull(entiteNull);
     }
@@ -207,18 +260,29 @@ public abstract class UniteMapperImplTest {
                 EntiteTropAnciennePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Unite nouvelleEntite = mapperManager.getUniteMapper()
-                        .create(nouvelleUniteRef);
-                Unite entite = mapperManager.getUniteMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                Unite entite = (Unite) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Unite nouvelleEntite = mm.getUniteMapper()
+                                    .create(nouvelleUniteRef);
+                            return mm.getUniteMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
                 Assertions.assertNotNull(entite);
 
-                mapperManager.getUniteMapper()
-                        .update(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper()
+                                    .update(entite);
+                            return null;
+                        });
 
-                mapperManager.getUniteMapper()
-                        .delete(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper()
+                                    .delete(entite);
+                            return null;
+                        });
             }
         });
 
@@ -230,13 +294,17 @@ public abstract class UniteMapperImplTest {
                 new Executable() {
             @Override
             public void execute() throws Throwable {
-                Unite entite = mapperManager.getUniteMapper()
-                        .retrieve(identifiantCS);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Unite entite = mm.getUniteMapper()
+                                    .retrieve(identifiantCS);
 
-                Assertions.assertNotNull(entite);
+                            Assertions.assertNotNull(entite);
 
-                mapperManager.getUniteMapper()
-                        .delete(entite);
+                            mm.getUniteMapper()
+                                    .delete(entite);
+                            return null;
+                        });
             }
         });
     }
@@ -251,18 +319,26 @@ public abstract class UniteMapperImplTest {
                         .unite(nouvelleUniteRef)
                         .identifiant(IdentifiantBase.builder().build())
                         .build();
-                mapperManager.getUniteMapper()
-                        .delete(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper()
+                                    .delete(entite);
+                            return null;
+                        });
+
             }
         });
     }
 
     @Test
     public void testUpdate() throws Exception {
-        Unite nouvelleEntite = mapperManager.getUniteMapper()
-                .create(nouvelleUniteRef);
-        Unite entite = mapperManager.getUniteMapper()
-                .retrieve(nouvelleEntite.getIdentifiant());
+        Unite entite = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    Unite nouvelleEntite = mm.getUniteMapper()
+                            .create(nouvelleUniteRef);
+                    return mm.getUniteMapper()
+                            .retrieve(nouvelleEntite.getIdentifiant());
+                });
 
         Assertions.assertNotNull(entite.getIdentifiant());
         Assertions.assertEquals(Long.valueOf(1),
@@ -274,10 +350,13 @@ public abstract class UniteMapperImplTest {
                 .build();
         entiteMod.setCode(entite.getCode() + " update");
 
-        mapperManager.getUniteMapper()
-                .update(entiteMod);
-        Unite entiteModifie = mapperManager.getUniteMapper()
-                .retrieve(entiteMod.getIdentifiant());
+        Unite entiteModifie = (Unite) transactionManager.executeTransaction(
+                (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                    mm.getUniteMapper()
+                            .update(entiteMod);
+                    return mm.getUniteMapper()
+                            .retrieve(entiteMod.getIdentifiant());
+                });
 
         Assertions.assertEquals(entiteMod, entiteModifie);
         Assertions.assertEquals(Long.valueOf(2),
@@ -300,10 +379,13 @@ public abstract class UniteMapperImplTest {
                 EntiteTropAnciennePersistenceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                Unite nouvelleEntite = mapperManager.getUniteMapper()
-                        .create(nouvelleUniteRef);
-                Unite entite = mapperManager.getUniteMapper()
-                        .retrieve(nouvelleEntite.getIdentifiant());
+                Unite entite = (Unite) transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Unite nouvelleEntite = mm.getUniteMapper()
+                                    .create(nouvelleUniteRef);
+                            return mm.getUniteMapper()
+                                    .retrieve(nouvelleEntite.getIdentifiant());
+                        });
 
                 Assertions.assertNotNull(entite.getIdentifiant());
                 Assertions.assertEquals(Long.valueOf(1),
@@ -315,11 +397,19 @@ public abstract class UniteMapperImplTest {
                         .build();
                 entiteMod.setCode(entite.getCode() + " update");
 
-                mapperManager.getUniteMapper()
-                        .update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
 
-                mapperManager.getUniteMapper()
-                        .update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
 
             }
         });
@@ -336,7 +426,13 @@ public abstract class UniteMapperImplTest {
                         .unite(nouvelleUniteRef)
                         .identifiant(IdentifiantBase.builder().build())
                         .build();
-                mapperManager.getUniteMapper().update(entiteMod);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            mm.getUniteMapper()
+                                    .update(entiteMod);
+                            return null;
+                        });
+
             }
         });
     }
@@ -347,11 +443,15 @@ public abstract class UniteMapperImplTest {
                 new Executable() {
             @Override
             public void execute() throws Throwable {
-                Unite entite = mapperManager.getUniteMapper()
-                        .retrieve(identifiantCS);
-                entite.setCode(null);
-                mapperManager.getUniteMapper()
-                        .update(entite);
+                transactionManager.executeTransaction(
+                        (TransactionManager.Operation<MapperManager>) (MapperManager mm) -> {
+                            Unite entite = mm.getUniteMapper()
+                                    .retrieve(identifiantCS);
+                            entite.setCode(null);
+                            mm.getUniteMapper()
+                                    .update(entite);
+                            return null;
+                        });
             }
         });
     }

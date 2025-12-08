@@ -6,7 +6,7 @@ public class IngredientMapperImplTest
         extends recette.datasource.IngredientMapperImplTest {
 
     public IngredientMapperImplTest() throws PersistenceException {
-        super(MemoryMapperManagerImpl.getInstance());
+        super(MemoryTransactionManagerImpl.getInstance());
 
         filtreRef = "^.*(aubergine|tomate|thym).*$";
 

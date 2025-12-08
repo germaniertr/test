@@ -9,7 +9,7 @@ import core.datasource.PersistenceException;
 public class UniteMapperImplTest extends recette.datasource.UniteMapperImplTest {
 
     public UniteMapperImplTest() throws PersistenceException {
-        super(MemoryMapperManagerImpl.getInstance());
+        super(MemoryTransactionManagerImpl.getInstance());
 
         filtreRef = "^.*(c.s|g|brins).*$";
     }
