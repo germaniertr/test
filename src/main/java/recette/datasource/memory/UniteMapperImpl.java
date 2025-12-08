@@ -115,6 +115,7 @@ public class UniteMapperImpl implements UniteMapper {
         e.update(entite);
         if (e instanceof UniteMemory um) {
             um.incrementVersion();
+            um.setDateModificationNow();
         }
     }
 

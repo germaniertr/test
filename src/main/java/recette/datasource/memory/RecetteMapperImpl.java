@@ -171,8 +171,8 @@ public class RecetteMapperImpl implements RecetteMapper {
         e.update(entiteModifie);
         if (e instanceof RecetteMemory um) {
             um.incrementVersion();
+            um.setDateModificationNow();
         }
-
     }
 
     @Override
@@ -203,6 +203,7 @@ public class RecetteMapperImpl implements RecetteMapper {
                         .identifiant(entite.getIdentifiant())
                         .build())
                 .version(entite.getVersion())
+                .audit(entite.getAudit())
                 .nom(entite.getNom())
                 .detail(entite.getDetail())
                 .preparation(entite.getPreparation())

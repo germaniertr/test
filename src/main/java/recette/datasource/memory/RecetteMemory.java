@@ -34,6 +34,9 @@ public class RecetteMemory implements Recette {
         this.audit = AuditBase.builder()
                 .dateCreation(Instant.now())
                 .build();
+        if (entite.getAudit() != null) {
+            this.audit = entite.getAudit();
+        }
 
     }
 

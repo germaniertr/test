@@ -146,6 +146,7 @@ public class IngredientMapperImpl implements IngredientMapper {
         e.setRecette(recette);
         if (e instanceof IngredientMemory um) {
             um.incrementVersion();
+            um.setDateModificationNow();
         }
 
     }
