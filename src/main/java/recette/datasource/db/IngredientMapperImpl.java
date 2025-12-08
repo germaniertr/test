@@ -11,7 +11,6 @@ import core.domain.Audit;
 import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,45 +48,39 @@ public class IngredientMapperImpl implements IngredientMapper {
         Ingredient nouvelEntite = null;
         Identifiant id = IdentifiantBase.builder().build();
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.INGREDIENTS.INSERT)) {
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.INGREDIENTS.INSERT)) {
+            ps.setString(1,
+                    id.getUUID());
 
-                ps.setString(1,
-                        id.getUUID());
-
-                if (entite.getNom() != null) {
-                    ps.setString(2,
-                            entite.getNom());
-                } else {
-                    ps.setNull(2,
-                            Types.VARCHAR);
-                }
-                if (entite.getDetail() != null) {
-                    ps.setString(3,
-                            entite.getDetail());
-                } else {
-                    ps.setNull(3,
-                            Types.VARCHAR);
-                }
-                if (entite.getRecette() != null) {
-                    ps.setString(4,
-                            entite.getRecette()
-                                    .getIdentifiant()
-                                    .getUUID());
-                } else {
-                    ps.setNull(4,
-                            Types.VARCHAR);
-                }
-
-                ps.executeUpdate();
-
-                nouvelEntite = this.retrieve(connection, id);
+            if (entite.getNom() != null) {
+                ps.setString(2,
+                        entite.getNom());
+            } else {
+                ps.setNull(2,
+                        Types.VARCHAR);
+            }
+            if (entite.getDetail() != null) {
+                ps.setString(3,
+                        entite.getDetail());
+            } else {
+                ps.setNull(3,
+                        Types.VARCHAR);
+            }
+            if (entite.getRecette() != null) {
+                ps.setString(4,
+                        entite.getRecette()
+                                .getIdentifiant()
+                                .getUUID());
+            } else {
+                ps.setNull(4,
+                        Types.VARCHAR);
             }
 
-            connection.commit();
+            ps.executeUpdate();
+
+            nouvelEntite = this.retrieve(id);
 
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -111,26 +104,6 @@ public class IngredientMapperImpl implements IngredientMapper {
 
     }
 
-    private Ingredient retrieve(final Connection connection,
-            final Identifiant id) throws PersistenceException {
-        Ingredient unite = null;
-
-        try (PreparedStatement ps
-                = connection.prepareStatement(SQL.INGREDIENTS.SELECT_BY_UUID)) {
-            ps.setString(1, id.getUUID());
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                unite = readEntite(rs);
-            }
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            throw new PersistenceException(ex);
-        }
-
-        return unite;
-    }
-
     @Override
     public Ingredient retrieve(final Identifiant id) throws PersistenceException {
         if (id == null) {
@@ -138,12 +111,14 @@ public class IngredientMapperImpl implements IngredientMapper {
         }
         Ingredient entite = null;
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.INGREDIENTS.SELECT_BY_UUID)) {
+            ps.setString(1, id.getUUID());
 
-            entite = this.retrieve(connection, id);
-
-            connection.commit();
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                entite = readEntite(rs);
+            }
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
@@ -160,24 +135,17 @@ public class IngredientMapperImpl implements IngredientMapper {
             return ingredients;
         }
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.INGREDIENTS.SELECT_BY_FILTRE)) {
+            ps.setString(1, filtre);
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.INGREDIENTS.SELECT_BY_FILTRE)) {
-                ps.setString(1, filtre);
-
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    Ingredient unite = readEntite(rs);
-                    if (unite != null) {
-                        ingredients.add(unite);
-                    }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Ingredient unite = readEntite(rs);
+                if (unite != null) {
+                    ingredients.add(unite);
                 }
             }
-
-            connection.commit();
-
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
@@ -207,49 +175,43 @@ public class IngredientMapperImpl implements IngredientMapper {
         }
 
         /* traitement*/
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.INGREDIENTS.UPDATE)) {
-                if (entite.getNom() != null) {
-                    ps.setString(1,
-                            entite.getNom());
-                } else {
-                    ps.setNull(1,
-                            Types.VARCHAR);
-                }
-                if (entite.getDetail() != null) {
-                    ps.setString(2,
-                            entite.getDetail());
-                } else {
-                    ps.setNull(2,
-                            Types.VARCHAR);
-                }
-                if (entite.getRecette() != null) {
-                    ps.setString(3,
-                            entite.getRecette()
-                                    .getIdentifiant()
-                                    .getUUID());
-                } else {
-                    ps.setNull(3,
-                            Types.VARCHAR);
-                }
-
-                ps.setString(4,
-                        entite.getIdentifiant().getUUID());
-
-                ps.setLong(5,
-                        entite.getVersion());
-
-                int row = ps.executeUpdate();
-                if (row == 0) {
-                    throw new EntiteTropAnciennePersistenceException(
-                            entite.toString());
-                }
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.INGREDIENTS.UPDATE)) {
+            if (entite.getNom() != null) {
+                ps.setString(1,
+                        entite.getNom());
+            } else {
+                ps.setNull(1,
+                        Types.VARCHAR);
+            }
+            if (entite.getDetail() != null) {
+                ps.setString(2,
+                        entite.getDetail());
+            } else {
+                ps.setNull(2,
+                        Types.VARCHAR);
+            }
+            if (entite.getRecette() != null) {
+                ps.setString(3,
+                        entite.getRecette()
+                                .getIdentifiant()
+                                .getUUID());
+            } else {
+                ps.setNull(3,
+                        Types.VARCHAR);
             }
 
-            connection.commit();
+            ps.setString(4,
+                    entite.getIdentifiant().getUUID());
+
+            ps.setLong(5,
+                    entite.getVersion());
+
+            int row = ps.executeUpdate();
+            if (row == 0) {
+                throw new EntiteTropAnciennePersistenceException(
+                        entite.toString());
+            }
 
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -292,24 +254,18 @@ public class IngredientMapperImpl implements IngredientMapper {
         }
 
         /* traitement*/
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.INGREDIENTS.DELETE_BY_UUID)) {
+            ps.setString(1, entite.getIdentifiant().getUUID());
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.INGREDIENTS.DELETE_BY_UUID)) {
-                ps.setString(1, entite.getIdentifiant().getUUID());
+            ps.setLong(2,
+                    entite.getVersion());
 
-                ps.setLong(2,
-                        entite.getVersion());
-
-                int row = ps.executeUpdate();
-                if (row == 0) {
-                    throw new EntiteTropAnciennePersistenceException(
-                            entite.toString());
-                }
+            int row = ps.executeUpdate();
+            if (row == 0) {
+                throw new EntiteTropAnciennePersistenceException(
+                        entite.toString());
             }
-
-            connection.commit();
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             if (ex.getSQLState().equals(

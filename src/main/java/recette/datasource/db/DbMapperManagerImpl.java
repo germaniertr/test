@@ -1,9 +1,11 @@
 package recette.datasource.db;
 
 import core.datasource.DatabaseSetup;
+import core.datasource.PersistenceException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+import java.sql.Statement;
 import recette.datasource.IngredientMapper;
 import recette.datasource.MapperManager;
 import recette.datasource.RecetteMapper;
@@ -16,25 +18,15 @@ import recette.datasource.UniteMapper;
 public final class DbMapperManagerImpl implements MapperManager {
 
     private static DbMapperManagerImpl mapperManager;
-    private final DataSource datasource;
+    private final Connection connection;
 
-    public static MapperManager getInstance(final DataSource datasource) {
-        if (mapperManager == null) {
-            mapperManager = new DbMapperManagerImpl(datasource);
-        }
-        return mapperManager;
-    }
     private DatabaseSetupImpl databaseSetup;
     private UniteMapperImpl uniteMapper;
     private IngredientMapperImpl ingredientMapper;
     private RecetteMapperImpl recetteMapper;
 
-    private DbMapperManagerImpl(final DataSource datasource) {
-        this.datasource = datasource;
-    }
-
-    Connection getConnection() throws SQLException {
-        return this.datasource.getConnection();
+    DbMapperManagerImpl(final Connection datasource) {
+        this.connection = datasource;
     }
 
     @Override
@@ -68,6 +60,24 @@ public final class DbMapperManagerImpl implements MapperManager {
             this.databaseSetup = new DatabaseSetupImpl(this);
         }
         return this.databaseSetup;
+    }
+
+    Statement createStatement() throws PersistenceException {
+        try {
+            return this.connection.createStatement();
+        } catch (SQLException ex) {
+            throw new PersistenceException(ex);
+        }
+
+    }
+
+    PreparedStatement prepareStatement(final String query)
+            throws PersistenceException {
+        try {
+            return this.connection.prepareStatement(query);
+        } catch (SQLException ex) {
+            throw new PersistenceException(ex);
+        }
     }
 
 }

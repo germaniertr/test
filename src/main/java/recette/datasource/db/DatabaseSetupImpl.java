@@ -3,7 +3,6 @@ package recette.datasource.db;
 import core.datasource.DatabaseSetup;
 import core.datasource.PersistenceException;
 import core.domain.IdentifiantBase;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,34 +29,30 @@ public class DatabaseSetupImpl implements DatabaseSetup {
 
     @Override
     public void createTables() throws PersistenceException {
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
-            try (Statement requete = connection.createStatement();) {
-                requete.addBatch(SQL.UNITES.CREATE_TABLE);
-                requete.addBatch(SQL.INGREDIENTS.CREATE_TABLE);
-                requete.addBatch(SQL.COMPOSANTS.CREATE_TABLE);
-                requete.addBatch(SQL.RECETTES.CREATE_TABLE);
+        try (Statement requete = this.mapperManager.createStatement();) {
+            requete.addBatch(SQL.UNITES.CREATE_TABLE);
+            requete.addBatch(SQL.INGREDIENTS.CREATE_TABLE);
+            requete.addBatch(SQL.COMPOSANTS.CREATE_TABLE);
+            requete.addBatch(SQL.RECETTES.CREATE_TABLE);
 
-                requete.addBatch(SQL.UNITES.ALTER_TABLE);
-                requete.addBatch(SQL.INGREDIENTS.ALTER_TABLE);
-                requete.addBatch(SQL.COMPOSANTS.ALTER_TABLE);
-                requete.addBatch(SQL.RECETTES.ALTER_TABLE);
+            requete.addBatch(SQL.UNITES.ALTER_TABLE);
+            requete.addBatch(SQL.INGREDIENTS.ALTER_TABLE);
+            requete.addBatch(SQL.COMPOSANTS.ALTER_TABLE);
+            requete.addBatch(SQL.RECETTES.ALTER_TABLE);
 
-                requete.addBatch(SQL.VERROU_OPTIMISTE.CREATE_PROCEDURE);
-                requete.addBatch(SQL.AUDIT.CREATE_PROCEDURE);
+            requete.addBatch(SQL.VERROU_OPTIMISTE.CREATE_PROCEDURE);
+            requete.addBatch(SQL.AUDIT.CREATE_PROCEDURE);
 
-                requete.addBatch(SQL.UNITES.CREATE_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.UNITES.CREATE_TRIGGER_AUDIT);
-                requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_AUDIT);
-                requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_AUDIT);
-                requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_AUDIT);
+            requete.addBatch(SQL.UNITES.CREATE_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.UNITES.CREATE_TRIGGER_AUDIT);
+            requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.INGREDIENTS.CREATE_TRIGGER_AUDIT);
+            requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.RECETTES.CREATE_TRIGGER_AUDIT);
+            requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.COMPOSANTS.CREATE_TRIGGER_AUDIT);
 
-                requete.executeBatch();
-            }
-            connection.commit();
+            requete.executeBatch();
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
@@ -67,30 +62,26 @@ public class DatabaseSetupImpl implements DatabaseSetup {
 
     @Override
     public void dropTables() throws PersistenceException {
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
-            try (Statement requete = connection.createStatement();) {
+        try (Statement requete = this.mapperManager.createStatement();) {
 
-                requete.addBatch(SQL.UNITES.DROP_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.UNITES.DROP_TRIGGER_AUDIT);
-                requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_AUDIT);
-                requete.addBatch(SQL.RECETTES.DROP_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.RECETTES.DROP_TRIGGER_AUDIT);
-                requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_VERROU_OPTIMISTE);
-                requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_AUDIT);
+            requete.addBatch(SQL.UNITES.DROP_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.UNITES.DROP_TRIGGER_AUDIT);
+            requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.INGREDIENTS.DROP_TRIGGER_AUDIT);
+            requete.addBatch(SQL.RECETTES.DROP_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.RECETTES.DROP_TRIGGER_AUDIT);
+            requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_VERROU_OPTIMISTE);
+            requete.addBatch(SQL.COMPOSANTS.DROP_TRIGGER_AUDIT);
 
-                requete.addBatch(SQL.COMPOSANTS.DROP_TABLE);
-                requete.addBatch(SQL.INGREDIENTS.DROP_TABLE);
-                requete.addBatch(SQL.UNITES.DROP_TABLE);
-                requete.addBatch(SQL.RECETTES.DROP_TABLE);
+            requete.addBatch(SQL.COMPOSANTS.DROP_TABLE);
+            requete.addBatch(SQL.INGREDIENTS.DROP_TABLE);
+            requete.addBatch(SQL.UNITES.DROP_TABLE);
+            requete.addBatch(SQL.RECETTES.DROP_TABLE);
 
-                requete.addBatch(SQL.VERROU_OPTIMISTE.DROP_PROCEDURE);
-                requete.addBatch(SQL.AUDIT.DROP_PROCEDURE);
+            requete.addBatch(SQL.VERROU_OPTIMISTE.DROP_PROCEDURE);
+            requete.addBatch(SQL.AUDIT.DROP_PROCEDURE);
 
-                requete.executeBatch();
-            }
-            connection.commit();
+            requete.executeBatch();
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
@@ -103,13 +94,12 @@ public class DatabaseSetupImpl implements DatabaseSetup {
         DemoData data = new DemoData();
         data.initialisation();
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
-            connection.createStatement()
+        try {
+            this.mapperManager.createStatement()
                     .execute("SET CONSTRAINTS ALL DEFERRED");
 
             try (PreparedStatement rc
-                    = connection.prepareStatement(SQL.UNITES.INSERT)) {
+                    = this.mapperManager.prepareStatement(SQL.UNITES.INSERT)) {
 
                 for (Unite e : data.getUnites().values()) {
 
@@ -122,7 +112,7 @@ public class DatabaseSetupImpl implements DatabaseSetup {
             }
 
             try (PreparedStatement rc
-                    = connection.prepareStatement(SQL.INGREDIENTS.INSERT)) {
+                    = this.mapperManager.prepareStatement(SQL.INGREDIENTS.INSERT)) {
 
                 for (Ingredient e : data.getIngredients().values()) {
 
@@ -142,8 +132,8 @@ public class DatabaseSetupImpl implements DatabaseSetup {
             }
 
             try (PreparedStatement rc
-                    = connection.prepareStatement(SQL.RECETTES.INSERT); PreparedStatement rt
-                    = connection.prepareStatement(SQL.COMPOSANTS.INSERT)) {
+                    = this.mapperManager.prepareStatement(SQL.RECETTES.INSERT); PreparedStatement rt
+                    = this.mapperManager.prepareStatement(SQL.COMPOSANTS.INSERT)) {
 
                 for (Recette e : data.getRecettes().values()) {
 
@@ -182,10 +172,7 @@ public class DatabaseSetupImpl implements DatabaseSetup {
                 }
                 rc.executeBatch();
                 rt.executeBatch();
-
             }
-
-            connection.commit();
         } catch (SQLException ex) {
             throw new PersistenceException(ex);
         }

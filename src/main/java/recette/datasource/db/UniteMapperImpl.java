@@ -11,7 +11,6 @@ import core.domain.Audit;
 import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,29 +45,22 @@ public class UniteMapperImpl implements UniteMapper {
         Unite nouvelEntite = null;
         Identifiant id = IdentifiantBase.builder().build();
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.INSERT)) {
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.UNITES.INSERT)) {
+            ps.setString(1, id.getUUID());
 
-                ps.setString(1, id.getUUID());
-
-                if (entite.getCode() != null) {
-                    ps.setString(2,
-                            entite.getCode());
-                } else {
-                    ps.setNull(2,
-                            Types.VARCHAR);
-                }
-
-                ps.executeUpdate();
-
-                nouvelEntite = this.retrieve(connection, id);
+            if (entite.getCode() != null) {
+                ps.setString(2,
+                        entite.getCode());
+            } else {
+                ps.setNull(2,
+                        Types.VARCHAR);
             }
 
-            connection.commit();
+            ps.executeUpdate();
 
+            nouvelEntite = this.retrieve(id);
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             if (ex.getSQLState()
@@ -90,38 +82,20 @@ public class UniteMapperImpl implements UniteMapper {
         return nouvelEntite;
     }
 
-    private Unite retrieve(final Connection connection, final Identifiant id) throws PersistenceException {
-        Unite unite = null;
-
-        try (PreparedStatement ps
-                = connection.prepareStatement(SQL.UNITES.SELECT_BY_UUID)) {
-            ps.setString(1, id.getUUID());
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                unite = readEntite(rs);
-            }
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            throw new PersistenceException(ex);
-        }
-
-        return unite;
-    }
-
-    @Override
     public Unite retrieve(final Identifiant id) throws PersistenceException {
         if (id == null) {
             return null;
         }
         Unite unite = null;
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.SELECT_BY_UUID)) {
+            ps.setString(1, id.getUUID());
 
-            unite = this.retrieve(connection, id);
-
-            connection.commit();
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                unite = readEntite(rs);
+            }
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
@@ -138,23 +112,17 @@ public class UniteMapperImpl implements UniteMapper {
             return unites;
         }
 
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.SELECT_BY_FILTRE)) {
+            ps.setString(1, filtre);
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.UNITES.SELECT_BY_FILTRE)) {
-                ps.setString(1, filtre);
-
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    Unite unite = readEntite(rs);
-                    if (unite != null) {
-                        unites.add(unite);
-                    }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Unite unite = readEntite(rs);
+                if (unite != null) {
+                    unites.add(unite);
                 }
             }
-
-            connection.commit();
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
@@ -185,35 +153,27 @@ public class UniteMapperImpl implements UniteMapper {
         }
 
         /* traitement*/
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.UNITES.UPDATE)) {
-                if (entite.getCode() != null) {
-                    ps.setString(1,
-                            entite.getCode());
-                } else {
-                    ps.setNull(1,
-                            Types.VARCHAR);
-                }
-
-                ps.setString(2,
-                        entite.getIdentifiant().getUUID());
-
-                ps.setLong(3,
-                        entite.getVersion());
-
-                int row = ps.executeUpdate();
-                if (row == 0) {
-                    throw new EntiteTropAnciennePersistenceException(
-                            entite.toString());
-                }
-
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.UPDATE)) {
+            if (entite.getCode() != null) {
+                ps.setString(1,
+                        entite.getCode());
+            } else {
+                ps.setNull(1,
+                        Types.VARCHAR);
             }
 
-            connection.commit();
+            ps.setString(2,
+                    entite.getIdentifiant().getUUID());
 
+            ps.setLong(3,
+                    entite.getVersion());
+
+            int row = ps.executeUpdate();
+            if (row == 0) {
+                throw new EntiteTropAnciennePersistenceException(
+                        entite.toString());
+            }
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             if (ex.getSQLState()
@@ -256,24 +216,17 @@ public class UniteMapperImpl implements UniteMapper {
         }
 
         /* traitement*/
-        try (Connection connection = this.mapperManager.getConnection()) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.DELETE_BY_UUID)) {
+            ps.setString(1, entite.getIdentifiant().getUUID());
+            ps.setLong(2,
+                    entite.getVersion());
 
-            try (PreparedStatement ps
-                    = connection.prepareStatement(SQL.UNITES.DELETE_BY_UUID)) {
-                ps.setString(1, entite.getIdentifiant().getUUID());
-                ps.setLong(2,
-                        entite.getVersion());
-
-                int row = ps.executeUpdate();
-                if (row == 0) {
-                    throw new EntiteTropAnciennePersistenceException(
-                            entite.toString());
-                }
-
+            int row = ps.executeUpdate();
+            if (row == 0) {
+                throw new EntiteTropAnciennePersistenceException(
+                        entite.toString());
             }
-
-            connection.commit();
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             if (ex.getSQLState().equals(
