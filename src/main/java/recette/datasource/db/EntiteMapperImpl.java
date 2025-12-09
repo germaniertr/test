@@ -89,6 +89,9 @@ public abstract class EntiteMapperImpl<E extends Entite> implements Mapper<E> {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 entite = readEntite(rs);
+                if (entite != null) {
+                    retrieveEntitesDependantes(entite);
+                }
             }
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -111,6 +114,7 @@ public abstract class EntiteMapperImpl<E extends Entite> implements Mapper<E> {
             while (rs.next()) {
                 E entite = readEntite(rs);
                 if (entite != null) {
+                    retrieveEntitesDependantes(entite);
                     entites.add(entite);
                 }
             }
@@ -218,5 +222,10 @@ public abstract class EntiteMapperImpl<E extends Entite> implements Mapper<E> {
             throws SQLException, PersistenceException;
 
     protected abstract E readEntite(ResultSet rs) throws SQLException;
+
+    protected void retrieveEntitesDependantes(final E entite)
+            throws SQLException, PersistenceException {
+        //PAr défaut ne fait rien
+    }
 
 }
