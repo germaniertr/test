@@ -32,9 +32,15 @@ public class UniteMapperImpl implements UniteMapper {
 
     private final DbMapperManagerImpl mapperManager;
     private static final Logger LOG = Logger.getLogger(UniteMapperImpl.class.getName());
+    private final String querySelectById;
+    private final String querySelectByFiltre;
+    private final String queryDeleteById;
 
     UniteMapperImpl(final DbMapperManagerImpl mm) {
         this.mapperManager = mm;
+        this.querySelectById = SQL.UNITES.SELECT_BY_UUID;
+        this.querySelectByFiltre = SQL.UNITES.SELECT_BY_FILTRE;
+        this.queryDeleteById = SQL.UNITES.DELETE_BY_UUID;
     }
 
     @Override
@@ -45,21 +51,8 @@ public class UniteMapperImpl implements UniteMapper {
         Unite nouvelEntite = null;
         Identifiant id = IdentifiantBase.builder().build();
 
-        try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.UNITES.INSERT)) {
-
-            ps.setString(1, id.getUUID());
-
-            if (entite.getCode() != null) {
-                ps.setString(2,
-                        entite.getCode());
-            } else {
-                ps.setNull(2,
-                        Types.VARCHAR);
-            }
-
-            ps.executeUpdate();
-
+        try {
+            createEntity(id, entite);
             nouvelEntite = this.retrieve(id);
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -82,6 +75,26 @@ public class UniteMapperImpl implements UniteMapper {
         return nouvelEntite;
     }
 
+    private void createEntity(Identifiant id,
+            final Unite entite) throws SQLException, PersistenceException {
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.INSERT)) {
+
+            ps.setString(1, id.getUUID());
+
+            if (entite.getCode() != null) {
+                ps.setString(2,
+                        entite.getCode());
+            } else {
+                ps.setNull(2,
+                        Types.VARCHAR);
+            }
+
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
     public Unite retrieve(final Identifiant id) throws PersistenceException {
         if (id == null) {
             return null;
@@ -89,7 +102,7 @@ public class UniteMapperImpl implements UniteMapper {
         Unite unite = null;
 
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.UNITES.SELECT_BY_UUID)) {
+                = this.mapperManager.prepareStatement(this.querySelectById)) {
             ps.setString(1, id.getUUID());
 
             ResultSet rs = ps.executeQuery();
@@ -113,7 +126,7 @@ public class UniteMapperImpl implements UniteMapper {
         }
 
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.UNITES.SELECT_BY_FILTRE)) {
+                = this.mapperManager.prepareStatement(this.querySelectByFiltre)) {
             ps.setString(1, filtre);
 
             ResultSet rs = ps.executeQuery();
@@ -133,6 +146,33 @@ public class UniteMapperImpl implements UniteMapper {
     }
 
 //CHECKSTYLE.OFF: MagicNumber
+    private void updateEntity(final Unite entite) throws SQLException, PersistenceException {
+        try (PreparedStatement ps
+                = this.mapperManager.prepareStatement(SQL.UNITES.UPDATE)) {
+
+            if (entite.getCode() != null) {
+                ps.setString(1,
+                        entite.getCode());
+            } else {
+                ps.setNull(1,
+                        Types.VARCHAR);
+            }
+
+            ps.setString(2,
+                    entite.getIdentifiant().getUUID());
+
+            ps.setLong(3,
+                    entite.getVersion());
+
+            int row = ps.executeUpdate();
+            if (row == 0) {
+                throw new EntiteTropAnciennePersistenceException(
+                        entite.toString());
+            }
+
+        }
+    }
+
     @Override
     public void update(final Unite entite) throws PersistenceException {
         if (entite == null) {
@@ -153,27 +193,8 @@ public class UniteMapperImpl implements UniteMapper {
         }
 
         /* traitement*/
-        try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.UNITES.UPDATE)) {
-            if (entite.getCode() != null) {
-                ps.setString(1,
-                        entite.getCode());
-            } else {
-                ps.setNull(1,
-                        Types.VARCHAR);
-            }
-
-            ps.setString(2,
-                    entite.getIdentifiant().getUUID());
-
-            ps.setLong(3,
-                    entite.getVersion());
-
-            int row = ps.executeUpdate();
-            if (row == 0) {
-                throw new EntiteTropAnciennePersistenceException(
-                        entite.toString());
-            }
+        try {
+            updateEntity(entite);
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             if (ex.getSQLState()
@@ -217,7 +238,7 @@ public class UniteMapperImpl implements UniteMapper {
 
         /* traitement*/
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.UNITES.DELETE_BY_UUID)) {
+                = this.mapperManager.prepareStatement(this.queryDeleteById)) {
             ps.setString(1, entite.getIdentifiant().getUUID());
             ps.setLong(2,
                     entite.getVersion());
