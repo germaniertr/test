@@ -1,25 +1,16 @@
 package recette.datasource.db;
 
-import core.datasource.ContrainteNotNullPersistenceException;
-import core.datasource.ContrainteUniquePersistenceException;
-import core.datasource.EntiteInconnuePersistenceException;
 import core.datasource.EntiteTropAnciennePersistenceException;
-import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.PersistenceException;
-import core.datasource.db.SQL_ERREUR_CODES;
 import core.domain.Audit;
-import core.domain.AuditBase;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import recette.datasource.RecetteMapper;
 import recette.domain.Composant;
 import recette.domain.ComposantBase;
@@ -33,25 +24,23 @@ import recette.domain.Unite;
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
 //CHECKSTYLE.OFF: MagicNumber
-public class RecetteMapperImpl implements RecetteMapper {
-
-    private final DbMapperManagerImpl mapperManager;
-    private static final Logger LOG = Logger.getLogger(UniteMapperImpl.class.getName());
+public class RecetteMapperImpl
+        extends EntiteMapperImpl<Recette>
+        implements RecetteMapper {
 
     public RecetteMapperImpl(final DbMapperManagerImpl mm) {
-        this.mapperManager = mm;
+        super(mm,
+                SQL.RECETTES.SELECT_BY_UUID,
+                SQL.RECETTES.SELECT_BY_FILTRE,
+                SQL.RECETTES.DELETE_BY_UUID);
+
     }
 
     @Override
-    public Recette create(final Recette entite) throws PersistenceException {
-        if (entite == null) {
-            return null;
-        }
-        Recette nouvelEntite = null;
-        Identifiant id = IdentifiantBase.builder().build();
-
+    protected void createEntity(final Identifiant id, final Recette entite)
+            throws SQLException, PersistenceException {
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.RECETTES.INSERT)) {
+                = this.getMapperManager().prepareStatement(SQL.RECETTES.INSERT)) {
 
             ps.setString(1,
                     id.getUUID());
@@ -95,120 +84,14 @@ public class RecetteMapperImpl implements RecetteMapper {
                         id,
                         entite.getComposants());
             }
-
-            nouvelEntite = this.retrieve(id);
-
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            if (ex.getSQLState()
-                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_NOT_NULL_VIOLATION)) {
-                throw new ContrainteNotNullPersistenceException(ex);
-            }
-            if (ex.getSQLState()
-                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_UNIQUE_VIOLATION)) {
-                throw new ContrainteUniquePersistenceException(ex);
-            }
-            if (ex.getSQLState()
-                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
-                throw new EntiteInconnuePersistenceException(ex);
-            }
-
-            throw new PersistenceException(ex);
         }
-
-        return nouvelEntite;
-
-    }
-
-    public Recette retrieve(
-            final Identifiant id) throws PersistenceException {
-        if (id == null) {
-            return null;
-        }
-        Recette entite = null;
-
-        try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.RECETTES.SELECT_BY_UUID)) {
-            ps.setString(1, id.getUUID());
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                entite = readEntite(rs);
-                if (entite != null) {
-                    List<Composant> composants
-                            = this.retrieveComposantByUuidRecette(
-                                    entite.getIdentifiant());
-                    for (Composant c : composants) {
-                        entite.getComposants().add(c);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            throw new PersistenceException(ex);
-        }
-        return entite;
     }
 
     @Override
-    public List<Recette> retrieve(final String filtre) throws PersistenceException {
-        List<Recette> recettes = new ArrayList<>();
-
-        if (filtre == null) {
-            return recettes;
-        }
-
+    protected void updateEntity(final Recette entite)
+            throws SQLException, PersistenceException {
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.RECETTES.SELECT_BY_FILTRE)) {
-            ps.setString(1, filtre);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Recette entite = readEntite(rs);
-                if (entite != null) {
-                    List<Composant> composants
-                            = this.retrieveComposantByUuidRecette(
-                                    entite.getIdentifiant());
-                    for (Composant c : composants) {
-                        entite.getComposants().add(c);
-
-                    }
-
-                    recettes.add(entite);
-                }
-            }
-
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            throw new PersistenceException(ex);
-        }
-
-        return recettes;
-
-    }
-
-    @Override
-    public void update(final Recette entite) throws PersistenceException {
-        if (entite == null) {
-            return;
-        }
-
-        if (entite.getIdentifiant() == null) {
-            return;
-        }
-
-        Recette entiteTrouvee
-                = this.retrieve(entite.getIdentifiant());
-        if (entiteTrouvee == null) {
-            throw new EntiteInconnuePersistenceException(
-                    String.format("Erreur: l'entitée (%s) "
-                            + "n'est pas connue!",
-                            entite.toString()));
-        }
-
-        /* traitement*/
-        try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(
+                = this.getMapperManager().prepareStatement(
                         SQL.RECETTES.UPDATE)) {
             if (entite.getNom() != null) {
                 ps.setString(1,
@@ -259,73 +142,25 @@ public class RecetteMapperImpl implements RecetteMapper {
                         entite.getIdentifiant(),
                         entite.getComposants());
             }
-
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            if (ex.getSQLState()
-                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_NOT_NULL_VIOLATION)) {
-                throw new ContrainteNotNullPersistenceException(ex);
-            }
-            if (ex.getSQLState()
-                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_UNIQUE_VIOLATION)) {
-                throw new ContrainteUniquePersistenceException(ex);
-            }
-            if (ex.getSQLState()
-                    .equals(SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
-                throw new EntiteInconnuePersistenceException(ex);
-            }
-
-            throw new PersistenceException(ex);
         }
-
     }
 
     @Override
-    public void delete(final Recette entite) throws PersistenceException {
-        /*pré-condition*/
-        if (entite == null) {
-            return;
-        }
-
-        if (entite.getIdentifiant() == null) {
-            return;
-        }
-
-        Recette entiteTrouvee
-                = this.retrieve(entite.getIdentifiant());
-        if (entiteTrouvee == null) {
-            throw new EntiteInconnuePersistenceException(
-                    String.format("Erreur: l'entitée (%s) "
-                            + "n'est pas connue!",
-                            entite.toString()));
-        }
-
-        /* traitement*/
-        try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.RECETTES.DELETE_BY_UUID)) {
-            ps.setString(1, entite.getIdentifiant().getUUID());
-
-            ps.setLong(2,
-                    entite.getVersion());
-
-            int row = ps.executeUpdate();
-            if (row == 0) {
-                throw new EntiteTropAnciennePersistenceException(
-                        entite.toString());
+    protected void retrieveEntitesDependantes(final Recette entite)
+            throws SQLException, PersistenceException {
+        if (entite != null) {
+            List<Composant> composants
+                    = this.retrieveComposantByUuidRecette(
+                            entite.getIdentifiant());
+            for (Composant c : composants) {
+                entite.getComposants().add(c);
             }
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            if (ex.getSQLState().equals(
-                    SQL_ERREUR_CODES.POSTGRESQL.CONSTRAINT_FOREIGN_KEY_VIOLATION)) {
-                throw new EntiteUtiliseePersistenceException(ex);
-            }
-
-            throw new PersistenceException(ex);
         }
-
     }
 
-    private Recette readEntite(final ResultSet rs) throws SQLException {
+    @Override
+    protected Recette readEntite(final ResultSet rs)
+            throws SQLException {
         Identifiant identifiant = readIdentifiant(rs);
         Long version = rs.getLong(SQL.ENTITES.ATTRIBUTS.VERSION);
         Audit audit = readAudit(rs);
@@ -353,47 +188,12 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     }
 
-    protected Identifiant readIdentifiant(final ResultSet rs)
-            throws SQLException {
-        String uuid = rs.getString(SQL.ENTITES.ATTRIBUTS.UUID);
-
-        return IdentifiantBase.builder()
-                .uuid(uuid)
-                .build();
-    }
-
-    protected Audit readAudit(final ResultSet rs)
-            throws SQLException {
-        Timestamp rsDateCreation
-                = rs.getTimestamp(SQL.ENTITES.ATTRIBUTS.DATE_CREATION);
-        String rsUserCreation
-                = rs.getString(SQL.ENTITES.ATTRIBUTS.USER_CREATION);
-        Timestamp rsDateModification
-                = rs.getTimestamp(SQL.ENTITES.ATTRIBUTS.DATE_MODIFICATION);
-        String rsUserModification
-                = rs.getString(SQL.ENTITES.ATTRIBUTS.USER_MODIFICATION);
-
-        AuditBase.Builder builder = AuditBase.builder()
-                .userCreation(rsUserCreation)
-                .userModification(rsUserModification);
-
-        if (rsDateCreation != null) {
-            builder.dateCreation(rsDateCreation.toInstant());
-        }
-
-        if (rsDateModification != null) {
-            builder.dateModification(rsDateModification.toInstant());
-        }
-
-        return builder.build();
-    }
-
     private List<Composant> retrieveComposantByUuidRecette(
             final Identifiant id)
             throws SQLException, PersistenceException {
         List<Composant> list = new ArrayList<>();
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(
+                = this.getMapperManager().prepareStatement(
                         SQL.COMPOSANTS.SELECT_BY_UUID_RECETTE)) {
             ps.setString(1,
                     id.getUUID());
@@ -430,7 +230,7 @@ public class RecetteMapperImpl implements RecetteMapper {
 
         Ingredient ingredient = null;
         if (ingredientUUID != null) {
-            ingredient = this.mapperManager.getIngredientMapper()
+            ingredient = this.getMapperManager().getIngredientMapper()
                     .retrieve(IdentifiantBase.builder()
                             .uuid(ingredientUUID)
                             .build());
@@ -438,7 +238,7 @@ public class RecetteMapperImpl implements RecetteMapper {
 
         Unite unite = null;
         if (uniteUUID != null) {
-            unite = this.mapperManager.getUniteMapper()
+            unite = this.getMapperManager().getUniteMapper()
                     .retrieve(IdentifiantBase.builder()
                             .uuid(uniteUUID)
                             .build());
@@ -472,7 +272,7 @@ public class RecetteMapperImpl implements RecetteMapper {
     private void deleteComposants(final Identifiant id)
             throws SQLException, PersistenceException {
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.COMPOSANTS.DELETE_BY_UUID_RECETTES)) {
+                = this.getMapperManager().prepareStatement(SQL.COMPOSANTS.DELETE_BY_UUID_RECETTES)) {
             ps.setString(1,
                     id.getUUID());
 
@@ -483,9 +283,10 @@ public class RecetteMapperImpl implements RecetteMapper {
 
     private void insertComposants(
             final Identifiant id,
-            final List<Composant> composants) throws SQLException, PersistenceException {
+            final List<Composant> composants)
+            throws SQLException, PersistenceException {
         try (PreparedStatement ps
-                = this.mapperManager.prepareStatement(SQL.COMPOSANTS.INSERT)) {
+                = this.getMapperManager().prepareStatement(SQL.COMPOSANTS.INSERT)) {
             for (int ordre = 0; ordre < composants.size(); ordre += 1) {
                 Composant c = composants.get(ordre);
 
