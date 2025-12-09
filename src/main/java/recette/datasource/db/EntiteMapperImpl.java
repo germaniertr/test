@@ -10,6 +10,7 @@ import core.datasource.PersistenceException;
 import core.datasource.db.SQL_ERREUR_CODES;
 import core.domain.Audit;
 import core.domain.AuditBase;
+import core.domain.Entite;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
 import java.sql.PreparedStatement;
@@ -20,15 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import recette.domain.Unite;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
-public abstract class EntiteMapperImpl implements Mapper<Unite> {
+public abstract class EntiteMapperImpl<E extends Entite> implements Mapper<E> {
 
-    protected static final Logger LOG = Logger.getLogger(UniteMapperImpl.class.getName());
+    protected static final Logger LOG = Logger.getLogger(EntiteMapperImpl.class.getName());
     private final DbMapperManagerImpl mapperManager;
     private final String querySelectById;
     private final String querySelectByFiltre;
@@ -51,12 +51,12 @@ public abstract class EntiteMapperImpl implements Mapper<Unite> {
     }
 
     @Override
-    public Unite create(final Unite entite)
+    public E create(final E entite)
             throws PersistenceException {
         if (entite == null) {
             return null;
         }
-        Unite nouvelEntite = null;
+        E nouvelEntite = null;
         Identifiant id = IdentifiantBase.builder().build();
         try {
             createEntity(id, entite);
@@ -78,51 +78,51 @@ public abstract class EntiteMapperImpl implements Mapper<Unite> {
     }
 
     @Override
-    public Unite retrieve(final Identifiant id)
+    public E retrieve(final Identifiant id)
             throws PersistenceException {
         if (id == null) {
             return null;
         }
-        Unite unite = null;
+        E entite = null;
         try (PreparedStatement ps = this.mapperManager.prepareStatement(this.querySelectById)) {
             ps.setString(1, id.getUUID());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                unite = readEntite(rs);
+                entite = readEntite(rs);
             }
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
         }
-        return unite;
+        return entite;
     }
 
     @Override
-    public List<Unite> retrieve(final String filtre)
+    public List<E> retrieve(final String filtre)
             throws PersistenceException {
-        List<Unite> unites = new ArrayList<>();
+        List<E> entites = new ArrayList<>();
         if (filtre == null) {
-            return unites;
+            return entites;
         }
         try (PreparedStatement ps
                 = this.mapperManager.prepareStatement(this.querySelectByFiltre)) {
             ps.setString(1, filtre);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Unite unite = readEntite(rs);
-                if (unite != null) {
-                    unites.add(unite);
+                E entite = readEntite(rs);
+                if (entite != null) {
+                    entites.add(entite);
                 }
             }
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new PersistenceException(ex);
         }
-        return unites;
+        return entites;
     }
 
     @Override
-    public void update(final Unite entite)
+    public void update(final E entite)
             throws PersistenceException {
         if (entite == null) {
             return;
@@ -130,7 +130,7 @@ public abstract class EntiteMapperImpl implements Mapper<Unite> {
         if (entite.getIdentifiant() == null) {
             return;
         }
-        Unite entiteTrouvee = this.retrieve(entite.getIdentifiant());
+        E entiteTrouvee = this.retrieve(entite.getIdentifiant());
         if (entiteTrouvee == null) {
             throw new EntiteInconnuePersistenceException(
                     String.format("Erreur: l'entitée (%s) n'est pas connue!",
@@ -153,10 +153,9 @@ public abstract class EntiteMapperImpl implements Mapper<Unite> {
             throw new PersistenceException(ex);
         }
     }
-    //CHECKSTYLE.ON: MagicNumber
 
     @Override
-    public void delete(final Unite entite)
+    public void delete(final E entite)
             throws PersistenceException {
         /*pré-condition*/
         if (entite == null) {
@@ -165,7 +164,7 @@ public abstract class EntiteMapperImpl implements Mapper<Unite> {
         if (entite.getIdentifiant() == null) {
             return;
         }
-        Unite entiteTrouvee = this.retrieve(entite.getIdentifiant());
+        E entiteTrouvee = this.retrieve(entite.getIdentifiant());
         if (entiteTrouvee == null) {
             throw new EntiteInconnuePersistenceException(
                     String.format("Erreur: l'entitée (%s) n'est pas connue!",
@@ -212,12 +211,12 @@ public abstract class EntiteMapperImpl implements Mapper<Unite> {
         return builder.build();
     }
 
-    protected abstract void createEntity(Identifiant id, Unite entite)
+    protected abstract void createEntity(Identifiant id, E entite)
             throws SQLException, PersistenceException;
 
-    protected abstract void updateEntity(Unite entite)
+    protected abstract void updateEntity(E entite)
             throws SQLException, PersistenceException;
 
-    protected abstract Unite readEntite(ResultSet rs) throws SQLException;
+    protected abstract E readEntite(ResultSet rs) throws SQLException;
 
 }

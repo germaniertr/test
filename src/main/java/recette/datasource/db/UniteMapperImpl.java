@@ -17,7 +17,7 @@ import recette.domain.UniteBase;
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
 //CHECKSTYLE.OFF: MagicNumber
-public class UniteMapperImpl extends EntiteMapperImpl implements UniteMapper {
+public class UniteMapperImpl extends EntiteMapperImpl<Unite> implements UniteMapper {
 
     UniteMapperImpl(final DbMapperManagerImpl mm) {
         super(mm,
