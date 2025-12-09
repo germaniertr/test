@@ -1,5 +1,6 @@
 package recette.datasource.db;
 
+import core.datasource.db.EntiteMapperImpl;
 import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Audit;
@@ -17,7 +18,7 @@ import recette.domain.UniteBase;
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
 //CHECKSTYLE.OFF: MagicNumber
-public class UniteMapperImpl extends EntiteMapperImpl<Unite> implements UniteMapper {
+public class UniteMapperImpl extends EntiteMapperImpl<DbMapperManagerImpl, Unite> implements UniteMapper {
 
     UniteMapperImpl(final DbMapperManagerImpl mm) {
         super(mm,

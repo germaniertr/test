@@ -2,6 +2,7 @@ package recette.datasource.db;
 
 import core.datasource.DatabaseSetup;
 import core.datasource.PersistenceException;
+import core.datasource.db.StatementManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -15,9 +16,8 @@ import recette.datasource.UniteMapper;
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
-public final class DbMapperManagerImpl implements MapperManager {
+public final class DbMapperManagerImpl implements MapperManager, StatementManager {
 
-    private static DbMapperManagerImpl mapperManager;
     private final Connection connection;
 
     private DatabaseSetupImpl databaseSetup;
@@ -25,8 +25,8 @@ public final class DbMapperManagerImpl implements MapperManager {
     private IngredientMapperImpl ingredientMapper;
     private RecetteMapperImpl recetteMapper;
 
-    DbMapperManagerImpl(final Connection datasource) {
-        this.connection = datasource;
+    DbMapperManagerImpl(final Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -62,7 +62,8 @@ public final class DbMapperManagerImpl implements MapperManager {
         return this.databaseSetup;
     }
 
-    Statement createStatement() throws PersistenceException {
+    @Override
+    public Statement createStatement() throws PersistenceException {
         try {
             return this.connection.createStatement();
         } catch (SQLException ex) {
@@ -71,7 +72,8 @@ public final class DbMapperManagerImpl implements MapperManager {
 
     }
 
-    PreparedStatement prepareStatement(final String query)
+    @Override
+    public PreparedStatement prepareStatement(final String query)
             throws PersistenceException {
         try {
             return this.connection.prepareStatement(query);

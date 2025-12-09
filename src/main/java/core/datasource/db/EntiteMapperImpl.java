@@ -1,4 +1,4 @@
-package recette.datasource.db;
+package core.datasource.db;
 
 import core.datasource.ContrainteNotNullPersistenceException;
 import core.datasource.ContrainteUniquePersistenceException;
@@ -7,7 +7,6 @@ import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.EntiteUtiliseePersistenceException;
 import core.datasource.Mapper;
 import core.datasource.PersistenceException;
-import core.datasource.db.SQL_ERREUR_CODES;
 import core.domain.Audit;
 import core.domain.AuditBase;
 import core.domain.Entite;
@@ -21,20 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import recette.datasource.db.SQL;
 
 /**
  *
  * @author dominique huguenin (dominique.huguenin@rpn.ch)
  */
-public abstract class EntiteMapperImpl<E extends Entite> implements Mapper<E> {
+public abstract class EntiteMapperImpl<M extends StatementManager, E extends Entite> implements Mapper<E> {
 
     protected static final Logger LOG = Logger.getLogger(EntiteMapperImpl.class.getName());
-    private final DbMapperManagerImpl mapperManager;
+    private final M mapperManager;
     private final String querySelectById;
     private final String querySelectByFiltre;
     private final String queryDeleteById;
 
-    public EntiteMapperImpl(final DbMapperManagerImpl mm,
+    public EntiteMapperImpl(final M mm,
             final String querySelectById,
             final String querySelectByFiltre,
             final String queryDeleteById) {
@@ -46,7 +46,7 @@ public abstract class EntiteMapperImpl<E extends Entite> implements Mapper<E> {
 
     }
 
-    public DbMapperManagerImpl getMapperManager() {
+    public M getMapperManager() {
         return mapperManager;
     }
 

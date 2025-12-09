@@ -1,5 +1,6 @@
 package recette.datasource.db;
 
+import core.datasource.db.EntiteMapperImpl;
 import core.datasource.EntiteTropAnciennePersistenceException;
 import core.datasource.PersistenceException;
 import core.domain.Audit;
@@ -25,7 +26,7 @@ import recette.domain.Unite;
  */
 //CHECKSTYLE.OFF: MagicNumber
 public class RecetteMapperImpl
-        extends EntiteMapperImpl<Recette>
+        extends EntiteMapperImpl<DbMapperManagerImpl, Recette>
         implements RecetteMapper {
 
     public RecetteMapperImpl(final DbMapperManagerImpl mm) {
