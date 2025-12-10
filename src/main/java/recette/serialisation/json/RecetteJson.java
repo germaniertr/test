@@ -6,7 +6,6 @@ import core.serialisation.json.AuditJson;
 import core.serialisation.json.IdentifiantJson;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
-import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.util.List;
 import recette.domain.Composant;
@@ -35,13 +34,20 @@ public class RecetteJson implements Recette {
             @JsonbTypeAdapter(IdentifiantJson.Adapter.class) Identifiant identifiant,
             final @JsonbProperty("version") Long version,
             final @JsonbProperty("audit")
-            @JsonbTypeAdapter(AuditJson.Adapter.class) Audit audit) {
+            @JsonbTypeAdapter(AuditJson.Adapter.class) Audit audit,
+            final @JsonbProperty("composants")
+            @JsonbTypeAdapter(ComposantJson.ListAdapter.class) List<Composant> composants) {
 
-        this.entite = RecetteBase.builder()
+        RecetteBase.Builder builder = RecetteBase.builder()
                 .identifiant(identifiant)
                 .version(version)
-                .audit(audit)
-                .build();
+                .audit(audit);
+
+        for (Composant c : composants) {
+            builder.composant(c);
+        }
+
+        this.entite = builder.build();
     }
 
     @Override
@@ -85,7 +91,8 @@ public class RecetteJson implements Recette {
     }
 
     @Override
-    @JsonbTransient
+    @JsonbProperty("composants")
+    @JsonbTypeAdapter(ComposantJson.ListAdapter.class)
     public List<Composant> getComposants() {
         return this.entite.getComposants();
     }
