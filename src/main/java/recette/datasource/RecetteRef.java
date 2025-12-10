@@ -12,10 +12,7 @@ import recette.domain.Recette;
  */
 public class RecetteRef implements Recette {
 
-    private Identifiant identifiant;
-    private String nom;
-    private String detail;
-    private Long version;
+    private Recette recette;
 
     /**
      *
@@ -23,21 +20,28 @@ public class RecetteRef implements Recette {
      */
     public RecetteRef(final Recette recette) {
         if (recette != null) {
-            this.identifiant = recette.getIdentifiant();
-            this.version = recette.getVersion();
-            this.nom = recette.getNom();
-            this.detail = recette.getDetail();
+            this.recette = recette;
         }
     }
 
     @Override
     public Identifiant getIdentifiant() {
-        return this.identifiant;
+        return this.recette.getIdentifiant();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.recette.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return this.recette.equals(obj);
     }
 
     @Override
     public Long getVersion() {
-        return this.version;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -47,7 +51,7 @@ public class RecetteRef implements Recette {
 
     @Override
     public String getNom() {
-        return this.nom;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -57,7 +61,7 @@ public class RecetteRef implements Recette {
 
     @Override
     public String getDetail() {
-        return this.detail;
+        throw new UnsupportedOperationException();
     }
 
     @Override
