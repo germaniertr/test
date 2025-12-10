@@ -96,4 +96,18 @@ public class AuditJson implements Audit {
 
     }
 
+    public static class Adapter implements JsonbAdapter<Audit, AuditJson> {
+
+        @Override
+        public AuditJson adaptToJson(final Audit base) throws Exception {
+            return new AuditJson(base);
+        }
+
+        @Override
+        public Audit adaptFromJson(final AuditJson json) throws Exception {
+            return json;
+        }
+
+    }
+
 }

@@ -4,6 +4,7 @@ import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import core.domain.Identifiant;
 import core.domain.IdentifiantBase;
+import jakarta.json.bind.adapter.JsonbAdapter;
 
 /**
  *
@@ -48,4 +49,17 @@ public class IdentifiantJson implements Identifiant {
         return "IdentifiantJson{" + "identifiant=" + identifiant + '}';
     }
 
+    public static class Adapter implements JsonbAdapter<Identifiant, IdentifiantJson> {
+
+        @Override
+        public IdentifiantJson adaptToJson(final Identifiant base) throws Exception {
+            return new IdentifiantJson(base);
+        }
+
+        @Override
+        public Identifiant adaptFromJson(final IdentifiantJson json) throws Exception {
+            return json;
+        }
+
+    }
 }
