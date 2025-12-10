@@ -17,6 +17,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import recette.datasource.RecetteRef;
 import recette.domain.Ingredient;
 import recette.domain.IngredientBase;
 import recette.domain.Recette;
@@ -54,9 +55,9 @@ public class IngredientJsonTest {
         nomRef = "nom de référence";
         detailRef = "détail de référence";
 
-        recetteRef = RecetteBase.builder()
+        recetteRef = new RecetteRef(RecetteBase.builder()
                 .identifiant(IdentifiantBase.builder().build())
-                .build();
+                .build());
 
         entiteRef = IngredientBase.builder()
                 .identifiant(identifiantRef)
@@ -103,7 +104,8 @@ public class IngredientJsonTest {
 
         Assertions.assertEquals(this.entiteRef.getNom(), entite.getNom());
         Assertions.assertEquals(this.entiteRef.getDetail(), entite.getDetail());
-//        Assertions.assertEquals(this.entiteRef.getRecette(), entite.getRecette());
+        Assertions.assertEquals(this.entiteRef.getRecette().getIdentifiant(), entite.getRecette().getIdentifiant());        
+        Assertions.assertEquals(this.entiteRef.getRecette(), entite.getRecette());
 
     }
 

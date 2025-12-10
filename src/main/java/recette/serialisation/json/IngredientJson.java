@@ -7,7 +7,6 @@ import core.serialisation.json.IdentifiantJson;
 import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
-import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import recette.domain.Ingredient;
 import recette.domain.IngredientBase;
@@ -69,15 +68,15 @@ public class IngredientJson implements Ingredient {
     }
 
     @Override
-    @JsonbTransient
-    //@JsonbProperty("recette")
+    @JsonbProperty("recette")
+    @JsonbTypeAdapter(RecetteRefJson.Adapter.class)
     public Recette getRecette() {
         return this.entite.getRecette();
     }
 
     @Override
-    @JsonbTransient
-    //@JsonbProperty("recette")
+    @JsonbProperty("recette")
+    @JsonbTypeAdapter(RecetteRefJson.Adapter.class)
     public void setRecette(final Recette recette) {
         this.entite.setRecette(recette);
     }
