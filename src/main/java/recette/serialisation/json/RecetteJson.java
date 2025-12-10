@@ -6,6 +6,7 @@ import core.serialisation.json.AuditJson;
 import core.serialisation.json.IdentifiantJson;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
 import java.util.List;
 import recette.domain.Composant;
@@ -45,67 +46,87 @@ public class RecetteJson implements Recette {
 
     @Override
     public String getNom() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getNom();
     }
 
     @Override
     public void setNom(final String nom) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.entite.setNom(nom);
     }
 
     @Override
     public String getDetail() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getDetail();
     }
 
     @Override
     public void setDetail(final String detail) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.entite.setDetail(detail);
     }
 
     @Override
     public String getPreparation() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getPreparation();
     }
 
     @Override
     public void setPreparation(final String preparation) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.entite.setPreparation(preparation);
     }
 
     @Override
     public Integer getNombrePersonnes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getNombrePersonnes();
     }
 
     @Override
     public void setNombrePersonnes(final Integer nombrePersonnes) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.entite.setNombrePersonnes(nombrePersonnes);
     }
 
     @Override
+    @JsonbTransient
     public List<Composant> getComposants() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getComposants();
     }
 
     @Override
+    @JsonbProperty("identifiant")
+    @JsonbTypeAdapter(IdentifiantJson.Adapter.class)
     public Identifiant getIdentifiant() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getIdentifiant();
     }
 
     @Override
     public Long getVersion() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getVersion();
     }
 
     @Override
+    @JsonbProperty("audit")
+    @JsonbTypeAdapter(AuditJson.Adapter.class)
     public Audit getAudit() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.entite.getAudit();
     }
 
     @Override
     public void update(final Recette pEntite) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.entite.update(entite);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.entite.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return this.entite.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return "RecetteJson{" + "entite=" + entite + '}';
     }
 
 }
