@@ -4,6 +4,7 @@ import core.domain.Audit;
 import core.domain.Identifiant;
 import core.serialisation.json.AuditJson;
 import core.serialisation.json.IdentifiantJson;
+import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
@@ -119,6 +120,20 @@ public class IngredientJson implements Ingredient {
     @Override
     public String toString() {
         return "IngredientJson{" + "entite=" + entite + '}';
+    }
+
+    public static class Adapter implements JsonbAdapter<Ingredient, IngredientJson> {
+
+        @Override
+        public IngredientJson adaptToJson(final Ingredient base) throws Exception {
+            return new IngredientJson(base);
+        }
+
+        @Override
+        public Ingredient adaptFromJson(final IngredientJson json) throws Exception {
+            return json;
+        }
+
     }
 
 }

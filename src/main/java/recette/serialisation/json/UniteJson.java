@@ -4,6 +4,7 @@ import core.domain.Audit;
 import core.domain.Identifiant;
 import core.serialisation.json.AuditJson;
 import core.serialisation.json.IdentifiantJson;
+import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
@@ -91,6 +92,20 @@ public class UniteJson implements Unite {
     @Override
     public String toString() {
         return "UniteJson{" + "entite=" + entite + '}';
+    }
+
+    public static class Adapter implements JsonbAdapter<Unite, UniteJson> {
+
+        @Override
+        public UniteJson adaptToJson(final Unite base) throws Exception {
+            return new UniteJson(base);
+        }
+
+        @Override
+        public Unite adaptFromJson(final UniteJson json) throws Exception {
+            return json;
+        }
+
     }
 
 }
