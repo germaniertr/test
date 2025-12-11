@@ -44,10 +44,11 @@ public class RecetteJsonTest {
     private ArrayList<Object> composantsRef;
     private Recette entiteRef;
     private File fichierEntite;
-    
+    private File fichierEntiteVide;
+
     public RecetteJsonTest() {
     }
-    
+
     @BeforeEach
     public void setUp() {
         identifiantRef = IdentifiantBase.builder().build();
@@ -124,12 +125,12 @@ public class RecetteJsonTest {
                 .composant(composantRef2)
                 .composant(composantRef3)
                 .build();
-        
+
         fichierEntite = new File("target/recette.json");
-        
-        
+        fichierEntiteVide = new File("target/recette-vide.json");
+
     }
-    
+
     @Test
     public void testSerialisationDeserialisation() throws IOException {
         //Sérialisation
@@ -183,8 +184,37 @@ public class RecetteJsonTest {
                     entite.getComposants().get(i).getQuantite());
             Assertions.assertEquals(entiteRef.getComposants().get(i).getUnite(),
                     entite.getComposants().get(i).getUnite());
-        }        
+        }
     }
+    
+    @Test
+    public void testSerialisationDeserialisationRecetteVide() throws IOException {
+        //Sérialisation
+        Recette recetteVide = RecetteBase.builder().build();
+        try (OutputStream os = new FileOutputStream(fichierEntiteVide)) {
+            JsonbConfig config = new JsonbConfig()
+                    .withFormatting(true)
+                    .withStrictIJSON(true);
+            Jsonb jsonb = JsonbBuilder.create(config);
+            jsonb.toJson(new RecetteJson(recetteVide), os);
+        }
+
+        //dé-sérialisation
+        Recette entite;
+        try (InputStream is = new FileInputStream(fichierEntiteVide)) {
+            JsonbConfig config = new JsonbConfig()
+                    .withFormatting(true)
+                    .withStrictIJSON(true);
+            Jsonb jsonb = JsonbBuilder.create(config);
+            entite = jsonb.fromJson(is,
+                    RecetteJson.class);
+        }
+
+        Assertions.assertNotSame(recetteVide, entite);
+        Assertions.assertEquals(recetteVide, entite);
+
+    }
+    
 
     private void testAudit(Audit ref, Audit audit) {
         Assertions.assertEquals(ref, audit);
@@ -194,5 +224,4 @@ public class RecetteJsonTest {
                 audit.getUserModification());
     }
 
-    
 }
