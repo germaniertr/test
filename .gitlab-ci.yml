@@ -46,6 +46,7 @@ workflow:
   tags:
   - docker
   stage: test
+  coverage: '/([0-9.]+) % covered/'
   artifacts:
     when: always
     reports:
@@ -54,9 +55,12 @@ workflow:
       coverage_report:
         coverage_format: jacoco
         path: target/site/jacoco/jacoco.xml      
+    paths:
+      - target/site/jacoco/
   script:
   - 'mvn $MAVEN_CLI_OPTS verify --settings ci_settings.xml'
-
+  - if [ -f target/site/jacoco/jacoco.csv ]; then awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print 100*covered/instructions, "% covered" }' target/site/jacoco/jacoco.csv; fi
+  
 'mvn deploy':
   tags:
   - docker
