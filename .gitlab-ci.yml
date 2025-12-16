@@ -51,6 +51,9 @@ workflow:
     reports:
       junit:
       - './target/surefire-reports/TEST-*.xml'
+      coverage_report:
+        coverage_format: jacoco
+        path: target/site/jacoco/jacoco.xml      
   script:
   - 'mvn $MAVEN_CLI_OPTS verify --settings ci_settings.xml'
 
@@ -70,9 +73,9 @@ workflow:
     fi
   - 'mvn $MAVEN_CLI_OPTS deploy -s ci_settings.xml -B -DskipTests=true'
     
-  - 'echo "PROJECT_GROUP_ID=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" > deploy.env'
-  - 'echo "PROJECT_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> deploy.env'
-  - 'echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> deploy.env'
+  - 'echo "PROJECT_GROUP_ID=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" > ./deploy.env'
+  - 'echo "PROJECT_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> ./deploy.env'
+  - 'echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> ./deploy.env'
 
 .configuration_ssh:
   script:
@@ -108,8 +111,8 @@ workflow:
   
   - git checkout -B "$CI_COMMIT_REF_NAME"  
 
-  - 'echo "PROJECT_GROUP_ID=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" > ansible.env'
-  - 'echo "PROJECT_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> ansible.env'
+  - 'echo "PROJECT_GROUP_ID=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" > ./ansible.env'
+  - 'echo "PROJECT_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> ./ansible.env'
   # extrait la version sans la partie après le tiret
   - echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{ sub(/-SNAPSHOT.*/, ""); print }'  )" >> ansible.env
 
