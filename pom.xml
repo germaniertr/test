@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dhu</groupId>
     <artifactId>recette.lib</artifactId>
-    <version>25.0.1</version>
+    <version>25.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,7 +34,7 @@
         <connection>scm:git:git@mylos.s2.rpn.ch:dhu.projets/recettes/recette.lib</connection>
         <developerConnection>scm:git:git@mylos.s2.rpn.ch:dhu.projets/recettes/recette.lib</developerConnection>
         <url>https://mylos.s2.rpn.ch/gitlab/dhu.projets/recettes/recette.lib</url>
-        <tag>recette.lib-25.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
