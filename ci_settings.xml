@@ -5,7 +5,7 @@
     
     <servers>  
         <server>
-            <id>dhu_project_maven_repo_token</id>
+            <id>dhu_project_maven_repo_token_v2</id>
             <configuration>
                 <httpHeaders>
                     <property>

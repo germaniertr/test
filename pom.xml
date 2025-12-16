@@ -24,34 +24,34 @@
             <timezone>+2</timezone>
         </developer>
     </developers>
-
+    
     <issueManagement>
-        <system>mylos.cifom.ch</system>
-        <url>https://mylos.cifom.ch/gitlab/dhu.projets/recettes/recette.lib/-/issues</url>
+        <system>mylos.s2.rpn.ch</system>
+        <url>https://mylos.s2.rpn.ch/gitlab/dhu.projets/recettes/recette.lib/-/issues</url>
     </issueManagement>    
 
     <scm>
-        <connection>scm:git:git@mylos.cifom.ch:dhu.projets/recettes/recette.lib</connection>
-        <developerConnection>scm:git:git@mylos.cifom.ch:dhu.projets/recettes/recette.lib</developerConnection>
-        <url>https://mylos.cifom.ch/gitlab/dhu.projets/recettes/recette.lib</url>
+        <connection>scm:git:git@mylos.s2.rpn.ch:dhu.projets/recettes/recette.lib</connection>
+        <developerConnection>scm:git:git@mylos.s2.rpn.ch:dhu.projets/recettes/recette.lib</developerConnection>
+        <url>https://mylos.s2.rpn.ch/gitlab/dhu.projets/recettes/recette.lib</url>
         <tag>HEAD</tag>
     </scm>
 
     <repositories>
         <repository>
-            <id>dhu_project_maven_repo_token</id>
-            <url>https://mylos.cifom.ch/gitlab/api/v4/projects/1127/packages/maven</url>
+            <id>dhu_project_maven_repo_token_v2</id>
+            <url>https://mylos.s2.rpn.ch/gitlab/api/v4/projects/4/packages/maven</url>
         </repository>
     </repositories>
     
     <distributionManagement>
         <repository>
-            <id>dhu_project_maven_repo_token</id>
-            <url>https://mylos.cifom.ch/gitlab/api/v4/projects/1127/packages/maven</url>
+            <id>dhu_project_maven_repo_token_v2</id>
+            <url>https://mylos.s2.rpn.ch/gitlab/api/v4/projects/4/packages/maven</url>
         </repository>
         <snapshotRepository>
-            <id>dhu_project_maven_repo_token</id>
-            <url>https://mylos.cifom.ch/gitlab/api/v4/projects/1127/packages/maven</url>
+            <id>dhu_project_maven_repo_token_v2</id>
+            <url>https://mylos.s2.rpn.ch/gitlab/api/v4/projects/4/packages/maven</url>
         </snapshotRepository>
     </distributionManagement>
     
