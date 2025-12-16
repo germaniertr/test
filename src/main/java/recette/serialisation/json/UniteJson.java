@@ -8,6 +8,8 @@ import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
+import java.util.ArrayList;
+import java.util.List;
 import recette.domain.Unite;
 import recette.domain.UniteBase;
 
@@ -106,6 +108,19 @@ public class UniteJson implements Unite {
             return json;
         }
 
+    }
+
+    public static List<UniteJson> getInstance(final List<Unite> list) {
+        if (list == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<UniteJson> entiteJsonList = new ArrayList<>();
+        for (Unite p : list) {
+            entiteJsonList.add(new UniteJson(p));
+        }
+
+        return entiteJsonList;
     }
 
 }
