@@ -76,7 +76,20 @@
                         </goals>
                     </execution>                
                 </executions>
-            </plugin>            
+            </plugin>        
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- Ajoute Implementation-Title, Implementation-Version, etc. -->
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>                
         </plugins>
         
         <pluginManagement>
